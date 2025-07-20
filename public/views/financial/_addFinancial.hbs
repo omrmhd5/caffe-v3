@@ -1,0 +1,342 @@
+{{> header}}
+{{> navbar/navbar}}
+
+
+<style>
+  .table td {
+    height: 75% !important;
+    padding: .2rem !important;
+    text-align: center;
+  }
+  .table th {
+    padding: .6rem !important;
+    text-align: center;
+  }
+  input {text-align: center;}
+</style>
+
+<div class="col-md-12" dir="auto">
+  <div class="headerPage">
+    <div class="Title">
+      <h2 style="text-align: center; color:white;">
+        تقرير المالية لشهر {{ date }}
+      </h2>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header d-print-none">
+      <form class="form-horizontal" action="/financial/add" method="GET">
+        <div class="form-group row">
+          <label for="role" class="col-form-label"> الشهر </label>
+          <div class="col-sm-3">
+            <div class="input-group">
+              <input id="query-date" type="month" name="date" min="2019-01" class="form-control" value="{{date}}"
+                required>
+            </div>
+          </div>
+          <div>
+            <button class="btnclass"> بحث </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-body" style="padding-right: 0; padding-left: 0;">
+      <div class="table-responsive">
+        <table id="add-financial-table" class="table table-light d-print-none">
+          <thead class="thead-light">
+            <tr>
+              <th class="tableheader">
+                <p class="tableheader width8rem"> الفرع</p>
+              </th>
+              <th>
+                <p class="tableheader"> الدخل العم </p>
+              </th>
+              <th>
+                <p class="tableheader">الإيجار </p>
+              </th>
+              <th>
+                <p class="tableheader"> المصروفات</p>
+              </th>
+              <th>
+                <p class="tableheader"> نسبة البنك </p>
+              </th>
+              <th>
+                <p class="tableheader"> الرواتب</p>
+              </th>
+              <th>
+                <p class="tableheader"> رواتب السعوديين </p>
+              </th>
+              <th>
+                <p class="tableheader"> فواتير الخدمات </p>
+              </th>
+              <th>
+                <p class="tableheader"> مصروفات اضافي 1</p>
+              </th>
+              <th scope="col">
+                <p class="tableheader"> مصروفات اضافي 2</p>
+              </th>
+              <th>
+                <p class="tableheader">الصافي</p>
+              </th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each data}}
+            <tr>
+              <td><input type="text" value="{{ branchname }}" class="form-control " disabled> </td>
+              <td><input type="text" value="{{ toFixed income }}" class="form-control income" disabled></td>
+              <td><input type="text" value="{{checkOrZeror rent }}" class="form-control rent"></td>
+              <td><input type="text" value="{{checkOrZeror expenses }}" class="form-control expenses" disabled></td>
+              <td><input type="text" value="{{checkOrZeror bankRatio }}" class="form-control bank-ratio"></td>
+              <td><input type="text" value="{{checkOrZeror salaries }}" class="form-control salaries" disabled></td>
+              <td><input type="text" value="{{checkOrZeror saudizationSalary }}" class="form-control saudizationSalary">
+              </td>
+              <td><input type="text" value="{{checkOrZeror bills }}" class="form-control bills"></td>
+              <td><input type="text" value="{{checkOrZeror bills1 }}" class="form-control bills1"></td>
+              <td><input type="text" value="{{checkOrZeror bills2 }}" class="form-control bills2"></td>
+              <td><input type="text" value="{{ toFixed netIncome }}" class="form-control net-income" disabled></td>
+              <td>
+                <div class="form-button-action">
+                  <input class="branch-id" type="text" value="{{branchID}}" hidden>
+                  <button class="btn btn-link btn-primary btn-lg comments-edit-button" data-toggle="modal"
+                    data-target=".bd-example-modal-lg" data-original-title="تعديل الملاحظات ">
+                    <i class="fa fa-plus"></i>
+                  </button>
+                </div>
+              </td>
+              <td class="financial-comment" hidden>{{comment}}</td>
+              <td class="rent-comment" hidden>{{rentComment}}</td>
+              <td class="branch-id" hidden>{{branchID}}</td>
+            </tr>
+            {{/each}}
+            <tr>
+              <th scope="col"> المجموع</th>
+              <th scope="col"> {{checkOrZeror totals.totalIncome }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalRent }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalExpenses }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalBankRatio }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalSalaries }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalSaudizationSalary }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalBills }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalBills1 }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalBills2 }}</th>
+              <th scope="col" id="total-net-income"> {{toFixed totals.totalNetIncome }}</th>
+            </tr>
+          </tbody>
+        </table>
+        <table id="add-financial-table " class="table table-bordered d-print-block d-none">
+          <thead class="thead-light">
+            <tr>
+              <th>
+                <p class="tableheader"> الفرع</p>
+              </th>
+              <th>
+                <p class="tableheader"> الدخل العم </p>
+              </th>
+              <th>
+                <p class="tableheader">الإيجار </p>
+              </th>
+              <th>
+                <p class="tableheader"> المصروفات</p>
+              </th>
+              <th>
+                <p class="tableheader"> نسبة البنك </p>
+              </th>
+              <th>
+                <p class="tableheader"> الرواتب</p>
+              </th>
+              <th>
+                <p class="tableheader"> رواتب السعوديين </p>
+              </th>
+              <th>
+                <p class="tableheader"> فواتير الخدمات </p>
+              </th>
+              <th>
+                <p class="tableheader"> 1مصروفات اضافي </p>
+              </th>
+              <th>
+                <p class="tableheader"> 2مصروفات اضافي </p>
+              </th>
+              <th>
+                <p class="tableheader">الصافي</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each data}}
+            <tr>
+              <td>{{ branchname }} </td>
+              <td>{{ toFixed income }} </td>
+              <td>{{checkOrZeror rent }} </td>
+              <td>{{checkOrZeror expenses }} </td>
+              <td>{{checkOrZeror bankRatio }}</td>
+              <td>{{checkOrZeror salaries }} </td>
+              <td>{{checkOrZeror saudizationSalary }}
+              </td>
+              <td>{{checkOrZeror bills }} </td>
+              <td>{{checkOrZeror bills1 }} </td>
+              <td>{{checkOrZeror bills2 }} </td>
+              <td>{{ toFixed netIncome }} </td>
+              <td class="financial-comment" hidden>{{comment}}</td>
+              <td class="rent-comment" hidden>{{rentComment}}</td>
+              <td class="branch-id" hidden>{{branchID}}</td>
+            </tr>
+            {{/each}}
+            <tr>
+              <th scope="col"> المجموع</th>
+              <th scope="col"> {{checkOrZeror totals.totalIncome }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalRent }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalExpenses }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalBankRatio }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalSalaries }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalSaudizationSalary }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalBills }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalBills1 }}</th>
+              <th scope="col"> {{checkOrZeror totals.totalBills2 }}</th>
+              <th scope="col" id="total-net-income"> {{toFixed totals.totalNetIncome }}</th>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="modal fade bd-example-modal-lg" id="financialCommentsModal" tabindex="-1" role="dialog"
+          aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalLabel"> ملاحظات </h3>
+              </div>
+              <div class="modal-body">
+                <form id="modalFinancialCommentsForm">
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label for="modal-financial-comment" class="col-form-label float-right">
+                          <h4 class="select"> ملاحظات مالية</h4>
+                        </label>
+                        <input type="text" class="form-control text-right" id="modal-financial-comment">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label for="modal-rent-comment" class="col-form-label float-right">
+                          <h4 class="select"> ملاجظات الإيجار </h4>
+                        </label>
+                        <input type="text" class="form-control text-right" id="modal-rent-comment">
+                      </div>
+                    </div>
+                  </div>
+
+                  <input type="text" id="modal-branch-id" hidden>
+                  <input type="text" id="modal-date" hidden>
+
+                  <div class="form-group">
+                    <button type="button" class="btnclass" data-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btnclass">حفظ </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding-right: 0; padding-left: 0;">
+      <table id="add-row" class="table table-light">
+        <tr>
+          <th scope="col">إجمالي النقد</th>
+          <th scope="col">إجمالي الكوفي شوب</th>
+          <th scope="col">إجمالي الدخل الإضافي والتلفيات</th>
+          <th scope="col">إجمالي مدى / بنوك </th>
+          <th scope="col">إجمالي فيزا / ماستركارد</th>
+          <th scope="col">إجمالي تسوية العمليات البنكية</th>
+          <th scope="col">معدل صافي اليوم</th>
+          <th scope="col">عدد الشركاء</th>
+          <th scope="col">حساب الشركاء</th>
+        </tr>
+        <tr>
+          <td data-type="change"> {{checkOrZeror incomes.cash}}</td>
+          <td data-type="change"> {{checkOrZeror incomes.coffeeShop}}</td>
+          <td data-type="change"> {{checkOrZeror incomes.addedIncome}}</td>
+          <td data-type="change"> {{checkOrZeror incomes.mada}}</td>
+          <td data-type="change"> {{checkOrZeror incomes.visa}}</td>
+          <td data-type="change"> {{checkOrZeror incomes.bankTransfer}} </td>
+          <td data-type="change" id="daily-net-income"></td>
+          <td data-type="change"> <input type="text" id="partners-count" value="{{partnersCount}}" class="form-control">
+          </td>
+          <td data-type="change"> <input type="text" id="partners-value" value="0" class="form-control"> </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="text-right">الملاحظات : </h2>
+    </div>
+    <div class="card-body">
+      <form action="">
+        <div class="row form-group col-12">
+          <div class="col-6">
+            <input type="text" class="form-control text-right" placeholder="أكتب ملاحظة">
+          </div>
+          <div class="col-6">
+            <input type="text" class="form-control text-right" placeholder="أكتب ملاحظة">
+          </div>
+        </div>
+        <div class="row form-group col-12">
+          <div class="col-6">
+            <input type="text" class="form-control text-right" placeholder="أكتب ملاحظة">
+          </div>
+          <div class="col-6">
+            <input type="text" class="form-control text-right" placeholder="أكتب ملاحظة">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="d-none d-print-block">
+  <div class="row">
+    <div class="col-4">
+      <p id="signature2">
+        مراجعة</p>
+    </div>
+
+    <div class="col-4">
+      <p id="signature">
+        التوقيع</p>
+    </div>
+
+    <div class="col-4">
+      <p id="revision">
+        مراجعة
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body d-print-none" style="padding-right: 0; padding-left: 0;">
+    <center>
+      <button class="btn btn-primary btn-lg" id="submit-button">أضف</button>
+      <button class="btn btn-primary btn-lg" id="print-button">اطبع</button>
+    </center>
+  </div>
+</div>
+</div>
+{{> footer}}
+
+<script>
+
+</script>
+{{> footer/financialFooter}}

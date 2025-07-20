@@ -1,0 +1,115 @@
+<style>
+  .table {
+    border-collapse: collapse;
+    color: black;
+  }
+
+  th p {
+    color: black;
+  }
+
+  .table td,
+  .table th {
+    height: 75% !important;
+    padding: .2rem !important;
+    text-align: center;
+  }
+
+  #page-title {
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: auto;
+    color: black;
+    height: 75px;
+    width: 680px;
+    margin: 50px auto;
+  }
+
+  .table-bordered td,
+  .table-bordered th {
+    text-align: center;
+    border-color: black !important;
+  }
+</style>
+
+<div class="card-body d-none d-print-block" style="padding-right: 0; padding-left: 0;" dir="rtl">
+  <div id="page-title" class="headerPage">
+    <h2 style="text-align: center;">
+      الـتقرير الـشـهري المالي ل{{company.companyname}} لـشهر {{ date }}
+    </h2>
+  </div>
+
+  <div class="container">
+    <table id="add-row" class="table table-bordered">
+      <thead >
+        <tr>
+          <th scope="col">
+            <p> الفرع</p>
+          </th>
+          <th scope="col">
+            <p> الدخل العام </p>
+          </th>
+          <th scope="col">
+            <p> الإيجار </p>
+          </th>
+          <th scope="col">
+            <p> المصروفات </p>
+          </th>
+          <th scope="col">
+            <p>نسبة البنك </p>
+          </th>
+          <th scope="col">
+            <p> الرواتب </p>
+          </th>
+          <th scope="col">
+            <p>رواتب السعودة </p>
+          </th>
+          <th scope="col">
+            <p> فواتير الخدمات </p>
+          </th>
+          <th scope="col">
+            <p> مصروفات اضافي 1 </p>
+          </th>
+          <th scope="col">
+            <p> مصروفات اضافي 2</p>
+          </th>
+          <th scope="col">
+            <p> الصافي
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each financials}}
+        <tr>
+          <td>{{ branchID.branchname }}</td>
+          <td>{{ toFixed income }}</td>
+          <td>{{ rent }}</td>
+          <td>{{ expenses }}</td>
+          <td>{{ bankRatio }}</td>
+          <td>{{ salaries }}</td>
+          <td>{{ saudizationSalary }}</td>
+          <td>{{ bills }}</td>
+          <td>{{ bills1 }}</td>
+          <td>{{ bills2 }}</td>
+          <td>{{ toFixed netIncome }}</td>
+        </tr>
+        {{/each}}
+        <tr>
+          <th scope="col"> المجموع</th>
+          <th scope="col"> {{checkOrZeror totals.totalIncome }}</th>
+          <th scope="col"> {{checkOrZeror totals.totalRent }}</th>
+          <th scope="col"> {{checkOrZeror totals.totalExpenses }}</th>
+          <th scope="col"> {{checkOrZeror totals.totalBankRatio }}</th>
+          <th scope="col"> {{checkOrZeror totals.totalSalaries }}</th>
+          <th scope="col"> {{checkOrZeror totals.totalSaudizationSalary }}</th>
+          <th scope="col"> {{checkOrZeror totals.totalBills }}</th>
+          <th scope="col"> {{checkOrZeror totals.totalBills1 }}</th>
+          <th scope="col"> {{checkOrZeror totals.totalBills2 }}</th>
+          <th scope="col"> {{toFixed totals.totalNetIncome }}</th>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

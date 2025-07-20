@@ -1,0 +1,87 @@
+{{> header }}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-12 col-md-6">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div>
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center">إضافة صنف جديد</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="/items/add" method="POST" class="row" id="add-item-form">
+            <div class="form-group col-md-6" id="nameGroup">
+              <label for="itemPrice" class="float-right">
+                <p class="select">سعر الصنف</p>
+              </label>
+              <input type="number" id="itemPrice" name="itemPrice" class="form-control" placeholder="سعر الصنف"
+                dir="rtl" value="{{item.itemPrice}}" required>
+            </div>
+            <div class="form-group col-md-6" id="nameGroup">
+              <label for="itemName" class="float-right">
+                <p class="select">اسم الصنف</p>
+              </label>
+              <input type="text" id="itemName" name="itemName" class="form-control" placeholder="اسم الصنف " dir="rtl"
+                value="{{item.itemName}}" required>
+            </div>
+            <div class="form-group col-md-4 ml-auto" dir="rtl" id="branchGroup">
+              <label for="branchID" class="float-right">
+                <p class="select"> اختر الفرع</p>
+              </label>
+              <select id="branchID" name="branchID" class="form-control" required>
+                <option value="" selected> اختر الفرع </option>
+                {{#each branches}}
+                <option value="{{_id}}" {{selected}}>{{branchname}}</option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="form-group row col-md-8" id="specialGroup">
+              <div class="col-md-8 col-8">
+                <label for="specialItemsCount" class="float-right">
+                  <p class="select"> عدد الأصناف المُكَونة</p>
+                </label>
+                <input type="number" id="specialItemsCount" name="specialItemsCount" class="form-control"
+                  placeholder="عدد الأصناف المُكَونة" dir="rtl" value="1">
+              </div>
+              <div class="col-md-1 col-4 p-0 p-md-auto ml-auto">
+                <label for="expire" class="float-right">
+                  <p class="select"> صنف للبيع ؟</p>
+                  <input type="checkbox" class="form-control mt-md-auto mt-2" id="hasSpecialItems"
+                    name="hasSpecialItems" onclick="specialItemsCountShow()" checked>
+                </label>
+              </div>
+            </div>
+          </form>
+            <div class="modal-footer border-0 center Center row" style="align-items: center;">
+              <a href="/items" class=" btnclass signature btn-round">
+                <h6 class="select"> عودة إلى قائمة الأصناف </h6>
+              </a>
+              <button type="submit" class=" btnclass mx-auto mx-md-2" form="add-item-form">
+                <h6 class="select"> إضافة </h6>
+              </button>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+{{> footer/itemFooter}}
+<script>
+  specialItemsCountShow();
+</script>

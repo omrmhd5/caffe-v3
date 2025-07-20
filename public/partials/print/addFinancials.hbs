@@ -1,0 +1,243 @@
+<style>
+  .table {
+    border-collapse: collapse;
+    color: black;
+  }
+
+  th p {
+    color: black;
+  }
+
+  .table td,
+  .table th {
+    height: 75% !important;
+    padding: .2rem !important;
+    text-align: center;
+  }
+
+  .signature {
+    border: 1px solid black;
+    width: 180px;
+    height: 50px;
+    text-align: center;
+    align-self: center;
+    color: black;
+  }
+
+  #page-title {
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: auto;
+    color: black;
+    height: 75px;
+    width: 680px;
+    margin: 50px auto;
+  }
+
+  .table-bordered td,
+  .table-bordered th {
+    text-align: center;
+    border-color: black !important;
+  }
+</style>
+
+
+<div class="card-body d-none d-print-block" style="padding-right: 0; padding-left: 0;" dir="rtl">
+  <div id="page-title" class="headerPage">
+    <h2>
+      الـتقرير الـشـهري المالي ل{{company.companyname}} لـشهر {{ date }}
+    </h2>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding-right: 0; padding-left: 0;">
+      <div class="table-responsive">
+        <table id="add-financial-table" class="table table-bordered">
+          <thead>
+            <tr>
+              <th>
+                <p> الفرع</p>
+              </th>
+              <th>
+                <p> الدخل العم </p>
+              </th>
+              <th>
+                <p>الإيجار </p>
+              </th>
+              <th>
+                <p> المصروفات</p>
+              </th>
+              <th>
+                <p> نسبة البنك </p>
+              </th>
+              <th>
+                <p> الرواتب</p>
+              </th>
+              <th>
+                <p> رواتب السعودة </p>
+              </th>
+              <th>
+                <p> فواتير الخدمات </p>
+              </th>
+              <th>
+                <p> 1مصروفات اضافي </p>
+              </th>
+              <th>
+                <p> 2مصروفات اضافي </p>
+              </th>
+              <th>
+                <p>الصافي</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each data}}
+            <tr>
+              <td>{{ branchname }} </td>
+              <td>{{ numeral income }} </td>
+              <td>{{numeral rent }} </td>
+              <td>{{numeral expenses }} </td>
+              <td>{{numeral bankRatio }}</td>
+              <td>{{numeral salaries }} </td>
+              <td>{{numeral saudizationSalary }}
+              </td>
+              <td>{{numeral bills }} </td>
+              <td>{{numeral bills1 }} </td>
+              <td>{{numeral bills2 }} </td>
+              <td>{{ numeral netIncome }} </td>
+              <td class="financial-comment" hidden>{{comment}}</td>
+              <td class="rent-comment" hidden>{{rentComment}}</td>
+              <td class="branch-id" hidden>{{branchID}}</td>
+            </tr>
+            {{/each}}
+            <tr>
+              <th scope="col"> المجموع</th>
+              <th scope="col"> {{numeral totals.totalIncome }}</th>
+              <th scope="col"> {{numeral totals.totalRent }}</th>
+              <th scope="col"> {{numeral totals.totalExpenses }}</th>
+              <th scope="col"> {{numeral totals.totalBankRatio }}</th>
+              <th scope="col"> {{numeral totals.totalSalaries }}</th>
+              <th scope="col"> {{numeral totals.totalSaudizationSalary }}</th>
+              <th scope="col"> {{numeral totals.totalBills }}</th>
+              <th scope="col"> {{numeral totals.totalBills1 }}</th>
+              <th scope="col"> {{numeral totals.totalBills2 }}</th>
+              <th scope="col" id="total-net-income"> {{numeral totals.totalNetIncome }}</th>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding-right: 0; padding-left: 0;">
+      <table id="add-row" class="table table-bordered">
+        <tr>
+          <th scope="col">
+            <p>إجمالي النقد </p>
+          </th>
+          <th scope="col">
+            <p> إجمالي دخل الخدمات </p>
+          </th>
+          <th scope="col">
+            <p> إجمالي الدخل الإضافي والتلفيات </p>
+          </th>
+          <th scope="col">
+            <p> إجمالي مدى / بنوك </p>
+          </th>
+          <th scope="col">
+            <p> إجمالي فيزا / ماستركارد </p>
+          </th>
+          <th scope="col">
+            <p>إجمالي تسوية العمليات البنكية </p>
+          </th>
+          <th scope="col">
+            <p> معدل صافي اليوم </p>
+          </th>
+          <th scope="col">
+            <p> عدد الشركاء </p>
+          </th>
+          <th scope="col">
+            <p> حساب الشركاء </p>
+          </th>
+        </tr>
+        <tr>
+          <td data-type="change"> {{numeral incomes.cash}}</td>
+          <td data-type="change"> {{numeral incomes.coffeeShop}}</td>
+          <td data-type="change"> {{numeral incomes.addedIncome}}</td>
+          <td data-type="change"> {{numeral incomes.mada}}</td>
+          <td data-type="change"> {{numeral incomes.visa}}</td>
+          <td data-type="change"> {{numeral incomes.bankTransfer}} </td>
+          <td data-type="change" id="total-net-income-print"></td>
+          <td data-type="change"> <input type="text" id="print-partners-count" value="{{partnersCount}}"
+              class="form-control">
+          </td>
+          <td data-type="change"> <input type="text" id="print-partners-value" value="0" class="form-control"> </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div>
+    <table id="financial-notes-table" class="table table-bordered">
+      <tbody>
+        {{#each notes}}
+        <tr>
+          {{#each this}}
+          <td class="col text-right"> {{note}}</td>
+          {{/each}}
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding-right: 0; padding-left: 0;">
+      <table id="add-rent-note" class="table table-bordered">
+        <tbody>
+          <tr>
+            {{#each data}}
+            <th>
+              <p> {{ branchname }}</p>
+            </th>
+            {{/each}}
+          </tr>
+          <tr>
+            {{#each data}}
+            <td class="rent-branch-id" hidden>{{branchID}}</td>
+            <td>{{rentComment}}</td>
+            {{/each}}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="container ">
+  <div class="d-flex justify-content-center">
+    <div class="col-3 ">
+      <p class="signature" id="signature2">
+        مراجعة
+      </p>
+    </div>
+
+    <div class="col-3">
+      <p class="signature" id="signature">
+        التوقيع
+      </p>
+    </div>
+
+    <div class="col-3">
+      <p class="signature" id="revision">
+        مراجعة
+      </p>
+    </div>
+  </div>
+</div>
+
+{{> footer}}

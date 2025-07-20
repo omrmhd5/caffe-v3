@@ -1,0 +1,138 @@
+<style>
+  .table {
+    border-collapse: collapse;
+    color: black;
+  }
+
+  th p {
+    color: black;
+  }
+
+  .table td,
+  .table th {
+    height: 75% !important;
+    padding: .2rem !important;
+    text-align: center;
+  }
+
+  #page-title {
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: auto;
+    color: black;
+    height: 75px;
+    width: 680px;
+    margin: 50px auto;
+  }
+
+  .tail-border {
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    height: 60px;
+    width: 320px;
+    margin: 50px auto;
+  }
+
+  .table-bordered td,
+  .table-bordered th {
+    text-align: center;
+    border-color: black !important;
+  }
+
+  @page {
+    size: letter landscape
+  }
+</style>
+
+
+
+
+<div class="container col-lg-12 d-none d-print-block" dir="auto" style="border: 1px solid white;">
+  <div>
+    <div id="page-title" class="headerPage">
+      <h2>
+        رواتب شهر {{month}}
+        {{#if branch}}
+        فرع {{branch.branchname}}
+        {{/if}}
+      </h2>
+    </div>
+
+    <div class="card col-lg-12">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table id="add-salary-table" class="table table-bordered">
+            <thead>
+              <tr>
+                <th>
+                  <p> اسم الموظف</p>
+                </th>
+                <th>
+                  <p>الراتب</p>
+                </th>
+                <th>
+                  <p>زيادة بالقيمة </p>
+                </th>
+                <th>
+                  <p> زيادة بالايام </p>
+                </th>
+                <th>
+                  <p> خصم بالقيمة </p>
+                </th>
+                <th>
+                  <p> خصم بالأيام </p>
+                </th>
+                <th>
+                  <p> سلفة</p>
+                </th>
+                <th>
+                  <p> صافي الراتب </p>
+                </th>
+                <th>
+                  <p>التوقيع </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each salaries}}
+              <tr>
+                <td>{{employeeName}}</td>
+                <td hidden><input value="{{_id}}" type="text" class="form-control employee-id"></td>
+                <td hidden><input value="{{branchID}}" type="text" class="form-control branch-id"></td>
+                <td>{{numeral salary}}</td>
+                <td>{{numeral amountIncrease}}
+                </td>
+                <td>{{checkOrZeror daysIncrease}}
+                </td>
+                <td>{{numeral amountDecrease}}
+                </td>
+                <td>{{checkOrZeror daysDecrease}}
+                </td>
+                <td>{{numeral advancePayment}}
+                </td>
+                <td>{{numeral netSalary}}</td>
+                <td>
+                  <h1 style="width: 80px;"></h1>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+          <center class="tail-border">
+            {{#if total}}
+            <h3>مجموع الرواتب <strong id="salary-total">{{numeral total }}</strong></h3>
+            {{/if}}
+            {{#ifEquals total 0}}
+            <h3>مجموع الرواتب <strong id="salary-total">0.00</strong></h3>
+            {{/ifEquals}}
+          </center>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

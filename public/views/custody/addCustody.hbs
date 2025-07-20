@@ -1,0 +1,140 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-12 col-md-6">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div class="card">
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center ">إضافة عهدة جديد</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <form id="createCustodyForm" method="POST" action="/custody/add" class="row">
+            <div class="form-group col-md-6" dir="rtl" id="nameGroup">
+                <div>
+                  <label for="custodyName" class="float-right">
+                    <p class="select"> اسم الصنف</p>
+                  </label>
+                  <input type="text" id="custodyName" name="custodyName" class="form-control" placeholder=" اسم الصنف "
+                    dir="rtl" value="{{custody.custodyName}}" required>
+                </div>
+            </div>
+            <div class="form-group col-md-6" dir="rtl" id="branchGroup">
+              <label for="branchID" class="float-right">
+                <p class="select">الفرع </p>
+              </label>
+              {{#if branchedRole}}
+              <select id="branchID" name="branchID" class="form-control" disabled>
+                <option value="{{branchID._id}}" selected> {{branchID.branchname}} </option>
+              </select>
+              {{else}}
+              <select class="form-control form-control" id="branchID" name="branchID" required>
+                <option value=""> الفرع .. </option>
+                {{#each branches}}
+                <option value="{{_id}}">{{branchname}}</option>
+                {{/each}}
+              </select>
+              {{/if}}
+            </div>
+            <div class="form-group col-md-12" dir="rtl" id="countGroup">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="count" class="float-right">
+                    <p class="select"> العدد </p>
+                  </label>
+                  <input type="number" id="count" name="count" class="form-control" placeholder=" العدد " dir="rtl"
+                    value="{{custody.count}}" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="date" class="float-right">
+                    <p class="select"> عدد التالف </p>
+                  </label>
+                  <input type="number" class="form-control" name="invalidItemsNumber" {{eIn}} id="invalidItemsNumber"
+                    value={{custody.invalidItemsNumber}}>
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-md-12" dir="rtl" id="dateGroup">
+              <div class="row">
+                <div class="col-md-2 col-3">
+                  <label for="expire" class="float-right">
+                    <p class="select"> الصلاحية</p>
+                  </label>
+                  <input type="checkbox" class="form-control cursor" id="expire" name="expire"
+                    onclick="expireDateShow()">
+                </div>
+                <div class="col-md-8 col-8">
+                  <label for="expireDate" class="float-right">
+                    <p class="select"> تاريخ انتهاء الصلاحيه</p>
+                  </label>
+                  <input type="date" class="form-control" name="expireDate" id="expireDate" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-md-12" dir="rtl" id="warrantyGroup">
+              <div class="row">
+                <div class="col-md-2 col-3">
+                  <label for="expire" class="float-right">
+                    <p class="select">الضمان</p>
+                  </label>
+                  <input type="checkbox" class="form-control cursor" id="warranty" name="warranty"
+                    onclick="warrantyShow()">
+                </div>
+                <div class="col-md-8 col-8">
+                  <label for="date" class="float-right">
+                    <p class="select">عدد سنوات الضمان</p>
+                  </label>
+                  <input type="number" class="form-control" name="warrantyYears" id="warrantyYears" disabled>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="modal-footer border-0 center Center row">
+            <a href="/custody" class="btnclass signature px-3 btn-round">
+              <h6 class="select"> عودة إلى قائمة العهدة </h6>
+            </a>
+            <button type="submit" class="btnclass mx-auto mx-md-2" form="createCustodyForm">
+              <h6 class="select"> أضف العهدة </h6>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+{{> footer}}
+
+<script>
+  function warrantyShow() {
+    if (document.querySelector('#warranty').checked)
+      document.querySelector('#warrantyYears').disabled = false;
+    else {
+      document.querySelector('#warrantyYears').disabled = true;
+      document.querySelector('#warrantyYears').value = 0;
+    }
+  }
+  function expireDateShow() {
+    if (document.querySelector('#expire').checked) {
+      document.querySelector('#expireDate').disabled = false;
+    } else {
+      document.querySelector('#expireDate').disabled = true;
+    }
+  }
+</script>
+{{> footer/custodyFooter}}

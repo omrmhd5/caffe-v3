@@ -1,0 +1,270 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<style>
+
+</style>
+
+<div class="container col-md-12" dir="auto">
+  <div class="col-md-12 p-0">
+    <div class="headerPage">
+      <div class="Title">
+        <h2>
+          عرض الفواتير
+          {{#if branch}}
+          فرع {{branch.branchname}}
+          {{/if}}
+        </h2>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header px-0">
+        <form class="form-horizontal" action="/invoice" method="GET" id="search-form">
+          <div class="form-group row mx-3">
+            <label for="branchID" class="col-form-label pt-0">
+              <p class="select"> الفرع</p>
+            </label>
+            <div class="col-sm-2">
+              {{#if branchedRole}}
+              <select id="branchID" name="branchID" class="form-control" disabled>
+                <option value="{{branchID._id}}" selected> {{branchID.branchname}} </option>
+              </select>
+              {{else}}
+              <select id="branchID" name="branchID" class="form-control" onchange="submitSearchForm()" required>
+                <option value="" selected disabled hidden> اختر الفرع </option>
+                {{#each branches}}
+                <option value="{{_id}}" {{selected}}>{{branchname}}</option>
+                {{/each}}
+              </select>
+              {{/if}}
+            </div>
+            <label for="role" class="col-form-label pt-0">
+              <p class="select"> من</p>
+            </label>
+            <div class="col-sm-2" dir="ltr">
+              <div class="input-group">
+                <input type="text" class="form-control" id="fromDate" name="fromDate" value="{{fromDate}}">
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <label for="role" class="col-form-label pt-0">
+              <p class="select"> إلى</p>
+            </label>
+            <div class="col-sm-2" dir="ltr">
+              <div class="input-group">
+                <input type="text" class="form-control" id="toDate" name="toDate" value="{{toDate}}" />
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="role" class="col-form-label col-md-4 col-12">
+                <p class="select"> حالة الضمان </p>
+                <div class="">
+                  <select id="warrantyStatus" name="warrantyStatus" class="form-control">
+                    {{#each statuses}}
+                    <option value="{{value}}" {{selected}}>{{name}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+              </label>
+              <label for="role" class="col-form-label col-md-4 col-12">
+                <p class="select"> الرقم التسلسلي </p>
+                <div class="">
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="registrationNumber" value={{registrationNumber}}>
+                  </div>
+                </div>
+              </label>
+              <label for="role" class="col-form-label col-4">
+                <p class="select"> الوصف </p>
+                <div class="">
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="description" value={{description}}>
+                  </div>
+                </div>
+              </label>
+              <div class="col-sm-1">
+                <button class="btnclass width6rem p-0"> بحث </button>
+              </div>
+            </div>
+        </form>
+      </div>
+      <div class="table-responsive">
+        <table id="add-row" class=" table table-striped">
+          <thead>
+            <tr>
+              <th>
+                <p class="tableheader"> رقم القيد </p>
+              </th>
+              <th>
+                <p class="tableheader"> التاريخ </p>
+              </th>
+              <th>
+                <p class="tableheader"> المبلغ </p>
+              </th>
+              <th>
+                <p class="tableheader"> سنوات الضمان </p>
+              </th>
+              <th style="width:200px">
+                <p class="tableheader"> الوصف </p>
+              </th>
+              <th>
+                <p class="tableheader"> الفرع </p>
+              </th>
+              <th>
+                <p class="tableheader"> الصورة </p>
+              </th>
+              <th>
+                <p class="tableheader"> تفاصيل </p>
+              </th>
+              <th>
+                <p class="tableheader"> تعديل </p>
+              </th>
+              <th>
+                <p class="tableheader"> حذف </p>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each invoices}}
+            <tr>
+              <th scope="row">{{serialNumber}}</th>
+              <td>{{formatDate date}}</td>
+              <td>{{amount}}</td>
+              <td>{{warrantyYears}}</td>
+              <td>{{description}}</td>
+              <td>{{branchID.branchname}}</td>
+              <td>
+                <img src="/{{image}}" width="100px" height="100px" data-toggle="modal"
+                  data-target=".bd-example-modal-lg" data-whatever="{{image}}" class="p-2 cursor"></td>
+              <td>
+                <div class="form-button-action" style="align-items: center;">
+                  <a class="btn btn-primary btn-lg" type="button" data-toggle="tooltip" href="/invoice/{{_id}}"
+                    data-original-title=" بيانات الفاتورة ">
+                    <i class="fa fa-info"></i>
+                  </a>
+                </div>
+              </td>
+              <td {{#if disabled}} class="disabled" {{/if}}>
+              <a class="btn btn-primary btn-lg"
+                  href="/invoice/{{_id}}/edit"><i class="fa fa-pen"></i>
+              </a>
+              </td>
+              <td {{#if disabled}} class="disabled" {{/if}}>
+                <div class="form-button-action">
+                  <a class="btn btn-danger2 text-white" {{disabled}} onclick="deleteInvoice(`{{_id}}`)" data-toggle="tooltip" title=""
+                   data-original-title="حذف الفاتورة">
+                    <i class="fa fa-times"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      <div class="modal bd-example-modal-lg fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true" id="modal-image">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-content">
+            <img id="modal-image-content" width="100%" height="100%" style="object-fit: cover;">
+          </div>
+        </div>
+      </div>
+      <nav aria-label="Page navigation example">
+        <ul class="pagination mt-2">
+          {{#paginate pagination type="previous"}}
+          <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link"
+              href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&description={{../description}}&p={{n}}">السابق</a>
+          </li>
+          {{/paginate}}
+          {{#paginate pagination type="middle" limit="3"}}
+          <li {{#if active}} class="active page-item" {{/if}}><a class="page-link"
+              href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&description={{../description}}&p={{n}}">{{n}}</a>
+          </li>
+          {{/paginate}}
+          {{#paginate pagination type="next"}}
+          <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link"
+              href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&description={{../description}}&p={{n}}">التالي</a>
+          </li>
+          {{/paginate}}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+
+<script>
+  $('#fromDate').datetimepicker({
+    format: 'MM/DD/YYYY',
+    icons: {
+      time: 'fa fa-clock',
+      date: 'fa fa-calendar',
+      up: 'fa fa-chevron-up',
+      down: 'fa fa-chevron-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-check',
+      clear: 'fa fa-trash',
+      close: 'fa fa-times'
+    }
+  });
+
+  $('#toDate').datetimepicker({
+    format: 'MM/DD/YYYY',
+    icons: {
+      time: 'fas fa-clock',
+      date: 'fa fa-calendar',
+      up: 'fa fa-chevron-up',
+      down: 'fa fa-chevron-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-check',
+      clear: 'fa fa-trash',
+      close: 'fa fa-times'
+    }
+  }).on('dp.change', () => {
+    submitSearchForm();
+  });
+
+  const submitSearchForm = () => {
+    let branchID = $('#branchID').val();
+    let fromDate = $('#fromDate').val();
+    let toDate = $('#toDate').val();
+    let form = $('#search-form');
+
+    if (fromDate && toDate && branchID) {
+      if (fromDate > toDate) {
+        $.notify({
+          title: ' الرجاء اختيار تاريخ صحيح ',
+          message: ''
+        }, {
+          type: 'danger',
+          placement: {
+            align: 'center'
+          },
+          delay: 2000,
+        });
+      } else {
+        form.submit();
+      }
+    }
+  }
+
+</script>
+{{> footer/invoiceFooter}}

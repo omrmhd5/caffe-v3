@@ -1,0 +1,140 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div dir="auto">
+  {{#if successMessage}}
+  <div class="alert alert-success alert-dismissable">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+    {{successMessage}}
+  </div>
+  {{/if}}
+  {{#if errorMessage}}
+  <div class="alert alert-danger" role="alert">
+    {{errorMessage}}
+  </div>
+  {{/if}}
+  <div class="" dir="auto">
+    <div class="col-md-12">
+      <div class="headerPage">
+        <div class="Title">
+          <h2>
+            عرض الشركات
+          </h2>
+        </div>
+      </div>
+      <div class="btnclass col-12 col-md-3 signature">
+        <a class=" mr-auto" href="/companies/add">
+          أضافة شركة جديدة
+        </a>
+      </div>
+      <div class="card mt-4">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table id="add-row" class="display table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <p class="tableheader mb-0">اسم الشركة </p>
+                  </th>
+                  <th scope="col">
+                    <p class="tableheader mb-0"> رقم الهاتف </p>
+                  </th>
+                  <th scope="col">
+                    <p class="tableheader mb-0"> عرض تفاصيل الشركة </p>
+                  </th>
+                  <th scope="col">
+                    <p class="tableheader mb-0"> عرض فروع الشركة </p>
+                  </th>
+                  <th scope="col">
+                    <p class="tableheader mb-0"> تعديل بيانات الشركة </p>
+                  </th>
+                  <th scope="col">
+                    <p class="tableheader mb-0">حذف الشركة </p>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each companies}}
+                <tr>
+                  <td>{{companyname}}</td>
+                  <td>{{check phoneNumber}}</td>
+                  <td>
+                    <div class="form-button-action">
+                      <a type="button" data-toggle="tooltip" href="/companies/{{_id}}" class="btn btn-primary btn-lg"
+                        data-original-title=" بيانات الشركة ">
+                        <i class="fa fa-info"></i>
+                      </a>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="form-button-action">
+                      <a type="button" data-toggle="tooltip" href="/branches?companyID={{_id}}"
+                        class="btn btn-primary btn-lg" data-original-title=" فروع الشركة ">
+                        <i class="fa fa-info"></i>
+                      </a>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="form-button-action">
+                      <a type="button" data-toggle="tooltip" href="/companies/{{_id}}/edit"
+                        class="btn btn-primary btn-lg" data-original-title="تعديل بيانات الشركة ">
+                        <i class="fas fa-pencil-alt"></i>
+                      </a>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="form-button-action">
+                      <button type="button" data-toggle="tooltip" onclick="deleteCompany(`{{_id}}`)"
+                        class="btn btn-danger2" data-original-title="حذف">
+                        <i class="fa fa-times"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+            <nav aria-label="Page navigation example">
+              <ul class="pagination mt-2">
+                {{#paginate pagination type="previous"}}
+                <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link" href="?p={{n}}">السابق</a>
+                </li>
+                {{/paginate}}
+                {{#paginate pagination type="middle" limit="3"}}
+                <li {{#if active}} class="active page-item" {{/if}}><a class="page-link" href="?p={{n}}">{{n}}</a></li>
+                {{/paginate}}
+                {{#paginate pagination type="next"}}
+                <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link" href="?p={{n}}">التالي</a>
+                </li>
+                {{/paginate}}
+              </ul>
+            </nav>
+          <div id="imageModal" class="modal">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <img class="modal-content" id="img01">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{> footer}}
+
+    <script>
+      let span = document.getElementsByClassName("close")[0];
+      
+      // When the user clicks on <span> (x), close the modal
+      span.onclick = function () {
+        let modal = document.getElementById("imageModal");
+        modal.style.display = "none";
+      };
+
+      document.body.addEventListener("keydown", function (e) {
+        if (e.key == "Escape" || e.key == "Esc") {
+          modal.style.display = "none";
+        }
+      });
+    </script>
+    {{> footer/companyFooter}}

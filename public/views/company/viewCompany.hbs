@@ -1,0 +1,110 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="container" dir="auto">
+  {{#if successMessage}}
+  <div class="alert alert-success alert-dismissable">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+    {{successMessage}}
+  </div>
+  {{/if}}
+  {{#if errorMessage}}
+  <div class="alert alert-danger" role="alert">
+    {{errorMessage}}
+  </div>
+  {{/if}}
+  <div class="row">
+    <div class="col-md-8">
+      <div class="headerPage">
+        <div class="Title">
+          <h1>تفاصيل شركة : {{company.companyname}} </h1>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <div class="form-group ">
+                <label class="float-right">
+                  <p class="select"> اسم الشركة </p>
+                </label>
+                <input type="text" class="form-control" value="{{check company.companyname}}" disabled>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group ">
+                <label class="float-right">
+                  <p class="select"> البريد الإلكتروني </p>
+                </label>
+                <input type="email" class="form-control" name="email" value="{{check company.email}}" disabled>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <div class="form-group ">
+                <label class="float-right">
+                  <p class="select">رقم الهاتف </p>
+                </label>
+                <input type="text" class="form-control" value="{{check company.phoneNumber}}" disabled>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group ">
+                <label class="float-right">
+                  <p class="select"> العنوان </p>
+                </label>
+                <input type="text" class="form-control" value="{{check company.location}}" disabled>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3 mb-1">
+            <div class="col-md-12">
+              <div class="form-group ">
+                <label class="float-right">
+                  <p class="select">ملاحظات عن الشركة </p>
+                </label>
+                <textarea class="form-control" value="" rows="3" disabled>{{check company.notes}}</textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-0 row">
+            <a href="/companies/{{company._id}}/edit" class="col btn btnclass"> تعديل بيانات الشركة</a>
+            </br>
+            </br>
+            <a href="/companies" class="col btnclass btn btn-round">عودة إلى قائمة الشركات</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card card-profile">
+        <div class="card-body">
+          <div class="user-profile text-center">
+            <td><img src="/{{company.companyImage}}" width="250px" height="280px">
+            </td>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="row user-stats text-center">
+            <div class="col">
+              <div class="number">25K</div>
+              <div class="title">عدد الموظفين</div>
+            </div>
+            <div class="col">
+              <div class="number">134</div>
+              <div class="title">عدد الفروع</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+{{> footer/companyFooter}}

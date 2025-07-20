@@ -1,0 +1,218 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="d-print-none" dir="auto">
+  <div class="col-md-12">
+    <div class="headerPage">
+      <div class="Title">
+        <h2>
+          عرض المبيعات
+          {{#if branch}}
+          فرع {{branch.branchname}}
+          {{/if}}
+        </h2>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <form class="form-horizontal" action="/sales" method="GET" id="search-form">
+          <div class="form-group row p-0">
+            <label for="role" class="col-form-label pt-0">
+              <p class="select"> الفرع </p>
+            </label>
+            <div class="col-sm-2">
+              <select id="branchID" name="branchID" class="form-control" onchange="submitSearchForm()" required>
+                {{#unless branchID}}
+                <option value="" selected>اختار...</option>
+                {{/unless}}
+                {{#each branches}}
+                <option value="{{_id}}" {{selected}}>{{branchname}}</option>
+                {{/each}}
+              </select>
+            </div>
+            <label for="role" class="col-form-label pt-0">
+              <p class="select"> من </p>
+            </label>
+            <div class="col-sm-2" dir="ltr">
+              <div class="input-group">
+                <input type="text" class="form-control" id="fromDate" name="fromDate" value="{{fromDate}}">
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <label for="role" class="col-form-label pt-0">
+              <p class="select"> إلى</p>
+            </label>
+            <div class="col-sm-2" dir="ltr">
+              <div class="input-group">
+                <input type="text" class="form-control" id="toDate" name="toDate" value="{{toDate}}" />
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          <div class="col">
+            <button type="button" class="btnclass col-md-6 width6rem p-0" onclick="submitSearchForm()">
+           بحث
+            </button>
+            <button type="button" class="btnclass col-md-6 btn-round width6rem p-0" id="print-button">
+              اطبع
+            </button>
+          </div>
+          </div>
+      </div>
+      </form>
+    </div>
+    <div class="card-body">
+      {{#if sales.length}}
+      <div class="table-responsive">
+        <table id="add-row" class="display table table-striped table-hover">
+          <thead>
+            <tr>
+              <th scope="col">
+                <p class="tableheader">#
+              </th>
+              <th scope="col">
+                <p class="tableheader"> اسم الصنف </p>
+              </th>
+              <th scope="col">
+                <p class="tableheader"> السعر </p>
+              </th>
+              <th scope="col">
+                <p class="tableheader"> العدد المباع</p>
+              </th>
+              <th scope="col">
+                <p class="tableheader"> اجمالي السعر </p>
+              </th>
+              <th scope="col">
+                <p class="tableheader"> تعديل</p>
+              </th>
+              <th scope="col">
+                <p class="tableheader">حذف </p>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each sales}}
+            <tr>
+              <th scope="row">{{incremented @index}}</th>
+              <td>{{itemID.itemName}}</td>
+              <td>{{price}}</td>
+              <td>{{checkOrZeror boughtquantity}}</td>
+              <td>{{totalprice}}</td>
+              <td>
+                <div class="form-button-action">
+                  <a type="button" href="/sales/{{_id}}/edit" class="btn btn-primary btn-lg"
+                    data-original-title="تعديل بيانات المبيعات">
+                    <i class="fa fa-pen"></i>
+                  </a>
+                </div>
+              </td>
+              <td>
+                <div class="form-button-action">
+                  <a type="button" onclick="deleteSales(`{{_id}}`)" data-toggle="tooltip" title=""
+                    class="btn btn-danger2" data-original-title="حذف المبيعات">
+                    <i class="fa fa-times"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div> 
+      <nav aria-label="Page navigation example mt-5">
+          <ul class="pagination">
+            {{#paginate pagination type="previous"}}
+            <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link"
+                href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&p={{n}}">السابق</a></li>
+            {{/paginate}}
+            {{#paginate pagination type="middle" limit="3"}}
+            <li {{#if active}} class="active page-item" {{/if}}><a class="page-link"
+                href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&p={{n}}">{{n}}</a></li>
+            {{/paginate}}
+            {{#paginate pagination type="next"}}
+            <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link"
+                href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&p={{n}}">التالي</a></li>
+            {{/paginate}}
+          </ul>
+        </nav>
+      {{else}}
+      <div class="alert alert-danger">
+        <center>
+          <h2 class="select text-dark">لا توجد بيانات لعرضها .. اختر فرعا أو غير التاريخ</h2>
+        </center>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+</div>
+
+{{> print/viewSales}}
+{{> footer}}
+
+<script>
+  $('#fromDate').datetimepicker({
+    format: 'MM/DD/YYYY',
+    icons: {
+      time: 'fa fa-clock',
+      date: 'fa fa-calendar',
+      up: 'fa fa-chevron-up',
+      down: 'fa fa-chevron-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-check',
+      clear: 'fa fa-trash',
+      close: 'fa fa-times'
+    }
+  });
+
+  $('#toDate').datetimepicker({
+    format: 'MM/DD/YYYY',
+    icons: {
+      time: 'fas fa-clock',
+      date: 'fa fa-calendar',
+      up: 'fa fa-chevron-up',
+      down: 'fa fa-chevron-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-check',
+      clear: 'fa fa-trash',
+      close: 'fa fa-times'
+    }
+  }).on('dp.change', () => {
+    submitSearchForm()
+  });
+
+  const submitSearchForm = () => {
+    let branchID = $('#branchID').val();
+    let fromDate = $('#fromDate').val();
+    let toDate = $('#toDate').val();
+    let form = $('#search-form');
+
+    if (fromDate && toDate && branchID) {
+      if (fromDate > toDate) {
+        $.notify({
+          title: ' الرجاء اختيار تاريخ صحيح ',
+          message: ''
+        }, {
+          type: 'danger',
+          placement: {
+            align: 'center'
+          },
+          delay: 2000,
+        });
+      } else {
+        form.submit();
+      }
+    }
+  }
+</script>
+
+{{> footer/salesFooter}}

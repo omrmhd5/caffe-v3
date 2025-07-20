@@ -1,0 +1,87 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-md-5 col-12">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div style="padding: 10px;">
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center" style="text-align: center; color:white;"> تعديل العدد المشترى</h2>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <form action="/store/{{store._id}}/edit" method="POST" class="row">
+            <div class="form-group  col-12 col-md-6" id="branchNameGroup">
+              <label for="branchName" class="float-right">
+                <p class="select">الفرع</p>
+              </label>
+              <input id="branchName" name="branchName" class="form-control" dir="rtl"
+                value="{{store.branchID.branchname}}" disabled>
+            </div>
+            <div class="form-group col-12 col-md-6" id="itemNameGroup">
+              <label for="itemName" class="float-right">
+                <p class="select">اسم الصنف</p>
+              </label>
+              <input id="itemName" name="itemName" class="form-control" dir="rtl" value="{{store.itemID.itemName}}"
+                disabled>
+            </div>
+            <div class="form-group  col-12 col-md-6" id="addedQuantityGroup">
+              <label for="addedQuantity" class="float-right">
+                <p class="select"> العدد المضاف</p>
+              </label>
+              <input id="addedQuantity" name="addedQuantity" class="form-control" dir="rtl" value="0">
+            </div>
+            <div class="form-group  col-12 col-md-6" id="boughtQuantityGroup">
+              <label for="boughtQuantity" class="float-right">
+                <p class="select"> العدد المشترى الحالي</p>
+              </label>
+              <input id="boughtQuantity" name="boughtQuantity" class="form-control" dir="rtl"
+                value="{{store.boughtquantity}}" disabled>
+              <input id="originalBoughtQuantity" class="form-control" dir="rtl" value="{{store.boughtquantity}}" hidden>
+            </div>
+            <div class="form-group  col-12" id="newQuantityGroup">
+              <label for="newQuantity" class="float-right">
+                <p class="select"> العدد المشترى بعد الإضافة</p>
+              </label>
+              <input id="newQuantity" name="newQuantity" class="form-control" dir="rtl" value="{{store.boughtquantity}}"
+                disabled>
+            </div>
+            <div class="modal-footer border-0 row col-12 mx-auto">
+              <a href="/store" class=" col btn btnclass btn-border btn-round">عودة إلى عرض المخزون</a>
+              <button class="col btnclass signature"> تعديل</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+<script>
+
+  $("#addedQuantity").on("input", function () {
+    let addedQuantity = parseInt($("#addedQuantity").val()) || 0;
+    let boughtQuantity = $("#originalBoughtQuantity").val();
+
+    let newQuantity = parseInt(boughtQuantity) + parseInt(addedQuantity);
+    console.log('event', newQuantity)
+
+    $("#newQuantity").val(newQuantity);
+  });
+
+</script>
+{{> footer/userFooter}}

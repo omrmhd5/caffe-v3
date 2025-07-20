@@ -1,0 +1,138 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-12 col-md-8">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div style="padding: 10px;">
+        <div class="headerPage">
+          <div class="Title">
+            <h2>
+              تعديل بيانات الشركه
+            </h2>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <form action="/companies/{{company._id}}/edit" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <label for="companyName" class="float-right">
+                    <p class="select">اسم الشركة </p>
+                  </label>
+                  <input type="text" id="companyName" name="companyName" class="form-control" placeholder="اسم الشركة"
+                    dir="rtl">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="companyName" class="float-right">
+                    <p class="select"> الاسم الحالي </p>
+                  </label>
+                  <input type="text" class="form-control" placeholder="اسم الشركة" dir="rtl"
+                    value="{{company.companyname}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <label for="companyName" class="float-right">
+                    <p class="select"> رقم الهاتف </p>
+                  </label>
+                  <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control"
+                    placeholder="رقم هاتف الشركة" dir="rtl">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="float-right">
+                    <p class="select"> رقم الهاتف الحالي </p>
+                  </label>
+                  <input type="text" class="form-control" dir="rtl" value="{{check company.phoneNumber}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col">
+                  <label class="float-right">
+                    <p class="select">البريد الإلكتروني </p>
+                  </label>
+                  <input type="email" id="email" name="email" class="form-control" placeholder="البريد الإلكتروني"
+                    dir="rtl">
+                </div>
+                <div class="col">
+                  <label class="float-right">
+                    <p class="select"> البريد الإلكتروني الحالي </p>
+                  </label>
+                  <input type="text" class="form-control" dir="rtl" value="{{check company.email}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <label class="float-right">
+                    <p class="select"> الموقع</p>
+                  </label>
+                  <input type="text" id="location" name="location" class="form-control" placeholder="موقع الشركة"
+                    dir="rtl">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="float-right">
+                    <p class="select"> الموقع الحالي </p>
+                  </label>
+                  <input type="text" class="form-control" dir="rtl" value="{{check company.location}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <label class="float-right">
+                    <p class="select">ملاحظات </p>
+                  </label>
+                  <input type="text" id="notes" name="notes" class="form-control" placeholder=" ملاحظات عن الشركة"
+                    dir="rtl">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="float-right">
+                    <p class="select"> الملاحظات الحالية</p>
+                  </label>
+                  <input type="text" class="form-control" dir="rtl" value="{{check company.notes}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="float-right">
+                <p class="select"> صورة الشركة </p>
+              </label>
+              <input type="file" class="form-control" name="image" id="image" placeholder="صورة الشركة" dir="rtl">
+            </div>
+            <div class="modal-footer border-0 center Center row" style="align-items: center;">
+              <a href="/companies" class=" btnclass btn-round signature">
+                <h6 class="select"> العودة الى قائمة الشركات
+                </h6>
+              </a>
+              <button type="submit" class=" btnclass">
+                <h6 class="select"> أضف شركة </h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+{{> footer/companyFooter}}

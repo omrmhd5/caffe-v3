@@ -1,0 +1,83 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-12 col-md-8">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div style="padding: 10px;">
+        <div class="headerPage">
+          <div class="Title">
+            <h2>
+              تعديل بيانات الفرع
+            </h2>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <form action="/branches/{{branch._id}}/edit" method="POST">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <label for="branchName" class="float-right">
+                    <p class="select">اسم الفرع الجديد</p>
+                  </label>
+                  <input type="text" id="branchName" name="branchName" class="form-control" placeholder="اسم الفرع" dir="rtl">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="float-right">
+                    <p class="select"> الاسم الحالي </p>
+                  </label>
+                  <input type="text" class="form-control" placeholder="اسم الفرع" dir="rtl" value="{{branch.branchname}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <label for="companyID" class="float-right">
+                    <p class="select">اختر الشركة الجديدة</p>
+                  </label>
+                  <select class="form-control" id="companyID" name="companyID">
+                    <option value="">اختار...</option>
+                    {{#each companies}}
+                      <option value="{{_id}}" {{#if selected}}selected{{/if}}>{{companyname}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="float-right">
+                    <p class="select"> الشركة الحالية </p>
+                  </label>
+                  <input type="text" class="form-control" dir="rtl" value="{{branch.companyID.companyname}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer border-0 center Center row" style="align-items: center;">
+              <a href="/branches" class=" btnclass btn-round signature">
+                <h6 class="select"> العودة الى قائمة الفروع
+                </h6>
+              </a>
+              <button type="submit" class=" btnclass">
+                <h6 class="select"> تعديل </h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+{{> footer/branchFooter}} 

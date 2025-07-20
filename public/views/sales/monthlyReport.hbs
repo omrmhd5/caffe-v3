@@ -1,0 +1,166 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<style>
+  .table td {text-align: center;}
+  .table th {text-align: center;}
+</style>
+
+<div class="d-print-none" dir="auto">
+  <div class="col-md-12">
+    <div class="headerPage">
+      <div class="Title">
+        <h2 style="text-align: center; color:white;">
+          تقرير المبيعات الشهري {{month}}
+          {{#if branch}}
+          فرع {{branch.branchname}}
+          {{/if}}
+        </h2>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <form class="form-horizontal" action="/sales/monthlyReport" id="search-form" method="GET">
+          <div class="form-group row mx-2">
+            <label for="role" class="col-form-label"> من </label>
+            <div class="col-sm-2" dir="ltr">
+              <div class="input-group">
+                <input type="text" class="form-control" id="fromDate" name="fromDate" value="{{fromDate}}">
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <label for="role" class="col-form-label">
+              <p class="select"> إلى</p>
+            </label>
+            <div class="col-sm-2" dir="ltr">
+              <div class="input-group">
+                <input type="text" class="form-control" id="toDate" name="toDate" value="{{toDate}}" />
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-1">
+              <button class="btnclass width6rem p-0"> بحث </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table id="add-row" class="display table table-striped table-hover">
+            <thead>
+              <tr>
+                <th scope="col">
+                  <p class="tableheader"> # </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> التاريخ </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> اجمالي الدخل </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each sales}}
+              <tr>
+                <th scope="row">{{incremented @index}}</th>
+                <td>{{formatDate date}}</td>
+                <td>{{totalPrice}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <center>
+          {{#if total}}
+          <p class="select text-dark">إجمالي المبيعات <strong id="salary-total">{{ total }}</strong></p>
+          {{/if}}
+          {{#ifEquals total 0}}
+          <p class="select text-dark"> إجمالي المبيعات <strong id="salary-total">0.00</strong></p>
+          {{/ifEquals}}
+        </center>
+      </div>
+      <div class="card-footer" style="padding-right: 0; padding-left: 0;">
+        <center>
+          <button class="btnclass" id="print-button">
+            <h6 class="select"> اطبع</h6>
+          </button>
+        </center>
+      </div>
+    </div>
+  </div>
+</div>
+<div>
+  {{> print/salesMonthlyReport}}
+</div>
+{{> footer}}
+<script>
+  $('#fromDate').datetimepicker({
+    format: 'MM/DD/YYYY',
+    icons: {
+      time: 'fa fa-clock',
+      date: 'fa fa-calendar',
+      up: 'fa fa-chevron-up',
+      down: 'fa fa-chevron-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-check',
+      clear: 'fa fa-trash',
+      close: 'fa fa-times'
+    }
+  });
+
+  $('#toDate').datetimepicker({
+    format: 'MM/DD/YYYY',
+    icons: {
+      time: 'fas fa-clock',
+      date: 'fa fa-calendar',
+      up: 'fa fa-chevron-up',
+      down: 'fa fa-chevron-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-check',
+      clear: 'fa fa-trash',
+      close: 'fa fa-times'
+    }
+  }).on('dp.change', () => {
+    submitSearchForm();
+  });
+
+  const submitSearchForm = () => {
+    let fromDate = $('#fromDate').val();
+    let toDate = $('#toDate').val();
+    let form = $('#search-form');
+
+    if (fromDate && toDate) {
+      if (fromDate > toDate) {
+        $.notify({
+          title: ' الرجاء اختيار تاريخ صحيح ',
+          message: ''
+        }, {
+          type: 'danger',
+          placement: {
+            align: 'center'
+          },
+          delay: 2000,
+        });
+      } else {
+        form.submit();
+      }
+    }
+  }
+</script>
+
+{{> footer/salesFooter}}

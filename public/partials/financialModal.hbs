@@ -1,0 +1,96 @@
+	<link rel="stylesheet" href="../assets/css/login.css">
+
+  	<link rel="stylesheet" href="../assets/css/my.css">
+<div class="modal fade bd-example-modal-lg" id="editFinancialModal" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header head">
+        <h3 class="modal-title" id="exampleModalLabel">بيانات المالية </h3>
+      </div>
+      <div class="modal-body">
+        <form id="modalFinancialForm">
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-3 headerClass">
+                <label for="modal-income" class="col-form-label float-right">
+                  <h4 class="select">الدخل العام</h4>
+                </label>
+                <input type="text" class="form-control" id="modal-income" name="modal-income">
+              </div>
+              <div class="col-md-3">
+                <label for="modal-rent" class="col-form-label float-right">
+                  <h4 class="select"> الإيجار</h4>
+                </label>
+                <input  type="number" step=".01",  class="form-control" id="modal-rent" placeholder="hey">
+              </div>
+              <div class="col-md-3">
+                <label for="modal-expenses" class="col-form-label float-right">
+                  <h4 class="select"> المصروفات</h4>
+                </label>
+                <input type="number" step=".01",  class="form-control" id="modal-expenses">
+              </div>
+              <div class="col-md-3">
+                <label for="modal-bank-ratio" class="col-form-label float-right">
+                  <h4 class="select" > نسبة البنك</h4>
+                </label>
+                <input type="number" step=".01",  class="form-control" id="modal-bank-ratio">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-3">
+                <label for="modal-salaries" class="col-form-label float-right">
+                  <h4 class="select"> الرواتب</h4>
+                </label>
+                <input type="number" step=".01",  class="login_input" id="modal-salaries">
+              </div>
+              <div class="col-md-3">
+                <label for="modal-saudization-salary" class="col-form-label float-right">
+                  <h4 class="select">  رواتب السعودة</h4>
+                </label>
+                <input type="number" step=".01",class="login_input" id="modal-saudization-salary">
+              </div>
+              <div class="col-md-3">
+                <label for="modal-bills" class="col-form-label float-right">
+                  <h4 class="select"> فواتير الخدمات</h4>
+                </label>
+                <input type="number" step=".01",  class="login_input" id="modal-bills">
+              </div>
+              <div class="col-md-3">
+                <label for="modal-bills1" class="col-form-label float-right">
+                  <h4 class="select"> مصروفات اضافي 1 	</h4>
+                </label>
+                <input type="number" step=".01",  class="login_input" id="modal-bills1">
+              </div>
+              <input type="text" id="modal-branch-id" hidden>
+              <input type="text" id="modal-date" hidden>
+
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-3">
+                <label for="modal-bills2" class="col-form-label float-right">
+                  <h4 class="select"> مصروفات اضافي 2</h4>
+                </label>
+                <input type="number" step=".01", class="login_input" id="modal-bills2">
+              </div>
+              <div class="col-md-3">
+                <label for="modal-net-income" class="col-form-label float-right">
+                  <h4 class="select"> الصافي</h4>
+                </label>
+                <input type="number" step=".01",  class="login_input" id="modal-net-income" disabled>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
+            <button type="submit" class="btn btn-primary">حفظ </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

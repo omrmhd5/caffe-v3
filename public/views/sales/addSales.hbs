@@ -1,0 +1,173 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<style>
+  .table td {
+    height: 75% !important;
+    padding: .6rem !important;
+  }
+  input {text-align: center;}
+  td {color: black;}  
+  #sales-total, center > h3 {
+    color: black;
+  }
+</style>
+
+<div class="d-print-none" dir="auto">
+  <div class="col-md-12">
+    <div class="headerPage">
+      <div class="Title">
+        <h2 style="text-align: center; color:white;">
+          يوم {{formatDate date }}
+          {{#if branch}}
+          فرع {{branch.branchname}}
+          {{/if}}
+        </h2>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <form class="form-horizontal" action="/sales/add" method="GET" id="search-form">
+          <div class="form-group row">
+            <div class="col-sm-1"></div>
+            <label for="branchID" class="col-form-label">
+              <p class="select"> الفرع </p>
+            </label>
+            <div class="col-sm-2">
+              {{#if branchedRole}}
+              <select id="branchID" name="branchID" class="form-control" disabled>
+                <option value="{{branchID._id}}" selected> {{branch.branchname}} </option>
+              </select>
+              {{else}}
+              <select id="branchID" name="branchID" class="form-control" required>
+                <option value="" selected> اختر الفرع </option>
+                {{#each branches}}
+                <option value="{{_id}}" {{selected}}>{{branchname}}</option>
+                {{/each}}
+              </select>
+              {{/if}}
+            </div>
+            <label for="role" class="col-form-label">
+              <p class="select"> التاريخ </p>
+            </label>
+            <div class="col-sm-2">
+              <div class="input-group" dir="rtl">
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+                <input type="text" class="form-control" id="query-date" name="date" value="{{date}}"
+                  onchange="submitSearchForm()" required>
+              </div>
+            </div>
+            <div class="col-sm-1">
+              <button class="btnclass width6rem p-0"> بحث </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {{#if items.length}}
+
+      <div class="card-body">
+        <center>
+          <div class="col-12">
+            <table id="add-sales-table" class="table">
+              <thead>
+                <tr>
+                  <th style="width: 15%;">
+                    <p class="tableheader"> الصنف </p>
+                  </th>
+                  <th style="width: 20%;">
+                    <p class="tableheader"> العدد المباع </p>
+                  </th>
+                  <th style="width: 15%;">
+                    <p class="tableheader"> سعرالصنف </p>
+                  </th>
+                  <th style="width: 15%;">
+                    <p class="tableheader"> المبلغ </p>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each items}}
+                <tr>
+                  <td hidden><input type="text" class="itemID" value="{{_id}}"></td>
+                  <td hidden><input type="text" class="price" value="{{price}}"></td>
+                  <td> {{itemName}} </td>
+                  <td><input type="number" class="form-control bought-quantity" value="{{boughtquantity}}" {{disabled}}>
+                  </td>
+                  <td><input type="text" class="form-control bought-quantity" value="{{price}}" disabled>
+                  </td>
+                  <td>
+                    <input type="text" class="form-control amount" value="{{multiply boughtquantity price}}" disabled>
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        </center>
+      </div>
+      <div class="card-footer">
+        <div>
+          <center>
+            <input type="text" value="{{dayTotal}}" id="dayTotalValue" hidden>
+            <h3 class="text-dark"> إجمالي اليوم : <strong id="sales-total">{{ dayTotal }} ريال</strong></h3>
+          </center>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="">
+          <div class="col-md-12">
+            <center>
+              <button class="btnclass" id="submit-button" {{isDisabled disabled }}>أضف</button>
+              <button class="btnclass btn-round" id="print-button">اطبع</button>
+            </center>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{else}}
+    <div class="alert alert-danger">
+      <center>
+        <h2 class="text-dark">لا توجد بيانات لعرضها .. اختر فرعا </h2>
+      </center>
+    </div>
+    {{/if}}
+  </div>
+</div>
+{{> print/addSales}}
+{{> footer}}
+
+<script>
+  $('#query-date').datetimepicker({
+    format: 'MM/DD/YYYY',
+    icons: {
+      time: 'fa fa-clock',
+      date: 'fa fa-calendar',
+      up: 'fa fa-chevron-up',
+      down: 'fa fa-chevron-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-check',
+      clear: 'fa fa-trash',
+      close: 'fa fa-times'
+    }
+  }).on('dp.change', () => {
+    if ($('#query-date').val() && ($('#branchID').val() || $('#branchID').is(':disabled'))) {
+      $('#search-form').submit();
+    }
+  });
+
+  let branchID = $('#branchID');
+  branchID.on('change', () => {
+    if ($('#query-date').val()) {
+      $('#search-form').submit();
+    }
+  });
+</script>
+{{> footer/salesFooter}}

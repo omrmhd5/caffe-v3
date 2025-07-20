@@ -1,0 +1,178 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-md-6">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div style="padding: 10px;">
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center" style="text-align: center; color:white;"> تعديل بيانات الصنف</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="/items/{{item._id}}/edit" method="POST">
+            <input type="text" value="{{item._id}}" hidden id="itemID">
+            <div class="form-group" id="itemNameGroup">
+              <div class="form-group"></div>
+              <div class="row">
+                <div class="col">
+                  <label for="itemName" class="float-right">
+                    <p class="select">الاسم الجديد</p>
+                  </label>
+                  <input type="text" id="itemName" name="itemName" class="form-control" placeholder="الاسم الجديد"
+                    dir="rtl">
+                </div>
+                <div class="col">
+                  <label class="float-right">
+                    <p class="select"> الاسم الحالي</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{item.itemName}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" id="itemPriceGroup">
+              <div class="row">
+                <div class="col">
+                  <label for="itemName" class="float-right">
+                    <p class="select">السعر الجديد</p>
+                  </label>
+                  <input type="text" id="itemPrice" name="itemPrice" class="form-control" placeholder="السعر الجديد"
+                    dir="rtl">
+                </div>
+                <div class="col">
+                  <label class="float-right">
+                    <p class="select"> السعر الحالي</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{item.price}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group row checkbox" id="specialGroup">
+              <div class="col-md-10"></div>
+              <div class="col-md-2">
+                {{#if item.isSpecial}}
+                <label for="editIsHidden" class="float-right">
+                  <label class="float-right"> <p class="select">صنف مخفي ؟</p> </label class="">
+                  <input class="form-control mt-md-auto mt-2" type="checkbox" id="editIsHidden" name="editHasSpecialItems"
+                    {{isChecked item.isHidden }}>
+                </label>
+                {{/if}}
+                <label for="editHasSpecialItems" class="float-right">
+                  <label class="float-right"> <p class="select">صنف للبيع ؟</p> </label class="">
+                  <input class="form-control mt-md-auto mt-2" type="checkbox" id="editHasSpecialItems" name="editHasSpecialItems"
+                    onclick="addSpecialItemsShow()" {{isChecked item.isSpecial }} disabled>
+                </label>
+              </div>
+            </div>
+            <br>
+            {{#if item.isSpecial}}
+              <div class="form-group" dir="rtl" id="specialItemsGroup">
+              <div class="row">
+                <div class="col-md-4 col">
+                  <label class="float-right">
+                    <p class="select">الأصناف المُكَونة</p>
+                  </label>
+                </div>
+                <div class="col col-md-2">
+                  <button type="button" class="btn btn-lg btn-primary width6rem" id="add-special-item"
+                  style="font-size: 16px;">
+                   اضف
+                  </button>
+                </div>
+              </div>
+            </div>
+            {{/if}}
+            <div id="special-items">
+              {{#each item.specialItems}}
+              <div class="form-group specialItemsID" dir="rtl">
+                <div class="row">
+                  <input value="{{itemID._id}}" class="itemID" hidden>
+                  <div class="col-md-5">
+                    <input class="form-control" dir="rtl" value="{{itemID.itemName}}" disabled>
+                  </div>
+                  <div class="col-md-4">
+                    <input type="number" class="form-control qty" dir="rtl" value="{{qty}}">
+                  </div>
+                  <div class="col-md-2">
+                    <a onclick="removeSpecialItem(this)" data-toggle="tooltip" title="" class="btn btn-link btn-danger"
+                      data-original-title="حذف الصنف">
+                      <i class="fa fa-trash"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              {{/each}}
+            </div>
+        </div>
+        <div class="modal-footer border-0">
+          <a href="/items" class="col btn btn-border btn-round btnclass">عودة إلى قائمة الأصناف
+          </a>
+          <button class="col btn btn-lg btnclass" type="button"
+            onclick="updateItem()"> تعديل </button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script id="selectItemTemplate" type="text/x-handlebars-template">
+  <select class="form-control itemID"  name="itemID" required>
+    <option value="" selected disabled hidden> اختر الصنف </option>
+    {{#each items}}
+    <option value="{{_id}}"> {{itemName}} </option>
+    {{/each}}
+  </select>
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"
+  integrity="sha512-RNLkV3d+aLtfcpEyFG8jRbnWHxUqVZozacROI4J2F1sTaDqo1dPQYs01OMi1t1w9Y2FdbSCDSQ2ZVdAC8bzgAg=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+  const addSpecialItem = (event) => {
+    event.preventDefault();
+    const itemsTemplate = $("#selectItemTemplate").html();
+    const templateScript = Handlebars.compile(itemsTemplate);
+    let wrapper = $("#special-items");
+    let input = null;
+    input =
+      '<div class="form-group specialItemsID" dir="rtl">' +
+      '<div class="row">' +
+      '<div class="col-md-5">' +
+
+      templateScript() +
+
+      '</div>' +
+
+      '<div class="col-md-4">' +
+      '<input type="number" class="form-control qty" dir="rtl" value="{{qty}}">' +
+      '</div>' +
+
+      '<div class="col-md-1 mt-md-0 mt-1">' +
+      '<a onclick="removeSpecialItem(this)" data-toggle="tooltip" title=""' +
+      'class="btn btn-danger2" data-original-title="حذف الصنف">' +
+      '<i class="fa fa-trash"></i>' +
+      '</a>' +
+      '</div>' +
+      "</div></div>";
+
+    $(wrapper).append(input);
+  };
+
+</script>
+
+{{> footer}}
+{{> footer/itemFooter}}

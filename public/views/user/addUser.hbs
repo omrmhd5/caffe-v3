@@ -1,0 +1,147 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center py-3">
+    <div class="col-md-7 col-12">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div>
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center">إضافة مستخدم جديد</h2>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <form action="/users/add" method="POST" class="col-12">
+            <div class="form-group col-md-6 col-12 float-right" dir="rtl">
+              <label for="role" class="float-right">
+                <p class="select"> اختر الصلاحية</p>
+              </label>
+              <select class="form-control form-control" id="role" name="role" required>
+                {{#each roles}}
+                <option value="{{value}}"> {{name}} </option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="form-group col-md-6 col-12 float-right" id="nameGroup">
+              <label for="fullName" class="float-right">
+                <p class="select">الاسم</p>
+              </label>
+              <input type="text" id="fullName" name="fullName" class="form-control" placeholder="الاسم " dir="rtl"
+                value="{{fullName}}">
+            </div>
+            <div class="form-group col-md-6 col-12 float-right" id="usernameGroup">
+              <label for="userName" class="float-right">
+                <p class="select">اسم المستخدم </p>
+              </label>
+              <input type="text" id="userName" name="userName" class="form-control" placeholder="اسم المستخدم" dir="rtl"
+                value="{{userName}}">
+            </div>
+            <div class="form-group col-md-6 col-12 float-right" id="emailGroup">
+              <label for="email" class="float-right">
+                <p class="select"> البريد الالكتروني </p>
+              </label>
+              <input type="text" id="email" name="email" class="form-control" placeholder="البريد الالكتروني" dir="rtl"
+                value="{{email}}">
+            </div>
+            <div class="form-group" id="passwordGroup">
+              <label for="password" class="float-right">
+                <p class="select">كلمة المرور </p>
+              </label>
+              <input type="password" id="password" name="password" class="form-control" placeholder="كلمة المرور"
+                dir="rtl" required>
+            </div>
+            <div class="form-group" dir="rtl" id="branchGroup">
+              <label for="branchID" class="float-right">
+                <p class="select">اختر الفرع</p>
+              </label>
+              <select class="form-control" id="branchID" name="branchID">
+                <option class="select" value=""> الفرع .. </option>
+                {{#each branches}}
+                <option value="{{_id}}" {{selected}}>{{branchname}}</option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="Center row">
+              <a href="/users" class=" btnclass btn-round">
+                <h6 class="select">الرجوع</h6>
+              </a>
+              <button type="submit" class=" btnclass">
+                <h6 class="select"> أضف المستخدم </h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+
+<script>
+  const showFields = (role) => {
+
+    const branchGroup = document.querySelector("#branchGroup");
+    const branch = document.querySelector("#branchID");
+
+    const passwordGroup = document.querySelector("#passwordGroup");
+    const password = document.querySelector("#password");
+
+    const nameGroup = document.querySelector("#nameGroup");
+    const name = document.querySelector("#fullName");
+
+    const usernameGroup = document.querySelector("#usernameGroup");
+    const username = document.querySelector("#userName");
+
+    if (role === 'AccountantManager' || role === 'Manager' || role === 'Accountant' || role === 'StoreMan') {
+      passwordGroup.style.display = "block";
+      usernameGroup.style.display = "block";
+      branchGroup.style.display = "none";
+
+      branch.required = false;
+      password.required = true;
+      username.required = true;
+    } else if (role === 'BranchAccountant' || role === 'Cashier' || role === 'Invoicer' || role === 'BranchStoreMan') {
+      branchGroup.style.display = "block";
+      usernameGroup.style.display = "block";
+      passwordGroup.style.display = "block";
+
+      branch.required = true;
+      password.required = true;
+      username.required = true;
+    } else if (role === 'Employee') {
+      branchGroup.style.display = "block";
+      nameGroup.style.display = "block";
+      passwordGroup.style.display = "none";
+      usernameGroup.style.display = "none";
+
+      branch.required = true;
+      name.required = true;
+      username.required = false;
+      password.required = false;
+    }
+  }
+
+  let role = $("select#role").val();
+  if (role) {
+    showFields(role);
+  }
+
+  $("select#role").on('change', function () {
+    let role = $(this).val();
+    showFields(role)
+  });
+</script>
+{{> footer/userFooter}}

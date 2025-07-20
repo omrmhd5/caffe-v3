@@ -1,0 +1,40 @@
+{{> header}}
+
+<form class="login" dir="rtl" action="/users/login" method="POST">
+  <div class="wrapper wrapper-login">
+    <div class="container container-login animated fadeIn">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <h3 class="text-center"> تسجيل الدخول</h3>
+      <div class="login-form">
+        <div class="form-group">
+          <label for="username" class="placeholder float-right"><b>اسم المستخدم</b></label>
+          <input id="username" name="username" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="password" class="placeholder float-right"><b>كلمة المرور</b></label>
+          <input id="password" name="password" type="password" class="form-control" required>
+          <div class="show-password">
+          </div>
+        </div>
+        <div class="row form-sub m-0">
+          <a href="/users/resetPasswordRequest" class="link float-right"> نسيت كلمةالمرور ؟</a>
+        </div>
+        <div class="form-group form-action-d-flex mb-3">
+          <button class="btn btn-primary col-md-5 float-right mt-3 mt-sm-0 fw-bold">تسجيل الدخول</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+{{> footer}}

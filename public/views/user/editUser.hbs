@@ -1,0 +1,196 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-12 col-md-7">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div>
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center" style="text-align: center; color:white;">تعديل بيانات المستخدم</h2>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <form action="/users/{{user._id}}/edit" method="POST">
+            <div class="form-group" dir="rtl">
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <label class="float-right">
+                    <p class="select"> الصلاحية الحالية</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{user.role}}" disabled id="currentRole">
+                </div>
+                <div class="col-12 col-md-6 mb-0">
+                  <label for="role" class="float-right">
+                    <p class="select mb-0" style="text-align: right;">تعديل الصلاحية</h4>
+                  </label>
+                  <select class="form-control form-control px-md-5 mt-2" id="role" name="role">
+                    <option value=""> اختر الصلاحية ... </option>
+                    {{#each roles}}
+                    <option value="{{value}}"> {{name}} </option>
+                    {{/each}}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" id="fullNameGroup">
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <label for="fullName" class="float-right">
+                    <p class="select">تعديل الاسم</p>
+                  </label>
+                  <input type="text" id="fullName" name="fullName" class="form-control" placeholder="الاسم " dir="rtl"
+                    value="{{fullName}}">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="float-right">
+                    <p class="select"> الاسم الحالي</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{check user.fullName}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" id="usernameGroup">
+              <div class="row">
+                <div class="col">
+                  <label for="username" class="float-right">
+                    <p class="select">تعديل اسم المستخدم </p>
+                  </label>
+                  <input type="text" id="userName" name="username" class="form-control" placeholder="اسم المستخدم"
+                    dir="rtl" value="">
+                </div>
+                <div class="col">
+                  <label class="float-right">
+                    <p class="select">اسم المستخدم الحالي</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{user.username}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" id="emailGroup">
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <label for="email" class="float-right">
+                    <p class="select"> تعديل البريد الإلكتروني </p>
+                  </label>
+                  <input type="text" id="email" name="email" class="form-control" placeholder="البريد البريد الجديد"
+                    dir="rtl">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="email" class="float-right">
+                    <p class="select"> البريد الإلكتروني الحالي </p>
+                  </label>
+                  <input type="text" class="form-control" id="email" name="email" dir="rtl" value="{{check user.email}}"
+                    disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" id="passwordGroup">
+              <div class="row">
+                <div class="col-md-6 ml-md-auto">
+                  <label for="password" class="float-right">
+                    <p class="select"> تغيير كلمة المرور </p>
+                  </label>
+                  <input type="password" id="password" name="password" class="form-control" dir="rtl">
+                </div>
+              </div>
+            </div>
+            <div class="form-group" dir="rtl" id="branchGroup">
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <label for="branchID" class="float-right">
+                    <p class="select"> الفرع الحالي</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{check user.branchID.branchname}}" disabled
+                    id="currentBranch">
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="branchID" class="float-right">
+                    <p class="select">اختر الفرع</p>
+                  </label>
+                  <select class="form-control form-control" id="branchID" name="branchID">
+                    <option value=""> الفرع .. </option>
+                    {{#each branches}}
+                    <option value="{{_id}}">{{branchname}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer border-0 center Center" style="align-items: center;">
+              <a href="/invoice" class=" btnclass btn-round">
+                <h6 class="select"> رجوع</h6>
+              </a>
+              <button type="submit" class=" btnclass">
+                <h6 class="select"> تعديل </h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+
+<script>
+  const showFields = (role) => {
+    const branchGroup = document.querySelector("#branchGroup");
+    const branch = document.querySelector("#branchID");
+
+    const passwordGroup = document.querySelector("#passwordGroup");
+    const password = document.querySelector("#password");
+
+    const fullNameGroup = document.querySelector("#fullNameGroup");
+    const name = document.querySelector("#fullName");
+
+    const usernameGroup = document.querySelector("#usernameGroup");
+    const username = document.querySelector("#userName");
+
+    if (role === 'AccountantManager' || role === 'Manager' || role === 'Accountant' || role === 'StoreMan') {
+      passwordGroup.style.display = "block";
+      usernameGroup.style.display = "block";
+      branchGroup.style.display = "none";
+
+      branch.required = false;
+    } else if (role === 'BranchAccountant' || role === 'Cashier' || role === 'Invoicer' || role === 'BranchStoreMan') {
+      branchGroup.style.display = "block";
+      usernameGroup.style.display = "block";
+      passwordGroup.style.display = "block";
+
+      let currentBranch = $("#currentBranch").val();
+      if (!currentBranch || currentBranch === 'لا يوجد') {
+        branch.required = true;
+      } else {
+        branch.required = false;
+      }
+    }
+  }
+
+  let role = $("select#role").val();
+  let currentRole = $("#currentRole").val();
+
+  if (role || currentRole) {
+    if (role) showFields(role)
+    else showFields(currentRole)
+  }
+
+  $("select#role").on('change', function () {
+    let role = $(this).val();
+    showFields(role)
+  });
+</script>
+{{> footer/userFooter}}

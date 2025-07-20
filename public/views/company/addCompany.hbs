@@ -1,0 +1,86 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-12 col-md-6">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div>
+        <div class="headerPage">
+          <div class="Title">
+            <h2>
+              إضافة شركة جديدة
+            </h2>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <form action="/companies/add" method="POST" enctype="multipart/form-data" class="col-12 p-0">
+            <div class="form-group col-md-6 col-12 float-right">
+              <label for="companyName" class="float-right">
+                <p class="select"> اسم الشركة </p>
+              </label>
+              <input type="text" id="companyName" name="companyName" class="form-control" placeholder="اسم الشركة"
+                dir="rtl" required>
+            </div>
+            <div class="form-group col-md-6 col-12 float-right">
+              <label for="companyName" class="float-right">
+                <p class="select"> رقم الهاتف </p>
+              </label>
+              <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="رقم هاتف الشركة"
+                dir="rtl">
+            </div>
+            <div class="form-group col-md-6 col-12 float-right">
+              <label for="companyName" class="float-right">
+                <p class="select">البريد الإلكتروني</p>
+              </label>
+              <input type="email" id="email" name="email" class="form-control" placeholder="البريد الإلكتروني"
+                dir="rtl">
+            </div>
+            <div class="form-group col-md-6 col-12 float-right">
+              <label for="companyName" class="float-right">
+                <p class="select"> الموقع</p>
+              </label>
+              <input type="text" id="location" name="location" class="form-control" placeholder="موقع الشركة" dir="rtl">
+            </div>
+            <div class="form-group col-md-6 col-12 float-right">
+              <label for="companyName" class="float-right">
+                <p class="select"> ملاحظات </p>
+              </label>
+              <input type="text" id="notes" name="notes" class="form-control" placeholder=" ملاحظات عن الشركة"
+                dir="rtl">
+            </div>
+            <div class="form-group col-md-6 col-12 float-right">
+              <label class="float-right">
+                <p class="select">صورة الشركة </p>
+              </label>
+              <input type="file" class="form-control" name="image" id="image" placeholder="صورة الشركة" dir="rtl"
+                required>
+            </div>
+            <div class="modal-footer border-0 center Center">
+              <a href="/companies" class="btnclass btn-round">
+                <h6 class="select"> الرجوع </h6>
+              </a>
+              <button type="submit" class="btnclass">
+                <h6 class="select">إضافة</h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+{{> footer/companyFooter}}

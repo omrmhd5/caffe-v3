@@ -1,0 +1,63 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-12 col-md-6">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close text-danger" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div>
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center">إضافة موظف جديد</h2>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <form action="/employees/add" method="POST" class="col-12">
+            <div class="form-group col-md-6 col-12 float-right" id="nameGroup">
+              <label for="employeeName" class="float-right">
+                <p class="select">الاسم</p>
+              </label>
+              <input type="text" id="employeeName" name="employeeName" class="form-control" placeholder="الاسم "
+                dir="rtl" value="{{employeeName}}" required>
+            </div>
+            <div class="form-group col-md-6 col-12 float-right" dir="rtl" id="branchGroup">
+              <label for="branchID" class="float-right">
+                <p class="select">اختر الفرع</p>
+              </label>
+              <select class="form-control form-control" id="branchID" name="branchID">
+                {{#unless branchID}}
+                <option value="" selected>اختار...</option>
+                {{/unless}}
+                {{#each branches}}
+                <option value="{{_id}}" {{selected}}>{{branchname}}</option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="modal-footer border-0 center Center row">
+              <a href="/employees" class=" btnclass btn-round">
+                <h6 class="select">الرجوع</h6>
+              </a>
+              <button type="submit" class=" btnclass">
+                <h6 class="select"> أضف الموظف </h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+{{> footer/employeeFooter}}

@@ -1,0 +1,133 @@
+{{> header}}
+{{> navbar/navbar}}
+<style>
+  .table td {text-align: center;}
+</style>
+<div class="col-md-12" dir="rtl">
+  <div class="headerPage">
+    <div class="Title">
+      <h2 style="text-align: center;">
+        تقرير المالية لشهر {{ date }}
+      </h2>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <form class="form-horizontal" action="/financial" method="GET" id="search-form">
+        <div class="form-group">
+          <div class="row">
+            <label for="branchID" class="col-form-label col-md-1 col-4 mb-1 pt-0">
+              <p class="select">اختر الفرع</p>
+            </label>
+            <div class="col-md-2 col-8 mb-1">
+              <select id="branchID" name="branchID" class="form-control" onchange="submitSearchForm()">
+                <option value="" selected> كل الفروع </option>
+                {{#each branches}}
+                <option value="{{_id}}" {{selected}}>{{branchname}}</option>
+                {{/each}}
+              </select>
+            </div>
+            <label for="role" class="col-form-label col-md-1 col-4 pt-0">
+              <p class="select">الشهر</p>
+            </label>
+            <div class="col-md-2 col-8 pr-0">
+              <div class="input-group">
+                <input id="query-date" type="month" name="date" min="2019-01" class="form-control" value="{{date}}"
+                  onchange="submitSearchForm()" required>
+              </div>
+            </div>
+            <div class="col-md-2 pr-0">
+              <button class="btnclass width6rem p-0"> بحث </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-body" style="padding-right: 0; padding-left: 0;">
+      <div class="table-responsive">
+        <table id="add-row" class="table table-striped table-light">
+          <thead>
+            <tr>
+              <th>
+                <p class="tableheader  ptable"> الفرع</p>
+              </th>
+              <th>
+                <p class="tableheader"> الدخل العام </p>
+              </th>
+              <th>
+                <p class="tableheader"> الإيجار </p>
+              </th>
+              <th>
+                <p class="tableheader">المصروفات</p>
+              </th>
+              <th>
+                <p class="tableheader"> نسبة البنك </p>
+              </th>
+              <th>
+                <p class="tableheader"> الرواتب </p>
+              </th>
+              <th>
+                <p class="tableheader ptable "> رواتب السعوديين </p>
+              </th>
+              <th>
+                <p class="tableheader ptable "> فواتير الخدمات </p>
+              </th>
+              <th>
+                <p class="tableheader ptable "> مصروفات اضافي 1 </p>
+              </th>
+              <th class="ptable">
+                <p class="tableheader  "> مصروفات اضافي 2 </p>
+              </th>
+              <th>
+                <p class="tableheader ptable ">الصافي </p>
+              </th>
+              <th class="edit-button">
+                <p class="tableheader"> تعديل </p>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each financials}}
+            <tr>
+              <td>{{ branchID.branchname }}</td>
+              <td class="branch-id" hidden>{{ branchID._id }}</td>
+              <td class="income">{{ toFixed income }}</td>
+              <td class="rent">{{ rent }}</td>
+              <td class="expenses">{{ expenses }}</td>
+              <td class="bank-ratio">{{ bankRatio }}</td>
+              <td class="salaries">{{ salaries }}</td>
+              <td class="saudization-salary">{{ saudizationSalary }}</td>
+              <td class="bills">
+                <div style="width:100%;"> {{ bills }}</div>
+              </td>
+              <td class="  bills1">
+                <div style="width:100%;"> {{ bills1 }} </div>
+              </td>
+              <td class="bills2">
+                <div style="width:100%;"> {{ bills2 }} </div>
+              </td>
+              <td class="net-income">{{ toFixed netIncome }}</td>
+              <td>
+                <div class="form-button-action">
+                  <input class="salary-id" type="text" value="{{_id}}" hidden>
+                  <button class="btn btn-primary btn-lg" data-toggle="modal"
+                    data-target=".bd-example-modal-lg" data-original-title="تعديل البيانات">
+                    <i class="fa fa-pen"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+        {{> financialModal }}
+      </div>
+    </div>
+  </div>
+</div>
+{{> footer}}
+
+<script>
+
+</script>
+{{> footer/financialFooter}}

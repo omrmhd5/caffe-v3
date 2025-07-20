@@ -1,0 +1,172 @@
+{{> header}}
+{{> navbar/navbar}}
+<div class="container" dir="auto">
+  <div class="col-md-12">
+    <div class="headerPage">
+      <div class="Title">
+        <h2 style="text-align: center;">
+          عرض الموظفين
+        </h2>
+      </div>
+    </div>
+    <div style="padding: 10px;">
+      <div class="card-header headerClass">
+        <form class="form-horizontal" action="/employees" method="GET">
+          <div class="form-group row">
+            <label for="companyID" class="col-form-label">
+              <p class="select">اختر الشركة </p>
+            </label>
+            <div class="col-sm-2">
+              <select id="companyID" name="companyID" class="form-control">
+                <option value="" selected>كل الشركات</option>
+                {{#each companies}}
+                <option value="{{_id}}"> {{companyname}} </option>
+                {{/each}}
+              </select>
+            </div>
+            <br>
+            <label for="branchID" class="col-form-label">
+              <p class="select"> اختر الفرع </p>
+            </label>
+            <div class="col-sm-2">
+              <select id="branchID" name="branchID" class="form-control">
+                <option value="" selected>كل الفروع</option>
+              </select>
+            </div>
+            <br>
+            <div class="col-sm-1">
+              <button class="btnclass"> بحث </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table id="add-row" class="display table table-striped table-hover">
+            <thead>
+              <tr>
+                <th scope="col">
+                  <p class="tableheader">الرقم الوظيفي </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> اسم الموظف </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> الفرع </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> الشركة </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> الحالة </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> تعديل </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader">حذف </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each employees}}
+              <tr>
+                <td>{{check employeeID}}</td>
+                <td>{{employeeName}}</td>
+                <td>{{check branchID.branchname}}</td>
+                <td>{{check companyID.companyname}}</td>
+                <td>{{check statusMessage}}</td>
+                <td>
+                  <div class="form-button-action">
+                    <a type="button" href="/employees/{{_id}}/edit" class="btn btn-link btn-primary btn-lg"
+                      data-original-title="تعديل بيانات الموظف">
+                      <i class="fa fa-edit"></i>
+                    </a>
+                  </div>
+                </td>
+                <td>
+                  <div class="form-button-action">
+                    <a type="button" onclick="deleteEmployee(`{{_id}}`)" data-toggle="tooltip" title=""
+                      class="btn btn-link btn-danger" data-original-title="حذف الموظف">
+                      <i class="fa fa-times"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+          <nav aria-label="Page navigation example">
+            <ul class="pagination">
+              {{#paginate pagination type="previous"}}
+              <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link"
+                  href="?branchID={{../branchID}}&companyID={{../companyID}}&p={{n}}">السابق</a></li>
+              {{/paginate}}
+              {{#paginate pagination type="middle" limit="3"}}
+              <li {{#if active}} class="active page-item" {{/if}}><a class="page-link"
+                  href="?branchID={{../branchID}}&companyID={{../companyID}}&p={{n}}">{{n}}</a></li>
+              {{/paginate}}
+              {{#paginate pagination type="next"}}
+              <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link"
+                  href="?branchID={{../branchID}}&companyID={{../companyID}}&p={{n}}">التالي</a></li>
+              {{/paginate}}
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+<script>
+  const companies = {{{ json companies }}};
+  let currentCompanyID = null;
+  let currentBranchID = null;
+
+  { {#if expreq.query } }
+  { {#if expreq.query.companyID } }
+  currentCompanyID = "{{ expreq.query.companyID }}"
+  $("select#companyID").val(currentCompanyID);
+  {
+    {
+      /if}}
+      { {#if expreq.query.branchID } }
+      currentBranchID = "{{ expreq.query.branchID }}"
+      {
+        {
+          /if}}
+          {
+            {
+              /if}}
+
+              const showBranches = (companyID) => {
+                let company = companies.find(company => company._id === companyID);
+                $("select#branchID").html('');
+                let option = $('<option></option>');
+                option.attr('value', '');
+                option.html('اختر الفرع');
+                $("select#branchID").append(option);
+
+                if (company) {
+                  for (let branch of company.branches) {
+                    option = $('<option></option>');
+                    if (branch._id == currentBranchID) {
+                      option.attr('selected', 'selected');
+                    } option.attr('value', branch._id);
+                    option.html(branch.branchname);
+                    $("select#branchID").append(option);
+                  }
+                }
+              }
+              $("select#companyID").on('change', function () {
+                let companyID = $(this).val();
+                showBranches(companyID);
+              });
+
+              let companyID = $("select#companyID").val();
+              if (companyID) {
+                showBranches(companyID);
+              }
+</script>
+{{> footer/employeeFooter}}

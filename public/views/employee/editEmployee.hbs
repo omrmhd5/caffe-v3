@@ -1,0 +1,112 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-12 col-md-6">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div style="padding: 10px;">
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center"> تعديل بيانات الموظف</h2>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <form action="/employees/{{employee._id}}/edit" method="POST">
+            <div class="form-group" id="employeeIDGroup">
+              <label for="employeeID" class="float-right">
+                <p class="select">الرقم الوظيفي</p>
+              </label>
+              <input id="employeeID" name="employeeID" class="form-control" dir="rtl"
+                value="{{check employee.employeeID}}" disabled>
+            </div>
+            <div class="form-group" id="employeeNameGroup">
+              <div class="row">
+                <div class="col-md col-12">
+                  <label for="employeeName" class="float-right">
+                    <p class="select">الاسم الجديد</p>
+                  </label>
+                  <input type="text" id="employeeName" name="employeeName" class="form-control"
+                    placeholder="الاسم الجديد" dir="rtl">
+                </div>
+                <div class="col-md col-12">
+                  <label class="float-right">
+                    <p class="select"> الاسم الحالي</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{employee.employeeName}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" dir="rtl" id="statusGroup">
+              <div class="row">
+                <div class="col-md col-12">
+                  <label for="status" class="float-right">
+                    <p class="select">الحالة</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{employee.statusMessage}}" disabled>
+                </div>
+                <div class="col-md col-12">
+                  <label for="status" class="float-right">
+                    <p class="select">اختر الحالة</p>
+                  </label>
+                  <select class="form-control form-control" id="status" name="status">
+                    <option value=""> الحالة .. </option>
+                    {{#each statuses}}
+                    <option value="{{value}}">{{name}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" dir="rtl" id="branchGroup">
+              <div class="row">
+                <div class="col-md col-12">
+                  <label for="branchID" class="float-right">
+                    <p class="select"> الفرع الحالي</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{check employee.branchID.branchname}}" disabled>
+                </div>
+                <div class="col-md col-12">
+                  <label for="branchID" class="float-right">
+                    <p class="select">اختر الفرع</p>
+                  </label>
+                  <select class="form-control form-control" id="branchID" name="branchID">
+                    <option value=""> الفرع .. </option>
+                    {{#each branches}}
+                    <option value="{{_id}}">{{branchname}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer border-0 center Center row">
+              <a href="/employees" class="btnclass btn-round">
+                <h6 class="select"> رجوع </h6>
+              </a>
+              <button type="submit" class=" btnclass">
+                <h6 class="select">تعديل</h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+
+<script>
+</script>
+{{> footer/userFooter}}

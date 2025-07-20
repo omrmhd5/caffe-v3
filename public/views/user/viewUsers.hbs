@@ -1,0 +1,191 @@
+{{> header}}
+{{> navbar/navbar}}
+
+
+<style>
+  td {width: 100px;}
+</style>
+<div class="" dir="auto">
+  <div class="col-12">
+    <div class="headerPage">
+      <div class="Title">
+        <h2>
+          عرض المستخدمين
+        </h2>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <form class="form-horizontal" action="/users" method="GET" id="search-form">
+          <div class="form-group row">
+            <br>
+            <label for="branchID" class="col-form-label pt-0">
+              <p class="select"> اختر الفرع </p>
+            </label>
+            <div class="col-sm-2">
+              <select id="branchID" name="branchID" class="form-control" onchange="submitSearchForm()">
+                {{#unless branchID}}
+                <option value="" selected>كل الفروع</option>
+                {{/unless}}
+                {{#each branches}}
+                <option value="{{_id}}" {{selected}}>{{branchname}}</option>
+                {{/each}}
+              </select>
+            </div>
+            <br>
+            <label for="role" class="col-form-label pt-0">
+              <p class="select">اختر الصلاحية </p>
+            </label>
+            <div class="col-sm-2">
+              <select id="role" name="role" class="form-control" onchange="submitSearchForm()">
+                <option value="" selected>كل الصلاحيات</option>
+                {{#each roles}}
+                <option value="{{value}}">{{name}}</option>
+                {{/each}}
+                <option value="" selected>كل الصلاحيات</option>
+              </select>
+            </div>
+            {{!-- <br> --}}
+            <div class="">
+              <button class="btnclass width6rem p-0"> بحث </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table id="add-row" class="display table table-striped table-hover">
+            <thead>
+              <tr>
+                <th scope="col">
+                  <p class="tableheader"> الاسم </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> اسم المستخدم </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> الصلاحية </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> الفرع </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> الشركة </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> تعديل </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> حالة المستخدم </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> حذف </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each users}}
+              <tr>
+                <td>{{check fullName}}</td>
+                <td>{{username}}</td>
+                <td>{{role}}</td>
+                <td>{{check branchID.branchname}}</td>
+                <td>{{companyID.companyname}}</td>
+                <td>
+                  <div class="form-button-action">
+                    <a data-toggle="tooltip" href="/users/{{_id}}/edit" class="btn btn-primary btn-lg"
+                      data-original-title="تعديل بيانات المستخدم ">
+                      <i class="fas fa-pencil-alt"></i>
+                    </a>
+                  </div>
+                </td>
+                <td>
+                  <input type="checkbox" {{isBlocked blocked}} data-toggle="toggle" data-onstyle="success"
+                    data-offstyle="danger" onchange="changeUserStatus(`{{_id}}`, this)" id="statusCheckBox">
+                </td>
+                <td>
+                  <div class="form-button-action">
+                    <a onclick="deleteUser(`{{_id}}`)" data-toggle="tooltip" title="" class="btn btn-danger2"
+                      data-original-title="حذف المستخدم">
+                      <i class="fa fa-times"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+          <nav aria-label="Page navigation example">
+            <ul class="pagination mt-2">
+              {{#paginate pagination type="previous"}}
+              <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link"
+                  href="?role={{../userRole}}&p={{n}}">السابق</a></li>
+              {{/paginate}}
+              {{#paginate pagination type="middle" limit="3"}}
+              <li {{#if active}} class="active page-item" {{/if}}><a class="page-link"
+                  href="?role={{../userRole}}&p={{n}}">{{n}}</a></li>
+              {{/paginate}}
+              {{#paginate pagination type="next"}}
+              <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link"
+                  href="?role={{../userRole}}&p={{n}}">التالي</a></li>
+              {{/paginate}}
+            </ul>
+          </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+
+<script>
+  const companies = {{{ json companies }}};
+  let currentCompanyID = null;
+  let currentBranchID = null;
+  let currentRole = null;
+
+  { {#if expreq.query } }
+  { {#if expreq.query.companyID } }
+  currentCompanyID = "{{ expreq.query.companyID }}"
+  $("select#companyID").val(currentCompanyID);
+  {
+    {
+      /if}}
+      { {#if expreq.query.branchID } }
+      currentBranchID = "{{ expreq.query.branchID }}"
+      {
+        {
+          /if}}
+          { {#if expreq.query.role } }
+          currentRole = "{{ expreq.query.role }}"
+          $("select#role").val(currentRole);
+          {
+            {
+              /if}}
+              {
+                {
+                  /if}}
+
+                  const showBranches = (companyID) => {
+                    let company = companies.find(company => company._id === companyID);
+                    $("select#branchID").html('');
+                    let option = $('<option></option>');
+                    option.attr('value', '');
+                    option.html('اختر الفرع');
+                    $("select#branchID").append(option);
+
+                    if (company) {
+                      for (let branch of company.branches) {
+                        option = $('<option></option>');
+                        if (branch._id == currentBranchID) {
+                          option.attr('selected', 'selected');
+                        }
+                        option.attr('value', branch._id);
+                        option.html(branch.branchname);
+                        $("select#branchID").append(option);
+                      }
+                    }
+                  }
+</script>
+{{> footer/userFooter}}

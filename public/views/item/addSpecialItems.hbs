@@ -1,0 +1,70 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-md-4 col-xl-5">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div style="padding: 5px;">
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center " style="text-align: center; color:white;">إضافة أصناف مخصوصة</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="/items/add" method="POST" id="addItem">
+            {{#forLoop item.specialItemsCount}}
+            <div class="form-group" dir="rtl" id="branchGroup">
+              <div class="row">
+                <div class="col">
+                  <label for="itemID" class="float-right">
+                    <p class="select"> اختر الصنف</p>
+                  </label>
+                  <select class="form-control" name="itemID[]" required>
+                    <option value="" selected disabled hidden> اختر الصنف </option>
+                    {{#each ../items}}
+                    <option value="{{_id}}"> {{itemName}} </option>
+                    {{/each}}
+                  </select>
+                </div>
+                <div class="col">
+                  <label for="qty" class="float-right">
+                    <p class="select"> العدد</p>
+                  </label>
+                  <input type="number" name="qty[]" class="form-control" placeholder="عدد الصنف" dir="rtl" required>
+                </div>
+              </div>
+            </div>
+            {{/forLoop}}
+            <input name="itemPrice" class="form-control" value="{{item.itemPrice}}" hidden>
+            <input name="itemName" class="form-control" value="{{item.itemName}}" hidden>
+            <input name="branchID" class="form-control" value="{{item.branchID}}" hidden>
+            <div class="modal-footer border-0 center Center" style="align-items: center;">
+              <a href="/items" class=" btnclass  " style="background-color: #BF8F00; width:auto">
+                <h6 class="select" style="color: white; margin-right:10px; margin-left:10px;"> عودة إلى قائمة الأصناف
+                </h6>
+              </a>
+              <button type="submit" class="btnclass" style="width:auto;">
+                <h6 class="select" > أضف الصنف </h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+{{> footer/userFooter}}

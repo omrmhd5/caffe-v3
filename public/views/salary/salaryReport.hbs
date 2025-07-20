@@ -1,0 +1,200 @@
+{{> header}}
+{{> navbar/navbar}}
+<link rel="stylesheet" href="../assets/css/my.css">
+<style>
+  .table td {
+    height: 75% !important;
+    text-align: center;
+    padding: 6px !important;
+  }
+  input {text-align: center;}
+</style>
+
+<div class="container col-lg-12 d-print-none p-0" dir="auto">
+  <div>
+    <div class="headerPage">
+      <div class="Title">
+        <h2 style="text-align: center; color:white;">
+          رواتب شهر {{month}}
+          {{#if branch}}
+          فرع {{branch.branchname}}
+          {{/if}}
+        </h2>
+      </div>
+    </div>
+    <div class="card col-lg-12 p-0">
+      <div class="card-header d-print-none p-0">
+        <form class="form-horizontal" action="/salary/report" method="GET" id="search-form">
+          <div class="form-group row mx-3">
+            <label for="branchID" class="col-form-label test pt-0">
+              <p class="select">الفرع</p>
+            </label>
+            <div class="col-sm-2">
+              {{#if branchedRole}}
+              <select id="branchID" name="branchID" class="form-control" disabled style="padding: 0;">
+                <option value="{{branch._id}}" selected class="select">
+                  <p class="select"> {{branch.branchname}} </p>
+                </option>
+              </select>
+              {{else}}
+              <select id="branchID" name="branchID" class="form-control" onchange="submitSearchForm()" required>
+                <option style="float: right;" value="" selected> اختر الفرع </option>
+                {{#each branches}}
+                <option style="float: right;" value="{{_id}}" {{selected}}>{{branchname}}</option>
+                {{/each}}
+              </select>
+              {{/if}}
+            </div>
+            <label for="role" class="col-form-label pt-0">
+              <p class="select">الشهر</p>
+            </label>
+            <div class="col-sm-2" dir="ltr">
+              <div class="input-group">
+                <input type="text" class="form-control" id="month" name="month" onchange="submitSearchForm()"
+                  value="{{month}}">
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <i class="fa fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-1">
+              <button class="btnclass width6rem p-0"> بحث </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table id="add-salary-table" class="table">
+            <thead>
+              <tr>
+                <th>
+                  <p class="tableheader mb-0 px-3 px-md-0 width8rem "> اسم الموظف</p>
+                </th>
+                <th>
+                  <p class="tableheader mb-0 px-4 px-md-0 width8rem">الراتب</p>
+                </th>
+                <th>
+                  <p class="tableheader mb-0 width8rem">زيادة بالقيمة </p>
+                </th>
+                <th>
+                  <p class="tableheader mb-0 width8rem"> زيادة بالايام </p>
+                </th>
+                <th>
+                  <p class="tableheader mb-0 width8rem"> خصم بالقيمة </p>
+                </th>
+                <th>
+                  <p class="tableheader mb-0 width8rem"> خصم بالأيام </p>
+                </th>
+                <th>
+                  <p class="tableheader mb-0 px-4 px-md-0 width8rem"> سلفة</p>
+                </th>
+                <th>
+                  <p class="tableheader mb-0 width8rem"> صافي الراتب </p>
+                </th>
+                <th>
+                  <p class="tableheader mb-0">التوقيع </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each salaries}}
+              <tr>
+                <td><input value="{{employeeName}}" type="text" class="form-control name" disabled></td>
+                <td hidden><input value="{{_id}}" type="text" class="form-control employee-id"></td>
+                <td hidden><input value="{{branchID}}" type="text" class="form-control branch-id"></td>
+                <td><input value="{{checkOrZeror salary}}" type="number" class="form-control salary" {{disabled}}></td>
+                <td><input value="{{checkOrZeror amountIncrease}}" type="number" class="form-control amount-increase"
+                    {{disabled}}>
+                </td>
+                <td><input value="{{checkOrZeror daysIncrease}}" type="number" class="form-control days-increase"
+                    {{disabled}}>
+                </td>
+                <td><input value="{{checkOrZeror amountDecrease}}" type="number" class="form-control amount-decrease"
+                    {{disabled}}>
+                </td>
+                <td><input value="{{checkOrZeror daysDecrease}}" type="number" class="form-control days-decrease"
+                    {{disabled}}>
+                </td>
+                <td><input value="{{checkOrZeror advancePayment}}" type="number" class="form-control advance-payment"
+                    {{disabled}}>
+                </td>
+                <td><input value="{{numeral netSalary}}" type="text" class="form-control net-salary" disabled></td>
+                <td>
+                  <h1 style="width: 80px;"></h1>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+          <center class="card-header mt-3 Center">
+            {{#if total}}
+            <h3>مجموع الرواتب <strong
+                id="salary-total">{{ numeral total }}</strong></h3>
+            {{/if}}
+            {{#ifEquals total 0}}
+            <h3>مجموع الرواتب <strong
+                id="salary-total">0.00</strong></h3>
+            {{/ifEquals}}
+          </center>
+      </div>
+    </div>
+  </div>
+  <div class="card d-print-none">
+    <div class="card-header select">
+      <h2 class="text-right tableheader ">الملاحظات : </h2>
+    </div>
+    <div class="card-body" id="notes-body">
+      <button class="btn btn-lg note" id="add-note-button" data-original-title=" إضافة ملاحظة ">
+        أضف ملاحظة <i class="fa fa-plus ml-2"> </i>
+      </button>
+      {{#each notes}}
+      <div class="row form-group">
+        {{#each this}}
+        <div class="col-6 mb-2">
+          <input type="text" class="form-control text-right note-input" placeholder="أكتب ملاحظة" {{disabled}}
+            value="{{note}}">
+        </div>
+        {{/each}}
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body d-print-none" style="padding-right: 0; padding-left: 0;">
+      <center>
+        <button class="btnclass" id="submit-button">حفظ</button>
+        <button class="btnclass btn-round" id="print-button">اطبع</button>
+      </center>
+    </div>
+  </div>
+</div>
+
+{{> print/salaryReport }}
+{{> footer}}
+
+<script>
+  $('#month').datetimepicker({
+    format: 'YYYY/MM',
+    icons: {
+      time: 'fas fa-clock',
+      date: 'fa fa-calendar',
+      up: 'fa fa-chevron-up',
+      down: 'fa fa-chevron-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-check',
+      clear: 'fa fa-trash',
+      close: 'fa fa-times'
+    }
+  }).on('dp.change', () => {
+    if ($('#branchID').val()) {
+      $('#search-form').submit();
+    }
+  });
+
+</script>
+{{> footer/salaryFooter}}

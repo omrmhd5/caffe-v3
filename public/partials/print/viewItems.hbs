@@ -1,0 +1,88 @@
+<style>
+  .table {
+    border-collapse: collapse;
+    color: black;
+  }
+
+  th p {
+    color: black;
+  }
+
+  .table td,
+  .table th {
+    height: 75% !important;
+    padding: .2rem !important;
+    text-align: center;
+  }
+
+  #page-title {
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: auto;
+    color: black;
+    height: 75px;
+    width: 680px;
+    margin: 50px auto;
+  }
+
+  .tail-border {
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    height: 60px;
+    width: 320px;
+    margin: 50px auto;
+  }
+
+  .table-bordered td,
+  .table-bordered th {
+    text-align: center;
+    border-color: black !important;
+  }
+</style>
+
+
+<div class="d-none d-print-block" dir="rtl">
+  <div id="page-title">
+    <h2>
+      الأصناف
+      {{#if branch}}
+      فرع {{branch.branchname}}
+      {{/if}}
+    </h2>
+  </div>
+
+  <div class="card-body">
+    <table id="add-row" class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">
+            <p> #</p>
+          </th>
+          <th scope="col">
+            <p> اسم الصنف </p>
+          </th>
+          <th scope="col">
+            <p> السعر </p>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each printedData}}
+        <tr>
+          <th scope="row">{{incremented @index}}</th>
+          <td>{{itemName}}</td>
+          <td>{{price}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+</div>
+</div>

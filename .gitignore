@@ -1,0 +1,7 @@
+node_modules
+config
+/public/uploads
+test.js
+./test.js
+.env
+.env.save

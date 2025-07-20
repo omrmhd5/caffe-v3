@@ -1,0 +1,94 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-12">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div style="padding: 10px;">
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center" style="text-align: center; color:white;">إضافة موظف جديد</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="/employees/add" method="POST">
+            <div class="form-group" id="nameGroup">
+              <label for="employeeName" class="float-right">
+                <p class="select"> الاسم</p>
+              </label>
+              <input type="text" id="employeeName" name="employeeName" class="form-control" placeholder="الاسم "
+                dir="rtl" value="{{employeeName}}" required>
+            </div>
+            <div class="form-group" dir="rtl" id="companyGroup">
+              <label for="companyID" class="float-right">
+                <p class="select">اختر الشركة</p>
+              </label>
+              <select class="form-control form-control" id="companyID" name="companyID" required>
+                {{#each companies}}
+                <option value="{{_id}}"> {{companyname}} </option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="form-group" dir="rtl" id="branchGroup">
+              <label for="branchID" class="float-right">
+                <p class="select"> اختر الفرع</p>
+              </label>
+              <select class="form-control form-control" id="branchID" name="branchID">
+                <option value=""> الفرع .. </option>
+              </select>
+            </div>
+            <div class="modal-footer border-0 center Center" style="align-items: center;">
+              <a href="/employees" class=" btnclass  " style="background-color: #BF8F00; width:auto">
+                <h6 class="select" style="color: white; margin-right:10px; margin-left:10px;"> عودة إلى قائمة الموظفين
+                </h6>
+              </a>
+              <button type="submit" class=" btnclass  btn-round" style="background-color: #BF8F00; width:auto;">
+                <h6 class="select" style="color: white; margin-right:10px; margin-left:10px;"> أضف الموظف </h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+
+<script>
+  const showBranches = (companyID) => {
+    let company = companies.find(company => company._id === companyID);
+    $("select#branchID").html('');
+    if (company) {
+      for (let branch of company.branches) {
+        let option = $('<option></option>');
+        option.attr('value', branch._id);
+        option.html(branch.branchname);
+        $("select#branchID").append(option);
+      }
+    }
+  }
+
+  const companies = {{{ json companies }}};
+  $("select#companyID").on('change', function () {
+    let companyID = $(this).val();
+    showBranches(companyID);
+  });
+
+  let companyID = $("select#companyID").val();
+  showBranches(companyID);
+
+</script>
+{{> footer/userFooter}}

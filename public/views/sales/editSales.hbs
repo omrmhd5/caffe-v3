@@ -1,0 +1,123 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-md-6">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div style="padding: 10px;">
+        <div class="headerPage">
+          <div class="Title">
+            <h2 style="text-align: center; color:white;" class="text-center"> تعديل بيانات المبيعات</h2>
+          </div>
+        </div>
+        <div class="card-body px-0">
+          <form action="/sales/{{sales._id}}/edit" method="POST">
+            <div class="form-group" id="branchGroup">
+              <div class="row">
+                <div class="col">
+                  <label for="itemName" class="float-right">
+                    <p class="select">اسم الصنف</p>
+                  </label>
+                  <input type="text" id="itemName" name="itemName" class="form-control" value={{sales.itemID.itemName}}
+                    dir="rtl" disabled>
+                </div>
+                <div class="col-md-6 col-12">
+                  <label for="itemName" class="float-right">
+                    <p class="select">الفرع</p>
+                  </label>
+                  <input type="text" id="branchID" name="branchID" class="form-control"
+                    value="{{sales.branchID.branchname}}" dir="rtl" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col">
+                  <label for="currentTime" class="float-right">
+                    <p class="select"> التاريخ الحالي</p>
+                  </label>
+                  <input type="text" id="currentTime" name="currentTime" class="form-control"
+                    value="{{formatDateTime sales.time}}" dir="lrt" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col">
+                  <label for="date" class="float-right">
+                    <p class="select">التاريخ الجديد</p>
+                  </label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="time" name="time" dir="ltr">
+                    <div class="input-group-append">
+                      <span class="input-group-text">
+                        <i class="fa fa-calendar"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" id="boughtQuantityGroup">
+              <div class="row">
+                <div class="col">
+                  <label for="boughtQuantity" class="float-right">
+                    <p class="select">الكمية الجديدة</p>
+                  </label>
+                  <input type="number" id="boughtQuantity" name="boughtQuantity" class="form-control" dir="rtl">
+                </div>
+                <div class="col">
+                  <label class="float-right">
+                    <p class="select"> الكمية الحالية</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{sales.boughtquantity}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" id="buttonsGroup">
+              <div class="modal-footer Center row">
+                <a href="/sales" class="col btn btnclass btn-border btn-round">عودة إلى قائمة المبيعات
+                </a>
+                <button class="col btn btnclass btn-lg"> تعديل </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+
+<script>
+  $('#time').datetimepicker({
+    format: 'YYYY/MM/DD H:mm',
+
+    icons: {
+      time: 'fa fa-clock',
+      date: 'fa fa-calendar',
+      up: 'fa fa-chevron-up',
+      down: 'fa fa-chevron-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-check',
+      clear: 'fa fa-trash',
+      close: 'fa fa-times'
+    }
+  });
+</script>
+
+{{> footer/salesFooter}}

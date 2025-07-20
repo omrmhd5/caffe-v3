@@ -1,0 +1,163 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-md-7 col-xl-7">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div class="card">
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center" style="text-align: center; color:white;"> بيانات الفاتورة </h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="/invoice/{{invoice._id}}/edit" method="POST" enctype="multipart/form-data">
+            <div class="row form-group">
+              <div class="col">
+                <label for="totalAmount" class="float-right">
+                  <p class="select">إجمالي الفاتورة</p>
+                </label>
+                <input type="number" id="totalAmount" name="totalAmount" class="form-control" dir="rtl"
+                  value="{{invoice.totalAmount}}" disabled>
+              </div>
+
+              <div class="col">
+                <label for="taxValue" class="float-right">
+                  <p class="select">قيمة الضريبة</p>
+                </label>
+                <input type="number" id="taxValue" name="taxValue" class="form-control" dir="rtl"
+                  value="{{invoice.taxValue}}" step="0.01" min="0" disabled>
+              </div>
+
+              <div class="col">
+                <label for="taxRatio" class="float-right">
+                  <p class="select">(%) نسبة الضريبة</p>
+                </label>
+                <input type="number" id="taxRatio" name="taxRatio" class="form-control" dir="rtl"
+                  value="{{invoice.taxRatio}}" step="1" min="0" max="100" disabled>
+              </div>
+
+            </div>
+            <div class="row form-group">
+              <div class="col">
+                <label for="amount" class="float-right">
+                  <p class="select">مبلغ الفاتورة</p>
+                </label>
+                <input type="number" id="amount" name="amount" class="form-control" dir="rtl" value="{{invoice.amount}}"
+                  step="0.01" min="0" disabled>
+              </div>
+
+              <div class="col">
+                <label for="supplierTaxNumber" class="float-right">
+                  <p class="select"> الرقم الضريبي للمورد</p>
+                </label>
+                <input type="string" id="supplierTaxNumber" name="supplierTaxNumber" class="form-control" dir="rtl" value="{{invoice.supplierTaxNumber}}" disabled>
+              </div>
+            </div>
+
+
+              <div class="row form-group" >
+                <div class="col">
+                  <label for="invoiceNumber" class="float-right">
+                    <p class="select">رقم  الفاتورة</p>
+                  </label>
+                  <input type="string" id="invoiceNumber" name="invoiceNumber" 
+                    class="form-control" dir="rtl" value="{{invoice.invoiceNumber}}" disabled>>
+                </div>
+
+                <div class="col">
+                  <label for="supplierName" class="float-right">
+                    <p class="select"> اسم المورد</p>
+                  </label>
+                  <input type="string" id="supplierName" name="supplierName" 
+                    class="form-control" dir="rtl" value="{{invoice.supplierName}}" disabled>
+                </div>
+              </div>
+
+            <div class="row form-group">
+              <div class="col-md-4"></div>
+
+              <div class="col-md-4">
+                <label for="serialNumber" class="float-right">
+                  <p class="select">رقم القيد</p>
+                </label>
+                <input type="number" id="serialNumber" name="serialNumber" class="form-control"
+                  placeholder="رقم القيد" dir="rtl" value="{{invoice.serialNumber}}" disabled>
+              </div>
+              <div class="col-md-4">
+                <label for="warrantyYears" class="float-right">
+                  <p class="select">عدد سنوات الضمان</p>
+                </label>
+                <input type="number" class="form-control" id="warrantyYears" name="warrantyYears"
+                  value="{{invoice.warrantyYears}}" disabled>
+              </div>
+            </div>
+            <div class="form-group" dir="rtl" id="warrantyGroup">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="date" class="float-right">
+                    <p class="select"> تاريخ الفاتورة</p>
+                  </label>
+                  <input type="date" id="date" name="date" class="form-control" dir="rtl"
+                    value="{{formatDate invoice.date}}" disabled>
+                </div>
+                <div class="col-md-6" dir="rtl">
+                  <label for="branchID" class="float-right">
+                    <p class="select">الفرع</p>
+                  </label>
+                  <input type="text" class="form-control" value=" {{invoice.branchID.branchname}} " disabled>
+                </div>
+              </div>
+            </div>
+            <div class="row form-group">
+              <div class="col">
+                <label for="description" class="float-right">
+                  <p class="select"> وصف الفاتورة</p>
+                </label>
+                <input type="text" id="description" name="description" class="form-control" placeholder=" وصف الفاتورة"
+                  value="{{invoice.description}}" dir="rtl" disabled>
+              </div>
+            </div>
+            <div class="row form-group" dir="rtl">
+              <label class="float-right">
+                <p class="select">صورة الفاتورة </p>
+              </label>
+              <div class="col-md-6">
+                <div>
+                  <img src="/{{invoice.image}}" width="100%">
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer border-0 center Center row" style="align-items: center;">
+              <a href="/invoice" class=" btnclass btn btn-primary signature btn-round">
+                <h6 class="select"> عودة إلى قائمة الفواتير
+                </h6>
+              </a>
+              <a type="button" href="/invoice/{{invoice._id}}/edit"  class=" btnclass"
+                {{invoice.disabled}}>
+                <h6 class="select"> تعديل الفاتورة </h6>
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+
+{{> footer/invoiceFooter}}

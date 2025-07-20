@@ -1,0 +1,62 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-12 col-md-6">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div>
+        <div class="headerPage">
+          <div class="Title">
+            <h2 style="text-align: center; color:white;">
+              اضافة فرع جديد </h2>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <form action="/branches/add" method="POST" class="col-12 p-0">
+            <div class="form-group col-md-6 col-12 float-right">
+              <label for="companyName" class="float-right">
+                <p class="select"> اسم الفرع </p>
+              </label>
+              <input type="text" id="branchName" name="branchName" class="form-control" placeholder="اسم الفرع"
+                dir="rtl" required>
+            </div>
+            <div class="form-group col-md-6 col-12 float-right" dir="rtl">
+              <label for="companyID" class="float-right">
+                <p class="select">أختر الشركة </p>
+              </label>
+              <select class="form-control form-control" id="companyID" name="companyID" required>
+                <option value="" selected>اختار...</option>
+                {{#each companies}}
+                <option value="{{_id}}"> {{companyname}} </option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="modal-footer border-0 center Center" style="align-items: center;">
+              <a href="/branches" class=" btnclass btn-round">
+                <h6 class="select">رجوع</h6>
+              </a>
+              <button type="submit" class=" btnclass ">
+                <h6 class="select">إضافة</h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+{{> footer/branchFooter}}

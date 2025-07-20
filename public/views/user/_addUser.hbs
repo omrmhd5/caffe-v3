@@ -1,0 +1,179 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-12">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div style="padding: 10px;">
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center" style="text-align: center; color:white;">إضافة مستخدم جديد</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="/users/add" method="POST">
+            <div class="form-group" dir="rtl">
+              <label for="role" class="float-right">
+                <p class="select">اختر الصلاحية</p>
+              </label>
+              <select class="form-control form-control" id="role" name="role" required>
+                {{#each roles}}
+                <option value="{{value}}"> {{name}} </option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="form-group" id="nameGroup">
+              <label for="fullName" class="float-right">
+                <p class="select">الاسم</p>
+              </label>
+              <input type="text" id="fullName" name="fullName" class="form-control" placeholder="الاسم " dir="rtl"
+                value="{{fullName}}">
+            </div>
+            <div class="form-group" id="usernameGroup">
+              <label for="companyName" class="float-right">
+                <p class="select">اسم المستخدم </p>
+              </label>
+              <input type="text" id="userName" name="userName" class="form-control" placeholder="اسم المستخدم"
+                dir="rtl">
+            </div>
+            <div class="form-group" id="emailGroup">
+              <label for="email" class="float-right">
+                <p class="select"> البريد الالكتروني </p>
+              </label>
+              <input type="text" id="email" name="email" class="form-control" placeholder="البريد الالكتروني" dir="rtl">
+            </div>
+            <div class="form-group" id="passwordGroup">
+              <label for="companyName" class="float-right">
+                <p class="select">كلمة المرور </p>
+              </label>
+              <input type="password" id="password" name="password" class="form-control" placeholder="كلمة المرور"
+                dir="rtl" required>
+            </div>
+            <div class="form-group" dir="rtl" id="companyGroup">
+              <label for="companyID" class="float-right">
+                <p class="select">اختر الشركة</p>
+              </label>
+              <select class="form-control form-control" id="companyID" name="companyID" required>
+                {{#each companies}}
+                <option value="{{_id}}"> {{companyname}} </option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="form-group" dir="rtl" id="branchGroup">
+              <label for="branchID" class="float-right">
+                <p class="select">اختر الفرع</p>
+              </label>
+              <select class="form-control form-control" id="branchID" name="branchID">
+                <option class="select" style="float right" value=""> الفرع .. </option>
+              </select>
+            </div>
+            <div class="modal-footer border-0 center Center" style="align-items: center;">
+              <a href="/users" class=" btnclass btn-round">
+                <h6 class="select"> عودة إلى قائمة المستخمين </h6>
+              </a>
+              <button type="submit" class=" btnclass">
+                <h6 class="select"> أضف المستخدم </h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+
+<script>
+  const showFields = (role) => {
+    const companyGroup = document.querySelector("#companyGroup");
+    const company = document.querySelector("#companyID");
+
+    const branchGroup = document.querySelector("#branchGroup");
+    const branch = document.querySelector("#branchID");
+
+    const passwordGroup = document.querySelector("#passwordGroup");
+    const password = document.querySelector("#password");
+
+    const nameGroup = document.querySelector("#nameGroup");
+    const name = document.querySelector("#fullName");
+
+    const usernameGroup = document.querySelector("#usernameGroup");
+    const username = document.querySelector("#userName");
+
+    if (role === 'AccountantManager' || role === 'Manager' || role === 'Accountant' || role === 'StoreMan') {
+      companyGroup.style.display = "block";
+      passwordGroup.style.display = "block";
+      usernameGroup.style.display = "block";
+      branchGroup.style.display = "none";
+
+      branch.required = false;
+      password.required = true;
+      username.required = true;
+    } else if (role === 'BranchAccountant' || role === 'Cashier' || role === 'Invoicer') {
+      companyGroup.style.display = "block";
+      branchGroup.style.display = "block";
+      usernameGroup.style.display = "block";
+      passwordGroup.style.display = "block";
+
+      branch.required = true;
+      password.required = true;
+      username.required = true;
+    } else if (role === 'Employee') {
+      companyGroup.style.display = "block";
+      branchGroup.style.display = "block";
+      nameGroup.style.display = "block";
+      passwordGroup.style.display = "none";
+      usernameGroup.style.display = "none";
+
+      branch.required = true;
+      name.required = true;
+      username.required = false;
+      password.required = false;
+    }
+  }
+  const showBranches = (companyID) => {
+    let company = companies.find(company => company._id === companyID);
+    $("select#branchID").html('');
+    if (company) {
+      for (let branch of company.branches) {
+        let option = $('<option></option>');
+        option.attr('value', branch._id);
+        option.html(branch.branchname);
+        $("select#branchID").append(option);
+      }
+    }
+  }
+  let role = $("select#role").val();
+  if (role) {
+    showFields(role);
+  }
+
+  $("select#role").on('change', function () {
+    let role = $(this).val();
+    showFields(role)
+  });
+
+  const companies = {{{ json companies }}};
+  $("select#companyID").on('change', function () {
+    let companyID = $(this).val();
+    showBranches(companyID);
+  });
+
+  let companyID = $("select#companyID").val();
+  showBranches(companyID);
+
+</script>
+{{> footer/userFooter}}

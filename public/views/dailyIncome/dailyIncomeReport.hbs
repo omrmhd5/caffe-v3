@@ -1,0 +1,310 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<style>
+  .table td {
+    height: 75% !important;
+    padding: .1rem !important;
+  }
+
+  .table th {text-align: center;}
+
+  input {
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+  .tax-title {
+    font-weight: bold;
+    color: black;
+  }
+  td .form-control {
+    font-size: 16px;
+    color: black;
+    padding: .6rem 0rem;
+  }
+  {{!-- .not-set {background: #e0958f !important;} --}}
+
+  {{!-- .not-set.form-control:disabled {
+    background: #e0958f !important;
+    opacity: 1 !important;
+  } --}}
+  .total-ratio {
+    width: 250px;
+    border-radius: 10px;
+    border: 1px solid black;
+    text-align: center;
+    height: 70px;
+  }
+
+  .inlineTable {display: inline-block;}
+</style>
+
+<div class="col-md-12 d-print-none p-0" dir="rtl" style="padding: 0px 28px;">
+  <div class="headerPage">
+    <div class="Title">
+      <h2 style="text-align: center;">
+        يوميات {{branch.branchname}} لشهر {{month}}
+      </h2>
+    </div>
+  </div>
+  <div class="card d-print-none">
+    <div class="card-header ">
+      <form class="form-horizontal" action="/dailyIncome" id="search-form" method="GET">
+        <div class="form-group row">
+          <label for="branchID" class="col-form-label pt-0">
+            <p class="select">الفرع</p>
+          </label>
+          <div class="col-sm-2">
+            {{#if branchedRole}}
+            <select id="branchID" name="branchID" class="form-control" disabled>
+              <option value="{{branchID._id}}" selected> {{branchID.branchname}} </option>
+            </select>
+            {{else}}
+            <select id="branchID" name="branchID" class="form-control" onchange="submitSearchForm()" required>
+              <option value="" selected disabled hidden> اختر الفرع </option>
+              {{#each branches}}
+              <option value="{{_id}}" {{selected}}>{{branchname}}</option>
+              {{/each}}
+            </select>
+            {{/if}}
+          </div>
+          <label for="role" class="col-form-label pt-0">
+            <p class="select">الشهر</p>
+          </label>
+          <div class="col-sm-2" dir="ltr">
+            <div class="input-group">
+              <input type="text" class="form-control" id="month" name="month" value="{{month}}">
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  <i class="fa fa-calendar"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-1">
+            <button class="btnclass width6rem p-0"> بحث </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-body col-lg-12 p-0">
+      <div class="table-responsive">
+        <table id="daily-income-table" class="table table-striped  col-lg-12 d-print-none">
+          <thead>
+            <tr>
+              <th>
+                <p class="tableheader px-4 px-xl-0 mb-0"> التاريخ </p>
+              </th>
+              <th>
+                <p class="tableheader px-5 px-xl-0 mb-0">نقد </p>
+              </th>
+              <th>
+                <p class="tableheader mb-0"> دخل خدمات </p>
+              </th>
+              <th>
+                <p class="tableheader mb-0"> دخل إضافي </p>
+              </th>
+              <th>
+                <p class="tableheader mb-0"> مدى / بنوك</p>
+              </th>
+              <th>
+                <p class="tableheader mb-0">فيزا / ماستر </p>
+              </th>
+              <th>
+                <p class="tableheader mb-0"> تسوية بنكية </p>
+              </th>
+              <th>
+                <p class="tableheader px-5 px-xl-0 mb-0"> الموازنة </p>
+              </th>
+              <th>
+                <p class="tableheader px-5 px-md-0 mb-0"> مجموع اليومية </p>
+              </th>
+              {{!-- <th> </th> --}}
+            </tr>
+          </thead>
+          <tbody>
+            {{#each data}}
+            <tr class="d-income-tr">
+              <td><input class="form-control income-date {{checkColor isSet}}" value="{{formatDate date }}" disabled>
+              </td>
+              <td hidden><input type="number" class="branch-id" value="{{ branchID._id }}"> </td>
+              <td><input type="number" class="form-control cash {{checkColor isSet}}" value="{{ toFixed cash }}" {{disabled}}> </td>
+              <td><input type="number" class="form-control coffe-shop {{checkColor isSet}}" value="{{toFixed coffeeShop }}"
+                  {{disabled}}> </td>
+              <td><input type="number" class="form-control added-income {{checkColor isSet}}" value="{{toFixed addedIncome }}"
+                  {{disabled}}> </td>
+              <td><input type="number" class="form-control mada {{checkColor isSet}}" value="{{toFixed mada }}" {{disabled}}> </td>
+              <td><input type="number" class="form-control visa {{checkColor isSet}}" value="{{toFixed visa }}" {{disabled}}> </td>
+              <td><input type="number" class="form-control bank-transfer {{checkColor isSet}}" value="{{toFixed bankTransfer }}"
+                  {{disabled}}> </td>
+              <td><input type="number" type="text" class="form-control arbitrage {{checkColor isSet}}" value="{{toFixed arbitrage }}"
+                  disabled>
+              </td>
+              <td><input type="number" class="form-control daily-total {{checkColor isSet}}" value="{{toFixed dailyTotal }}" disabled>
+              </td>
+              <td>
+                <div class="form-button-action">
+                  <button class="btn btn-primary btn-lg add-button" onclick="sendData(this)" {{disabled}}> أضف </button>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {{/each}}
+            <tr class="d-income-tr">
+              <td>المجموع</td>
+              <td><input class="form-control total-cash" value="{{toFixed totals.cash }}" disabled> </td>
+              <td><input class="form-control total-coffe-shop" value="{{toFixed totals.coffeeShop }}" disabled> </td>
+              <td><input class="form-control total-added-income" value="{{toFixed totals.addedIncome }}" disabled> </td>
+              <td><input class="form-control total-mada" value="{{toFixed totals.mada }}" disabled> </td>
+              <td><input class="form-control total-visa" value="{{toFixed totals.visa }}" disabled> </td>
+              <td><input class="form-control total-bank-transfer" value="{{toFixed totals.bankTransfer }}" disabled>
+              </td>
+              <td><input class="form-control total-arbitrage" value="{{toFixed totals.arbitrage }}" disabled> </td>
+              <td><input class="form-control total-daily-total" value="{{toFixed totals.dailyTotal }}" disabled> </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="row d-flex justify-content-center">
+      <table id="daily-income-table" class="col-md-5 col-10 inline-table mx-2">
+        <tbody>
+          <tr>
+            <td>
+              <input class="form-control tax-title" disabled value="نسبة مدى" />
+              </th>
+            <td><input type="number" class="form-control" {{taxValue.disabled}} id="mada-ratio"
+                value="{{checkOrZeror taxValue.madaRatio}}"></td>
+          </tr>
+          <tr>
+            <td>
+              <input class="form-control tax-title" disabled value="مجموع نسبة مدى" />
+              </th>
+            <td><input class="form-control" value="{{checkOrZeror taxValue.madaRatioSum}}" id="mada-ratio-sum" disabled>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input class="form-control tax-title" disabled value="قيمة الضريبة (%)" />
+              </th>
+            <td><input type="number" class="form-control" id="mada-tax" {{taxValue.disabled}}
+                value="{{checkOrZeror taxValue.madaTax}}"></td>
+          </tr>
+          <tr>
+            <td>
+              <input class="form-control tax-title" disabled value="إجمالي نسبة مدى" />
+              </th>
+            <td><input class="form-control" id="mada-ratio-total" value="{{checkOrZeror taxValue.madaRatioTotal}}"
+                disabled>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <table id="daily-income-table" class="col-md-5 col-10 inline-table mx-2">
+        <tbody>
+          <tr>
+            <td>
+              <input class=" form-control tax-title" disabled value="نسبة البنك للفيزا" />
+              </th>
+            <td><input type="number" id="visa-ratio" class="form-control" {{taxValue.disabled}}
+                value="{{checkOrZeror taxValue.visaRatio}}"></td>
+          </tr>
+          <tr>
+            <td>
+              <input class=" form-control tax-title " disabled value="مجموع نسبة الفيزا" />
+              </th>
+            <td><input type="number" class="form-control" id="visa-ratio-sum"
+                value="{{checkOrZeror taxValue.visaRatioSum}}" disabled></td>
+          </tr>
+          <tr>
+            <td>
+              <input class=" form-control tax-title" disabled value=" قيمة الضريبة (%)" />
+              </th>
+            <td><input class="form-control" type="number" id="visa-tax" value="{{checkOrZeror taxValue.visaTax}}"
+                {{taxValue.disabled}}></td>
+          </tr>
+          <tr>
+            <td>
+              <input class=" form-control tax-title" disabled value="إجمالي نسبة الفيزا" />
+              </th>
+            <td><input class="form-control" id="visa-ratio-total" value="{{checkOrZeror taxValue.visaRatioTotal}}"
+                disabled></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer d-print-block mt-3">
+      <div class="totaldiv" style="width: 100%;">
+        <div>
+          <center>
+            <button class="btn btn-lg mb-2 btnclass" id="tax-button" {{disableSaveRatio}}> حفظ النسبة </button>
+          </center>
+          <center>
+            <div class="total-ratio">
+              <h4 class="select text-dark mt-2">اجمالي النسبة <p>
+                  <strong id="tax-ratio-total">{{checkOrZeror taxValue.taxRatioTotal}}</strong>
+                </p>
+              </h4>
+            </div>
+          </center>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer d-print-block text-dark">
+      <div class="totaldiv">
+        <div>
+          <center>
+            <div class=" totalBtn ">
+              <h4 class="select" style="  margin-top: 10px;">إجمالي الرواتب <p>
+                  <strong>{{financials.totalSalaries}}</strong>
+                </p>
+              </h4>
+            </div>
+          </center>
+        </div>
+        <div>
+          <center>
+            <div class=" totalBtn ">
+              <h4 class="select" style="  margin-top: 10px;"> إجمالي المصروفات <p>
+                  <strong>{{financials.totalExpenses}}</strong>
+                </p>
+              </h4>
+            </div>
+          </center>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer d-print-none">
+      <center>
+        <button class="btnclass" id="print-button">اطبع</button>
+      </center>
+    </div>
+  </div>
+</div>
+
+{{> print/dailyIncome }}
+{{> footer}}
+
+<script>
+  $('#month').datetimepicker({
+    format: 'YYYY/MM',
+    icons: {
+      time: 'fas fa-clock',
+      date: 'fa fa-calendar',
+      up: 'fa fa-chevron-up',
+      down: 'fa fa-chevron-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-check',
+      clear: 'fa fa-trash',
+      close: 'fa fa-times'
+    }
+  }).on('dp.change', () => {
+    if ($('#branchID').val()) {
+      $('#search-form').submit();
+    }
+  });
+</script>
+
+{{> footer/dailyIncomeFooter}}

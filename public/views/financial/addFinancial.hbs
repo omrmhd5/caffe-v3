@@ -1,0 +1,245 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<link rel="stylesheet" href="../assets/css/my.css">
+<style>
+  .table td {
+    height: 75% !important;
+    padding: .2rem !important;
+    text-align: center;
+  }
+
+  .d-print-block td,
+  thead tr th {
+    border-top-width: 1px !important;
+    border-bottom-width: 1px !important;
+    border-left-width: 1px !important;
+    border-right-width: 1px !important;
+    border-top-color: black !important;
+    border-bottom-color: black !important;
+    border-left-color: black !important;
+    border-right-color: black !important;
+  }
+
+  .print-table {table-layout: fixed;}
+
+  .table th {
+    padding: .6rem !important;
+    text-align: center;
+  }
+
+  input {text-align: center;}
+</style>
+
+<div class="d-print-none">
+  <div class="col-md-12 center p-0" dir="auto">
+    <div class="headerPage">
+      <div class="Title">
+        <h2>
+          الـتقرير الـشـهري المالي ل{{company.companyname}} لـشهر {{ date }}
+        </h2>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header d-print-none">
+        <form id="search-form" class="form-horizontal" action="/financial/add" method="GET">
+          <div class="form-group row">
+            <label for="role" class="col-form-label pt-0">
+              <p class="select mr-3">الشهر</p>
+            </label>
+            <div class="col-sm-2">
+              <div class="input-group">
+                <input id="query-date" type="month" onchange="submitSearchForm()" name="date" min="2019-01"
+                  class="form-control" value="{{date}}" required>
+              </div>
+            </div>
+            <div>
+              <button class="btnclass width6rem p-0"> بحث </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="card-body" style="padding-right: 0; padding-left: 0;">
+        <div class="table-responsive">
+          <table id="add-financial-table" class="table d-print-none">
+            <thead style="height: 5px;">
+              <tr>
+                <th>
+                  <p class="tableheader width8rem mb-0"> الفرع</p>
+                </th>
+                <th>
+                  <p class="tableheader width8rem  mb-0"> الدخل العام </p>
+                </th>
+                <th>
+                  <p class="tableheader width8rem mb-0">الإيجار </p>
+                </th>
+                <th>
+                  <p class="tableheader width8rem  mb-0"> المصروفات</p>
+                </th>
+                <th>
+                  <p class="tableheader width8rem  mb-0"> نسبة البنك </p>
+                </th>
+                <th>
+                  <p class="tableheader width8rem  mb-0"> الرواتب</p>
+                </th>
+                <th>
+                  <p class="tableheader width8rem  mb-0"> رواتب السعوديين </p>
+                </th>
+                <th>
+                  <p class="tableheader width8rem  mb-0"> فواتير الخدمات </p>
+                </th>
+                <th>
+                  <p class="tableheader width8rem  mb-0"> مصروفات اضافي 1</p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader width8rem  mb-0"> مصروفات اضافي 2</p>
+                </th>
+                <th>
+                  <p class="tableheader width8rem mb-0">الصافي</p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each data}}
+              <tr>
+                <td><input type="text" value="{{ branchname }}" class="form-control " disabled> </td>
+                <td><input type="text" value="{{ numeral income }}" class="form-control income" disabled></td>
+                <td><input type="number" value="{{checkOrZeror rent }}" class="form-control rent"></td>
+                <td><input type="text" value="{{numeral expenses }}" class="form-control expenses" disabled></td>
+                <td><input type="number" value="{{checkOrZeror bankRatio }}" class="form-control bank-ratio" disabled></td>
+                <td><input type="text" value="{{numeral salaries }}" class="form-control salaries" disabled></td>
+                <td><input type="number" value="{{checkOrZeror saudizationSalary }}"
+                    class="form-control saudization-salary">
+                </td>
+                <td><input type="number" value="{{checkOrZeror bills }}" class="form-control bills"></td>
+                <td><input type="number" value="{{checkOrZeror bills1 }}" class="form-control bills1"></td>
+                <td><input type="number" value="{{checkOrZeror bills2 }}" class="form-control bills2"></td>
+                <td><input type="text" value="{{ numeral netIncome }}" class="form-control net-income" disabled></td>
+                <td class="financial-comment" hidden>{{comment}}</td>
+                <td class="rent-comment" hidden>{{rentComment}}</td>
+                <td class="branch-id" hidden>{{branchID}}</td>
+              </tr>
+              {{/each}}
+              <tr>
+                <th scope="col"> المجموع</th>
+                <th scope="col"> {{numeral totals.totalIncome }}</th>
+                <th scope="col" id="total-rent"> {{numeral totals.totalRent }}</th>
+                <th scope="col"> {{numeral totals.totalExpenses }}</th>
+                <th scope="col" id="total-bank-ratio"> {{numeral totals.totalBankRatio }}</th>
+                <th scope="col"> {{numeral totals.totalSalaries }}</th>
+                <th scope="col" id="total-saudization-salary"> {{numeral totals.totalSaudizationSalary }}</th>
+                <th scope="col" id="total-bills"> {{numeral totals.totalBills }}</th>
+                <th scope="col" id="total-bills1"> {{numeral totals.totalBills1 }}</th>
+                <th scope="col" id="total-bills2"> {{numeral totals.totalBills2 }}</th>
+                <th scope="col" id="total-net-income"> {{numeral totals.totalNetIncome }}</th>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="padding-right: 0; padding-left: 0;">
+        <table id="add-row" class="table table-light">
+          <tr>
+            <th scope="col">
+              <p class="tableheader mb-0">إجمالي النقد </p>
+            </th>
+            <th scope="col">
+              <p class="tableheader mb-0"> إجمالي دخل الخدمات </p>
+            </th>
+            <th scope="col">
+              <p class="tableheader mb-0"> إجمالي الدخل الإضافي والتلفيات </p>
+            </th>
+            <th scope="col">
+              <p class="tableheader mb-0"> إجمالي مدى / بنوك </p>
+            </th>
+            <th scope="col">
+              <p class="tableheader mb-0"> إجمالي فيزا / ماستركارد </p>
+            </th>
+            <th scope="col">
+              <p class="tableheader mb-0">إجمالي تسوية العمليات البنكية </p>
+            </th>
+            <th scope="col">
+              <p class="tableheader mb-0"> معدل صافي اليوم </p>
+            </th>
+            <th scope="col">
+              <p class="tableheader mb-0"> عدد الشركاء </p>
+            </th>
+            <th scope="col">
+              <p class="tableheader mb-0"> حساب الشركاء </p>
+            </th>
+          </tr>
+          <tr>
+            <td data-type="change"> {{numeral incomes.cash}}</td>
+            <td data-type="change"> {{numeral incomes.coffeeShop}}</td>
+            <td data-type="change"> {{numeral incomes.addedIncome}}</td>
+            <td data-type="change"> {{numeral incomes.mada}}</td>
+            <td data-type="change"> {{numeral incomes.visa}}</td>
+            <td data-type="change"> {{numeral incomes.bankTransfer}} </td>
+            <td data-type="change" id="daily-net-income"></td>
+            <td data-type="change"> <input type="text" id="partners-count" value="{{partnersCount}}"
+                class="form-control">
+            </td>
+            <td data-type="change"> <input type="text" id="partners-value" value="0" class="form-control"> </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="card d-print-none">
+      <div class="card-header select">
+        <h2 class="text-right tableheader noBorder">الملاحظات : </h2>
+      </div>
+      <div class="card-body" id="notes-body">
+        <div class="d-flex">
+        <button class="btn btn-lg note" id="add-note-button" data-original-title=" إضافة ملاحظة ">
+          أضف ملاحظة <i class="fa fa-plus ml-2"></i>
+        </button>
+        </div>
+        {{#each notes}}
+        <div class="row form-group">
+          {{#each this}}
+          <div class="col-6">
+            <input type="text" class="form-control text-right note-input" placeholder="أكتب ملاحظة" value="{{note}}">
+          </div>
+          {{/each}}
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header d-print-none">
+        <h2 class="text-right tableheader noBorder"> ملاحظات الإيجار: </h2>
+      </div>
+      <div class="card-body" style="padding-right: 0; padding-left: 0;">
+        <table id="add-rent-note" class="table table-light">
+          <tbody>
+            <tr>
+              {{#each data}}
+              <td>
+                <p class="tableheader noBorder mb-0"> {{ branchname }}</p>
+              </td>
+              {{/each}}
+            </tr>
+            <tr>
+              {{#each data}}
+              <td class="rent-branch-id" hidden>{{branchID}}</td>
+              <td><input type="text" class="form-control rent-note-input" value="{{rentComment}}"></td>
+              {{/each}}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body" style="padding-right: 0; padding-left: 0;">
+      <center>
+        <button class="btnclass btn-round" id="print-button">اطبع</button>
+        <button class="btnclass" id="submit-button">أضف</button>
+      </center>
+    </div>
+  </div>
+</div>
+{{> print/addFinancials }}
+{{> footer/financialFooter}}

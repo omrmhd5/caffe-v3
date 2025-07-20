@@ -1,0 +1,20 @@
+const express = require("express");
+const router = express.Router();
+const branchController = require("./controller");
+const { auth, isSuperAdmin } = require("../middleware/auth");
+
+router.route("/").get(auth, isSuperAdmin, branchController.getAllBranches);
+
+router
+  .route("/add")
+  .get(auth, isSuperAdmin, branchController.addBranch)
+  .post(auth, isSuperAdmin, branchController.createBranch);
+
+router.route("/:id").delete(auth, isSuperAdmin, branchController.deleteBranch);
+
+router
+  .route("/:id/edit")
+  .get(auth, isSuperAdmin, branchController.showEdit)
+  .post(auth, isSuperAdmin, branchController.updateBranch);
+
+module.exports = router;

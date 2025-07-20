@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+body, html {
+  height: 100%;
+  font-family: 'Cairo', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* @font-face {
+  font-family:'Sakkal Majalla';
+  src: url('./majalla.ttf');
+} */
+.bg-image {
+  /* The image used */
+  background-image: url("/images/bg.jpg");
+
+  /* Add the blur effect */
+  filter: blur(0px);
+  -webkit-filter: blur(0px);
+
+  /* Full height */
+  height: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+/*Logo*/
+
+.Text{
+  display: flex;
+  flex-direction: column;
+  
+
+}
+/* .Vline{
+  border-right: 1px solid #BF8F00;
+  height:200px;
+ 
+  display: flex;
+
+  align-items: center;
+
+} */
+
+
+/* Position text in the middle of the page/image */
+.bg-text {
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0, 0.8); /* Black w/opacity/see-through */
+  
+  /* font-weight: bold; */
+  border: 1px solid #f1f1f1;
+  /* border-radius: 15px; */
+  position: absolute;
+   top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+   z-index: 2; 
+  width: auto;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  height:100%;
+  width:100%;
+}
+.Form{
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+
+
+ 
+}
+
+.form{
+  display: flex;
+width: 100%;
+justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  
+}
+
+
+
+.form-group{
+display: flex;
+flex-direction: column;
+   
+
+}
+p{
+  font-size: 17px;
+  font-style: bold;
+  /* color:white; */
+  margin: 0;
+}
+.login_input{
+  /* border-radius: 10px; */
+}
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+ 
+  opacity: 1; /* Firefox */
+
+  text-align: center;
+}
+.loginDiv_btn{
+  padding: 10px;
+}
+.login_btn{
+  border-radius: 10px;
+  font-size: 15px;
+  font-style: bold;
+  color:white;
+  height: 40px;
+  padding: 0;
+  width:100px;
+  cursor: pointer;
+}
+.login_btn:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+.login_forgetLink{
+  color: white;
+}

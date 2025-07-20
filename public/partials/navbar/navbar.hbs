@@ -1,0 +1,123 @@
+<link rel="stylesheet" href="../../assets/css/my.css">
+
+<nav class="navbar navbar-expand-lg navbar_color shadow-sm" dir="rtl">
+  
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"><i class="fas fa-bars"></i></span>
+  </button>
+  
+  <div class="navContainer">
+    <div class="logoImg">
+  <a  href="/">
+    {{#ifEquals expreq.user.role 'Admin'}}
+    {{/ifEquals}}
+      <img 
+        {{#ifNotEquals expreq.user.role 'SuperAdmin'}}
+          src='/{{expreq.user.companyID.companyImage}}'
+        {{/ifNotEquals}} 
+        {{#ifEquals expreq.user.role 'SuperAdmin'}}
+          src='/images/ronzaHeaderLogo.jpeg'
+        {{/ifEquals}}
+        class="d-inline-block align-top navLogo" alt="">
+    </a>
+    </div>
+<div class="navLinks collapse navbar-collapse"  id="navbarSupportedContent">
+   <ul class="navbar-nav  navItems mr-4 mx-md-auto">
+        <li class="nav-item ">
+          <a class="nav-link" href="/" > الرئيسية</a>
+        </li>
+        {{#ifEquals expreq.user.role 'Admin'}}
+        {{> navbar/adminNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'Manager'}}
+        {{> navbar/managerNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'Accountant'}}
+        {{> navbar/accountantNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'BranchAccountant'}}
+        {{> navbar/accountantNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'AccountantManager'}}
+        {{> navbar/accountantManagerNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'StoreMan'}}
+        {{> navbar/storemanNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'BranchStoreMan'}}
+        {{> navbar/storemanNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'Cashier'}}
+        {{> navbar/cashierNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'SuperAdmin'}}
+        {{> navbar/superAdminNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'Invoicer'}}
+        {{> navbar/invoicerNavbar}}
+        {{/ifEquals}}
+      </ul>
+
+  </div>
+<div class="navLogOut">
+        <ul class="navbar-nav mr-auto ml-md-4">
+        <li class="nav-item dropdown">
+          <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" v-pre>
+            {{#if expreq.user.fullName}}
+            {{expreq.user.fullName}}
+            {{else}}
+            {{expreq.user.username}}
+            {{/if}}
+            <img class="user-image" src="/images/default.png">
+          </a>
+
+          <div class="dropdown-menu dropdown-menu-right text-right" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/users/changePassword">تغيير كلمة المرور</a>
+            <a class="dropdown-item" href="/users/logout">تسجيل خروج </a>
+          </div>
+
+        </li>
+      </ul>
+</div>
+</div>
+</nav>
+
+
+{{!-- /////////////////// --}}
+{{!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Navbar</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Dropdown
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="#">Action</a>
+          <a class="dropdown-item" href="#">Another action</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Something else here</a>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Disabled</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav> --}}
+{{!-- /////////////////// --}}

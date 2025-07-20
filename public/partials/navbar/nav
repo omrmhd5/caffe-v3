@@ -1,0 +1,64 @@
+<nav class="navbar navbar-expand  navbarClass shadow-sm" dir="">
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <a class="navbar-brand" href="/">
+      <img src="/images/ronzaHeaderLogo.jpeg" width="275" height="275" class="d-inline-block align-top" alt="">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse   navbar-collapse">
+      <ul class="navbar-nav  nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/"> الرئيسية</a>
+        </li>
+        {{#ifEquals expreq.user.role 'Admin'}}
+        {{> navbar/adminNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'Manager'}}
+        {{> navbar/managerNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'Accountant'}}
+        {{> navbar/accountantNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'BranchAccountant'}}
+        {{> navbar/accountantNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'AccountantManager'}}
+        {{> navbar/accountantManagerNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'StoreMan'}}
+        {{> navbar/storemanNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'Cashier'}}
+        {{> navbar/cashierNavbar}}
+        {{/ifEquals}}
+        {{#ifEquals expreq.user.role 'SuperAdmin'}}
+        {{> navbar/superAdminNavbar}}
+        {{/ifEquals}}
+      </ul>
+
+      <ul class="navbar-nav mr-auto ml-md-4">
+        <li class="nav-item dropdown">
+          <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false" v-pre>
+            {{#if expreq.user.fullName}}
+            {{expreq.user.fullName}}
+            {{else}}
+            {{expreq.user.username}}
+            {{/if}}
+            <img class="user-image" src="/images/default.png">
+          </a>
+
+          <div class="dropdown-menu dropdown-menu-right text-right" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/users/changePassword">تغيير كلمة المرور</a>
+            <a class="dropdown-item" href="/users/logout">تسجيل خروج </a>
+          </div>
+
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

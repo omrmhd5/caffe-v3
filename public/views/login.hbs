@@ -1,0 +1,47 @@
+{{> header}}
+
+<link rel="stylesheet" href="../assets/css/login.css">
+
+<div class="bg-image"></div>
+<div class="bg-text">
+  <div class="Form">
+    <p class="select">مكتمل</p>
+    {{#if errorMessage}}
+    <div class="alert alert-danger alert-dismissable">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+      {{errorMessage}}
+    </div>
+    {{/if}}
+    <form action="/users/login" method="POST" dir="rtl">
+      <div class="form-group">
+        <label class="login_label" for="username" class=" float-right ">
+          <p class="text-white"> <i class="fa fa-user" aria-hidden="true"></i> اسم المستخدم</p>
+        </label>
+        <input class="login_input" id="username" name="username" type="text" class="form-control"
+          placeholder=" اسم المستخدم" required>
+      </div>
+      <div class="form-group">
+        <label class="login_label" for="password" class="placeholder float-right">
+          <p class="text-white"> <i class="fa fa-unlock-alt" aria-hidden="true"></i> كلمة المرور</p>
+        </label>
+        <input class="login_input" id="password" name="password" type="password" class="form-control inputclass"
+          placeholder="  كلمه المرور " required>
+        <div class="show-password">
+        </div>
+      </div>
+      <div class="loginDiv_btn">
+        <button class="btnclass  login_btn">
+          <p class=""><i class="fa fa-sign-in " aria-hidden="true"></i> تسجيل الدخول</p>
+        </button>
+      </div>
+      <div class="loginDiv_btn">
+        <a href="/users/resetPasswordRequest">
+          <p>نسيت كلمةالمرور ؟ </p>
+        </a>
+      </div>
+    </form>
+    <h6 class=""> جميع الحقوق محفوظه &#169; مكتمل </h6>
+  </div>
+</div>
+
+{{> footer}}

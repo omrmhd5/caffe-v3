@@ -1,0 +1,205 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="col-md-7 col-xl-7">
+      {{#if successMessage}}
+      <div class="alert alert-success alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{successMessage}}
+      </div>
+      {{/if}}
+      {{#if errorMessage}}
+      <div class="alert alert-danger alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+        {{errorMessage}}
+      </div>
+      {{/if}}
+      <div class="card">
+        <div class="headerPage">
+          <div class="Title">
+            <h2 class="text-center" style="text-align: center; color:white;">إضافة فاتورة جديدة</h2>
+          </div>
+        </div>
+        <div class="card-body px-0">
+          <form action="/invoice/add" method="POST" enctype="multipart/form-data" class="col-md-8 col-12 mx-auto">
+            <div class="row form-group">
+              <div class="col">
+                <label for="taxRatio" class="float-right">
+                  <p class="select">(%) نسبة الضريبة</p>
+                </label>
+                <input type="number" id="taxRatio" name="taxRatio" class="form-control" dir="rtl"
+                  value="{{invoice.taxRatio}}" step="1" min="0" max="100" required>
+              </div>
+              <div class="col">
+                <label for="amount" class="float-right">
+                  <p class="select">مبلغ الفاتورة</p>
+                </label>
+                <input type="number" id="amount" name="amount" class="form-control" dir="rtl" value="{{invoice.amount}}"
+                  step="0.01" min="0" required>
+              </div>
+
+              <div class="col">
+                <label for="totalAmount" class="float-right">
+                  <p class="select">إجمالي الفاتورة</p>
+                </label>
+                <input type="number" id="totalAmount" name="totalAmount" class="form-control" dir="rtl" value="0"
+                  readonly>
+              </div>
+
+              <div class="row form-group" >
+                <div class="col">
+                  <label for="invoiceNumber" class="float-right">
+                    <p class="select">رقم  الفاتورة</p>
+                  </label>
+                  <input type="string" id="invoiceNumber" name="invoiceNumber" class="form-control" dir="rtl">
+                </div>
+
+                <div class="col">
+                  <label for="supplierName" class="float-right">
+                    <p class="select"> اسم المورد</p>
+                  </label>
+                  <input type="string" id="supplierName" name="supplierName" class="form-control" dir="rtl">
+                </div>
+              </div>
+
+              <div class="col">
+                <label for="taxValue" class="float-right">
+                  <p class="select">قيمة الضريبة</p>
+                </label>
+                <input type="number" id="taxValue" name="taxValue" class="form-control" dir="rtl" value="0" step="0.01"
+                  min="0" readonly>
+              </div>
+
+              <div class="col">
+                <label for="supplierTaxNumber" class="float-right">
+                  <p class="select"> الرقم الضريبي للمورد</p>
+                </label>
+                <input type="string" id="supplierTaxNumber" name="supplierTaxNumber" class="form-control" dir="rtl">
+              </div>
+
+            </div>
+
+            <div class="row form-group">
+              <div class="col">
+                <label for="itemName" class="float-right">
+                  <p class="select">رقم القيد</p>
+                </label>
+                <input type="number" id="serialNumber" name="serialNumber" class="form-control" placeholder="رقم القيد "
+                  dir="rtl" value="{{invoice.serialNumber}}" required>
+              </div>
+              <div class="col-md-6 col-12">
+                <label for="date" class="float-right">
+                  <p class="select"> تاريخ الفاتورة</p>
+                </label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="date" name="date" dir="ltr">
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="fa fa-calendar"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <div class="form-group" dir="rtl">
+              <div class="row">
+                <div class="col-12">
+                  <div class="row">
+                    <label for="expire" class="float-right col-3 col-md-3">
+                      <p class="select mb-md-4 mb-2"> الضمان</p>
+                      <input type="checkbox" class="form-control cursor" id="warranty" name="warranty"
+                        onclick="warrantyShow()">
+                    </label>
+                    <div class="col-9 col-md-9">
+                      <label for="date" class="float-right">
+                        <p class="select">عدد سنوات الضمان</p>
+                      </label>
+                      <input type="number" class="form-control" name="warrantyYears" id="warrantyYears" disabled>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="image" class="float-right">
+                    <p class="select">صورة الفاتورة </p>
+                  </label>
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="image" name="image" required>
+                    <label class="custom-file-label text-right" for="image" id="image-label"> </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="branchID" class="float-right">
+                    <p class="select"> الفرع</p>
+                  </label>
+                  {{#if branchedRole}}
+                  <select id="branchID" name="branchID" class="form-control float-right " disabled>
+                    <option value="{{branchID._id}}" selected> {{branchID.branchname}} </option>
+                  </select>
+                  {{else}}
+                  <select class="form-control  float-right" id="branchID" name="branchID" style="text-align:right;"
+                    required>
+                    <option value="" selected="selected" hidden="hidden"> اختر الفرع </option>
+                    {{#each branches}}
+                    <option value="{{_id}}"> {{branchname}} </option>
+                    {{/each}}
+                  </select>
+                  {{/if}}
+                </div>
+              </div>
+            </div>
+            <div class="row form-group">
+              <div class="col">
+                <label for="description" class="float-right">
+                  <p class="select"> وصف الفاتورة</p>
+                </label>
+                <input type="text" id="description" name="description" class="form-control" placeholder=" وصف الفاتورة"
+                  dir="rtl">
+              </div>
+            </div>
+            <div class=" Center row">
+              <a href="/invoice" class="btnclass signature px-3 btn-round">
+                <h6 class="select"> عودة إلى قائمة الفواتير
+                </h6>
+              </a>
+              <button type="submit" class=" btnclass mx-auto mx-md-2">
+                <h6 class="select"> أضف الفاتورة </h6>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+<script>
+  $('#date').datetimepicker({
+    format: 'YYYY/MM/DD',
+    
+    icons: {
+      time: 'fa fa-clock',
+      date: 'fa fa-calendar',
+      up: 'fa fa-chevron-up',
+      down: 'fa fa-chevron-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-check',
+      clear: 'fa fa-trash',
+      close: 'fa fa-times'
+    }
+  });
+
+  if (window.history.replaceState) {
+    window.history.replaceState(null, null, window.location.href);
+  }
+</script>
+
+{{> footer/invoiceFooter}}
