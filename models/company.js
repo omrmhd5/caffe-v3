@@ -29,6 +29,20 @@ const companySchema = new mongoose.Schema(
     notes: {
       type: String,
     },
+    hidden: {
+      type: Boolean,
+      default: false,
+    },
+    hiddenFromDate: {
+      type: Date,
+      default: null,
+    },
+    rentHistory: [
+      {
+        value: { type: Number, required: true },
+        fromDate: { type: Date, required: true },
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -43,7 +57,6 @@ companySchema.virtual("branches", {
 });
 
 companySchema.pre("remove", async function (next) {
-
   const branches = await Branch.find({ companyID: this._id });
   branches.forEach(async (branch) => {
     const cashiers = await Cashier.find({ branchID: branch._id });

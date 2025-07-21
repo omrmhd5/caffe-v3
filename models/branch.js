@@ -14,6 +14,20 @@ const branchSchema = new mongoose.Schema({
     required: true,
     ref: "Company",
   },
+  hidden: {
+    type: Boolean,
+    default: false,
+  },
+  hiddenFromDate: {
+    type: Date,
+    default: null,
+  },
+  rentHistory: [
+    {
+      value: { type: Number, required: true },
+      fromDate: { type: Date, required: true },
+    },
+  ],
   // custodies: [
   //   {
   //     type: mongoose.Schema.Types.ObjectId,

@@ -11,25 +11,49 @@ const Salary = require("../../models/salary");
 const Invoice = require("../../models/invoice");
 require("../common/date");
 
+// Helper to get rent for a branch for a specific date
+async function getRentForMonth(branch, date) {
+  if (!branch.rentHistory || branch.rentHistory.length === 0) return 0;
+  const d = new Date(date);
+  // Find the most recent rent entry before or at the given date
+  let best = null;
+  for (const entry of branch.rentHistory) {
+    if (entry.fromDate <= d && (!best || entry.fromDate > best.fromDate)) {
+      best = entry;
+    }
+  }
+  return best ? best.value : 0;
+}
+
 exports.report = async (date, user) => {
   let results = [];
   if (!date) return results;
 
-  let branches = await branchService.getAllBranches(user.companyID);
+  let branches = await branchService.getAllBranches(user.companyID, date);
 
   let totals = await this.calculateTotalsByDate(date, branches);
 
-  let financials = await Financial.find({ date, branchID: { $in: branches } })
+  let financials = await Financial.find({
+    date,
+    branchID: { $in: branches.map((b) => b._id) },
+  })
     .populate("branchID")
     .populate("accounter")
     .lean();
+
+  // Update rent in financials to use rentHistory
+  for (let f of financials) {
+    if (f.branchID && f.branchID.rentHistory) {
+      f.rent = await getRentForMonth(f.branchID, date);
+    }
+  }
 
   return { financials, totals };
 };
 
 exports.getAllFinancials = async (date, branchID, user) => {
   let find = {};
-
+  let branches;
   if (date) {
     find.date = date;
   } else {
@@ -38,14 +62,25 @@ exports.getAllFinancials = async (date, branchID, user) => {
 
   if (branchID) {
     find.branchID = branchID;
+    branches = [await branchService.getBranchById(branchID)];
   } else {
-    let branches = await branchService.getAllBranches(user.companyID);
+    branches = await branchService.getAllBranches(user.companyID, find.date);
     find.branchID = {
-      $in: branches,
+      $in: branches.map((b) => b._id),
     };
   }
 
-  return Financial.find(find).populate("branchID").populate("accounter").lean();
+  let financials = await Financial.find(find)
+    .populate("branchID")
+    .populate("accounter")
+    .lean();
+  // Update rent in financials to use rentHistory
+  for (let f of financials) {
+    if (f.branchID && f.branchID.rentHistory) {
+      f.rent = await getRentForMonth(f.branchID, find.date);
+    }
+  }
+  return financials;
 };
 
 exports.getFinanceById = async (id) => {
@@ -53,7 +88,10 @@ exports.getFinanceById = async (id) => {
   if (!item) {
     throw new NotFoundException("الصنف غير موجود");
   }
-
+  // Update rent to use rentHistory
+  if (item.branchID && item.branchID.rentHistory) {
+    item.rent = await getRentForMonth(item.branchID, item.date);
+  }
   return item;
 };
 
@@ -68,6 +106,20 @@ exports.deleteFinance = async (id) => {
 };
 
 exports.updateFinance = async (date, branchID, financial) => {
+  // Prevent update if branch is not editable for this date
+  const editable = await branchService.isBranchEditable(branchID, date);
+  if (!editable) {
+    throw new NotFoundException("لا يمكن تعديل فرع مخفي أو بعد تاريخ الإخفاء");
+  }
+  // Use rent from rentHistory if not explicitly set
+  const branch = await branchService.getBranchById(branchID);
+  if (
+    branch &&
+    branch.rentHistory &&
+    (!financial.rent || financial.rent === 0)
+  ) {
+    financial.rent = await getRentForMonth(branch, date);
+  }
   let netIncome = (
     parseFloat(financial.income) -
     parseFloat(financial.rent) -
@@ -128,30 +180,14 @@ exports.getFinanceByBranchId = async (branchID, date) => {
   }).populate("branchID");
 
   let branch = await branchService.getBranchById(branchID);
-  let previousRent;
-
-  if (!financial) {
-    const previousMonthFinancial = await Financial.findOne({
-      branchID,
-      rent: {
-        $ne: 0,
-      },
-    }).sort({
-      date: -1,
-    });
-
-    previousRent = previousMonthFinancial ? previousMonthFinancial.rent : 0;
-    if (financial && !financial.rent) {
-      financial.rent = previousRent;
-    }
-  }
+  let rent = await getRentForMonth(branch, date);
 
   if (!financial) {
     return {
       branchID: { branchname: branch.branchname },
       saudizationSalary: 0,
       income: 0,
-      rent: previousRent,
+      rent: rent,
       expenses: 0,
       bankRatio: 0,
       salaries: 0,
@@ -162,7 +198,10 @@ exports.getFinanceByBranchId = async (branchID, date) => {
       netIncome: 0,
     };
   }
-
+  // Update rent to use rentHistory
+  if (branch && branch.rentHistory) {
+    financial.rent = rent;
+  }
   return financial;
 };
 
@@ -209,7 +248,7 @@ exports.calculateTotalsByDate = async (date, branches) => {
 };
 
 exports.showAdd = async (date, user) => {
-  let branches = await branchService.getAllBranches(user.companyID);
+  let branches = await branchService.getAllBranches(user.companyID, date);
   let data = [];
   let totalBankRatio = 0;
   let totalRent = 0;
@@ -357,13 +396,15 @@ exports.updateSalariesAndNetIncome = async (branchID, date, userID) => {
       });
     }
   } catch (error) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-    console.log('something went wrong while executing updateSalariesAndNetIncome ');
-    console.log('error', error);
-    console.log('branchID', branchID);
-    console.log('date', date);
-    console.log('userID', userID);
-    console.log('#####################################');
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    console.log(
+      "something went wrong while executing updateSalariesAndNetIncome "
+    );
+    console.log("error", error);
+    console.log("branchID", branchID);
+    console.log("date", date);
+    console.log("userID", userID);
+    console.log("#####################################");
   }
 };
 
@@ -450,13 +491,15 @@ exports.updateIncomeAndNetIncome = async (branchID, date, userID) => {
       });
     }
   } catch (error) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-    console.log('something went wrong while executing updateIncomeAndNetIncome');
-    console.log('error', error);
-    console.log('branchID', branchID);
-    console.log('date', date);
-    console.log('userID', userID);
-    console.log('#####################################');
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    console.log(
+      "something went wrong while executing updateIncomeAndNetIncome"
+    );
+    console.log("error", error);
+    console.log("branchID", branchID);
+    console.log("date", date);
+    console.log("userID", userID);
+    console.log("#####################################");
   }
 };
 
@@ -536,14 +579,13 @@ exports.updateExpenses = async (branchID, date, userID = null) => {
         accounter: userID,
       });
     }
-
   } catch (error) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-    console.log('something went wrong while executing updateExpenses');
-    console.log('error', error);
-    console.log('branchID', branchID);
-    console.log('date', date);
-    console.log('userID', userID);
-    console.log('#####################################');
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    console.log("something went wrong while executing updateExpenses");
+    console.log("error", error);
+    console.log("branchID", branchID);
+    console.log("date", date);
+    console.log("userID", userID);
+    console.log("#####################################");
   }
 };

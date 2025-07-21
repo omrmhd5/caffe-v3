@@ -38,10 +38,10 @@ const calculatePartnersValue = function () {
 
     if (!partnersCountValue) {
       partnersValue.value = totalNetIncome;
-      printPartnersValue.value = numeral(totalNetIncome).format('0,0.00');
-    } else { 
+      printPartnersValue.value = numeral(totalNetIncome).format("0,0.00");
+    } else {
       partnersValue.value = (totalNetIncome / partnersCountValue).toFixed(2);
-      printPartnersValue.value = numeral(partnersValue.value).format('0,0.00');
+      printPartnersValue.value = numeral(partnersValue.value).format("0,0.00");
     }
   }
 };
@@ -193,7 +193,7 @@ $("#modalFinancialForm").delegate("input", "keyup", "change", function (e) {
     parseFloat(bills2)
   ).toFixed(2);
 
-  netIcome = getNumberWithCommas(netIcome)
+  netIcome = getNumberWithCommas(netIcome);
   $("#modal-net-income").val(netIcome);
 });
 
@@ -215,7 +215,12 @@ $(".comments-edit-button").on("click", function () {
   });
 });
 
+let isSubmittingFinancials = false;
+
 const sendData = async () => {
+  if (isSubmittingFinancials) return;
+  isSubmittingFinancials = true;
+
   let url = "/financial/add";
   let method = "POST";
   let data = [];
@@ -224,14 +229,20 @@ const sendData = async () => {
   let date = $("#query-date").val();
   let table = document.getElementById("add-financial-table");
 
+  // Collect rent update promises
+  let rentUpdatePromises = [];
+
   for (let i = 0, row; (row = table.rows[i]); i++) {
     let branchData = {};
     let branchID = $(".branch-id", row).text();
+    let rentInput = $(".rent", row);
+    let originalRent = rentInput.data("original-value");
+    let currentRent = rentInput.val();
     if (branchID) {
       branchData.branchID = branchID;
       branchData.income = numeral($(".income", row).val()).value();
       branchData.expenses = numeral($(".expenses", row).val()).value();
-      branchData.rent = $(".rent", row).val();
+      branchData.rent = currentRent;
       branchData.bankRatio = $(".bank-ratio", row).val();
       branchData.salaries = numeral($(".salaries", row).val()).value();
       branchData.saudizationSalary = $(".saudization-salary", row).val();
@@ -239,8 +250,25 @@ const sendData = async () => {
       branchData.bills1 = $(".bills1", row).val();
       branchData.bills2 = $(".bills2", row).val();
       branchData.netIcome = numeral($(".net-income", row).val()).value();
-
       data.push(branchData);
+      // If rent changed, update rent history first
+      if (
+        originalRent !== undefined &&
+        currentRent !== undefined &&
+        parseFloat(originalRent) !== parseFloat(currentRent)
+      ) {
+        rentUpdatePromises.push(
+          $.ajax({
+            url: `/branches/${branchID}/rent`,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+              value: parseFloat(currentRent),
+              fromDate: date + "-01",
+            }),
+          })
+        );
+      }
     }
   }
 
@@ -249,7 +277,6 @@ const sendData = async () => {
     if (!notesElements[i].value) {
       continue;
     }
-
     notes.push({
       note: notesElements[i].value,
       date,
@@ -264,7 +291,6 @@ const sendData = async () => {
     if (!rentNotesElements[i].value) {
       rentNotesElements[i].value = "";
     }
-
     rentNotes.push({
       branchID: rentBranchIDs[i].innerHTML,
       note: rentNotesElements[i].value,
@@ -273,13 +299,33 @@ const sendData = async () => {
   }
 
   let partnersCount = $("#partners-count").val();
-  callUrl(url, method, {
-    data: JSON.stringify(data),
-    partnersCount,
-    date,
-    notes: JSON.stringify(notes),
-    rentNotes: JSON.stringify(rentNotes),
-  });
+
+  // Wait for all rent updates, then submit financials
+  Promise.all(rentUpdatePromises)
+    .then(function () {
+      callUrl(url, method, {
+        data: JSON.stringify(data),
+        partnersCount,
+        date,
+        notes: JSON.stringify(notes),
+        rentNotes: JSON.stringify(rentNotes),
+      });
+    })
+    .catch(function () {
+      swal(
+        "حدث خطأ",
+        "تعذر تحديث الإيجار لبعض الفروع. الرجاء المحاولة مرة أخرى.",
+        {
+          icon: "error",
+          buttons: {
+            confirm: {
+              className: "btn btn-danger",
+            },
+          },
+        }
+      );
+      isSubmittingFinancials = false;
+    });
 };
 
 let button = document.getElementById("submit-button");
@@ -493,7 +539,7 @@ const calculateBills2ColumntTotal = () => {
     parseFloat(totalBills2).toFixed(2);
 };
 
-const calculateTotalIncomeColumntTotal = () => {  
+const calculateTotalIncomeColumntTotal = () => {
   let totalNetIncome = 0;
 
   $("tr .net-income").each(function (index, value) {
@@ -508,7 +554,7 @@ const calculateTotalIncomeColumntTotal = () => {
   });
 
   document.getElementById("total-net-income").innerHTML =
-    numeral(totalNetIncome).format('0,0.00');
+    numeral(totalNetIncome).format("0,0.00");
 };
 
 $("#add-financial-table").delegate("input", "keyup", "change", function (e) {
@@ -558,7 +604,7 @@ $("#add-financial-table").delegate("input", "keyup", "change", function (e) {
     parseFloat(bills2)
   ).toFixed(2);
 
-  netIncome = numeral(netIncome).format('0,0.00');
+  netIncome = numeral(netIncome).format("0,0.00");
 
   $(".net-income", row).val(netIncome);
 
@@ -571,6 +617,81 @@ $("#add-financial-table").delegate("input", "keyup", "change", function (e) {
   calculateTotalIncomeColumntTotal();
 });
 
-const  getNumberWithCommas = (number) => {
+const getNumberWithCommas = (number) => {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-}
+};
+
+$(document).on("change", ".rent", function () {
+  const row = $(this).closest("tr");
+  const branchID = $(".branch-id", row).text();
+  const newRent = $(this).val();
+  const originalRent = $(this).data("original-value") || newRent;
+  const date = $("#query-date").val();
+
+  if (!branchID || !newRent || isNaN(newRent)) return;
+
+  // Store original value if not already stored
+  if (!$(this).data("original-value")) {
+    $(this).data("original-value", originalRent);
+  }
+
+  swal({
+    title: "تغيير الإيجار",
+    text: "هل أنت متأكد أنك تريد تغيير الإيجار لهذا الفرع؟ سيؤثر ذلك على هذا الشهر وكل الشهور القادمة.",
+    icon: "warning",
+    buttons: {
+      confirm: {
+        text: "نعم",
+        className: "btn btn-success",
+      },
+      cancel: {
+        text: "لا",
+        visible: true,
+        className: "btn btn-danger",
+      },
+    },
+  }).then((confirmed) => {
+    if (confirmed) {
+      // Keep the new value and send AJAX request in background
+      $.ajax({
+        url: `/branches/${branchID}/rent`,
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+          value: parseFloat(newRent),
+          fromDate: date + "-01",
+        }),
+        success: function (data) {
+          // Update the original value to the new value
+          $(this).data("original-value", newRent);
+          // Recalculate totals
+          calculateRentColumntTotal();
+          calculateTotalIncomeColumntTotal();
+        }.bind(this),
+        error: function (jqXhr) {
+          alert(
+            jqXhr.responseJSON && jqXhr.responseJSON.errorMessage
+              ? jqXhr.responseJSON.errorMessage
+              : "حدث خطأ"
+          );
+          // Revert to original value on error
+          $(this).val($(this).data("original-value"));
+          calculateRentColumntTotal();
+          calculateTotalIncomeColumntTotal();
+        }.bind(this),
+      });
+    } else {
+      // Revert to original value without refreshing
+      $(this).val($(this).data("original-value"));
+      calculateRentColumntTotal();
+      calculateTotalIncomeColumntTotal();
+    }
+  });
+});
+
+// Store original values when page loads
+$(document).ready(function () {
+  $(".rent").each(function () {
+    $(this).data("original-value", $(this).val());
+  });
+});

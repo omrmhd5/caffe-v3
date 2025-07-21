@@ -6,12 +6,19 @@ const {
 } = require("../common/errors/exceptions");
 const PAGE_SIZE = require("../common/constants").PAGE_SIZE;
 
-exports.getAllBranches = (companyID = null) => {
+exports.getAllBranches = (companyID = null, forDate = null) => {
   if (!companyID) {
     return [];
   }
-
-  return Branch.find({ companyID }).populate("companyID");
+  let query = { companyID };
+  if (forDate) {
+    query.$or = [
+      { hidden: { $ne: true } },
+      { hiddenFromDate: { $exists: false } },
+      { hiddenFromDate: { $gt: forDate } },
+    ];
+  }
+  return Branch.find(query).populate("companyID");
 };
 
 exports.getAllBranchesWithPagination = (companyID = null, page) => {
@@ -95,4 +102,43 @@ exports.updateBranch = async (id, branchName, companyID) => {
   }
 
   return await Branch.findByIdAndUpdate(id, update, { new: true });
+};
+
+exports.hideBranch = async (id, fromDate) => {
+  const branch = await Branch.findById(id);
+  if (!branch) throw new NotFoundException("الفرع غير موجود");
+  branch.hidden = true;
+  branch.hiddenFromDate = fromDate || new Date();
+  await branch.save();
+  return branch;
+};
+
+exports.unhideBranch = async (id) => {
+  const branch = await Branch.findById(id);
+  if (!branch) throw new NotFoundException("الفرع غير موجود");
+  branch.hidden = false;
+  branch.hiddenFromDate = null;
+  await branch.save();
+  return branch;
+};
+
+exports.updateRentHistory = async (id, value, fromDate) => {
+  const branch = await Branch.findById(id);
+  if (!branch) throw new NotFoundException("الفرع غير موجود");
+  // Remove all future rent history entries from this date forward
+  branch.rentHistory = branch.rentHistory.filter(
+    (entry) => new Date(entry.fromDate) < new Date(fromDate)
+  );
+  branch.rentHistory.push({ value, fromDate });
+  await branch.save();
+  return branch;
+};
+
+exports.isBranchEditable = async (id, date) => {
+  const branch = await Branch.findById(id);
+  if (!branch) throw new NotFoundException("الفرع غير موجود");
+  if (branch.hidden && branch.hiddenFromDate && date >= branch.hiddenFromDate) {
+    return false;
+  }
+  return true;
 };

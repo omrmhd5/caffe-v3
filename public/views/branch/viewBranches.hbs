@@ -59,6 +59,9 @@
                   <p class="tableheader"> اسم الشركة </p>
                 </th>
                 <th scope="col">
+                  <p class="tableheader">حالة الفرع</p>
+                </th>
+                <th scope="col">
                   <p class="tableheader">تعديل بيانات الفرع</p>
                 </th>
                 <th scope="col">
@@ -72,6 +75,9 @@
                 <td> {{@index}}</td>
                 <td>{{branchname}}</td>
                 <td>{{companyID.companyname}}</td>
+                <td>
+                  <input type="checkbox" {{#unless hidden}}checked{{/unless}} data-toggle="toggle" data-onstyle="success" data-offstyle="danger" onchange="toggleBranchHidden('{{_id}}', this.checked)">
+                </td>
                 <td>
                   <div class="form-button-action">
                     <a type="button" data-toggle="tooltip" href="/branches/{{_id}}/edit"

@@ -137,3 +137,35 @@ exports.viewCompany = async (req, res) => {
 
   res.render("company/viewCompany.hbs", { company });
 };
+
+exports.hideCompany = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const fromDate = req.body.fromDate || new Date();
+    await companyService.hideCompany(id, fromDate);
+    res.send({ message: "تم إخفاء الشركة بنجاح" });
+  } catch (error) {
+    res.status(error.status || 500).send({ errorMessage: error.message });
+  }
+};
+
+exports.unhideCompany = async (req, res) => {
+  try {
+    const id = req.params.id;
+    await companyService.unhideCompany(id);
+    res.send({ message: "تم إظهار الشركة بنجاح" });
+  } catch (error) {
+    res.status(error.status || 500).send({ errorMessage: error.message });
+  }
+};
+
+exports.updateRentHistory = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { value, fromDate } = req.body;
+    await companyService.updateRentHistory(id, value, fromDate || new Date());
+    res.send({ message: "تم تحديث الإيجار بنجاح" });
+  } catch (error) {
+    res.status(error.status || 500).send({ errorMessage: error.message });
+  }
+};

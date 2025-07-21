@@ -99,9 +99,18 @@ exports.createFinancials = async (req, res) => {
   }
 
   for (let financial of data) {
+    // Update branch rent history if rent is provided
+    if (financial.rent && parseFloat(financial.rent) > 0) {
+      await branchService.updateRentHistory(
+        financial.branchID,
+        parseFloat(financial.rent),
+        date + "-01"
+      );
+    }
+
     await financialService.updateFinance(date, financial.branchID, {
       income: financial.income,
-      rent:  parseFloat(financial.rent),
+      rent: parseFloat(financial.rent),
       expenses: financial.expenses,
       bankRatio: financial.bankRatio,
       salaries: financial.salaries,

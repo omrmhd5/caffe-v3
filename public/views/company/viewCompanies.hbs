@@ -46,6 +46,9 @@
                     <p class="tableheader mb-0"> عرض فروع الشركة </p>
                   </th>
                   <th scope="col">
+                    <p class="tableheader mb-0">حالة الشركة</p>
+                  </th>
+                  <th scope="col">
                     <p class="tableheader mb-0"> تعديل بيانات الشركة </p>
                   </th>
                   <th scope="col">
@@ -73,6 +76,9 @@
                         <i class="fa fa-info"></i>
                       </a>
                     </div>
+                  </td>
+                  <td>
+                    <input type="checkbox" {{#unless hidden}}checked{{/unless}} data-toggle="toggle" data-onstyle="success" data-offstyle="danger" onchange="toggleCompanyHidden('{{_id}}', this.checked)">
                   </td>
                   <td>
                     <div class="form-button-action">

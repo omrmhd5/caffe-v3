@@ -129,3 +129,35 @@ exports.updateBranch = async (req, res) => {
     });
   }
 };
+
+exports.hideBranch = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const fromDate = req.body.fromDate || new Date();
+    await branchService.hideBranch(id, fromDate);
+    res.send({ message: "تم إخفاء الفرع بنجاح" });
+  } catch (error) {
+    res.status(error.status || 500).send({ errorMessage: error.message });
+  }
+};
+
+exports.unhideBranch = async (req, res) => {
+  try {
+    const id = req.params.id;
+    await branchService.unhideBranch(id);
+    res.send({ message: "تم إظهار الفرع بنجاح" });
+  } catch (error) {
+    res.status(error.status || 500).send({ errorMessage: error.message });
+  }
+};
+
+exports.updateRentHistory = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { value, fromDate } = req.body;
+    await branchService.updateRentHistory(id, value, fromDate || new Date());
+    res.send({ message: "تم تحديث الإيجار بنجاح" });
+  } catch (error) {
+    res.status(error.status || 500).send({ errorMessage: error.message });
+  }
+};

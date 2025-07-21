@@ -77,3 +77,24 @@ function deleteBranch(id) {
     }
   });
 }
+
+function toggleBranchHidden(id, checked) {
+  const url = checked ? `/branches/${id}/unhide` : `/branches/${id}/hide`;
+  $.ajax({
+    url: url,
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({}),
+    success: function (data) {
+      location.reload();
+    },
+    error: function (jqXhr) {
+      alert(
+        jqXhr.responseJSON && jqXhr.responseJSON.errorMessage
+          ? jqXhr.responseJSON.errorMessage
+          : "حدث خطأ"
+      );
+      location.reload();
+    },
+  });
+}

@@ -17,4 +17,13 @@ router
   .get(auth, isSuperAdmin, branchController.showEdit)
   .post(auth, isSuperAdmin, branchController.updateBranch);
 
+router.post("/:id/hide", auth, isSuperAdmin, branchController.hideBranch);
+router.post("/:id/unhide", auth, isSuperAdmin, branchController.unhideBranch);
+router.post(
+  "/:id/rent",
+  auth,
+  isSuperAdmin,
+  branchController.updateRentHistory
+);
+
 module.exports = router;
