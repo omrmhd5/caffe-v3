@@ -84,7 +84,7 @@ exports.updateSalary = async (req, res) => {
     const branchID = req.body.branchID;
     const employeeID = req.body.employeeID;
     const salary = req.body.salary;
-    const advancePayment = req.body.advancePayment;
+    const extraWork = req.body.extraWork;
     const amountIncrease = req.body.amountIncrease;
     const amountDecrease = req.body.amountDecrease;
     const daysIncrease = req.body.daysIncrease;
@@ -98,7 +98,7 @@ exports.updateSalary = async (req, res) => {
       id,
       branchID,
       salary,
-      advancePayment,
+      extraWork,
       amountIncrease,
       daysIncrease,
       amountDecrease,
@@ -160,7 +160,7 @@ exports.report = async (req, res) => {
     let m = date.getMonth() + 1;
     if (m < 10) m = `0${m}`;
 
-    month = `${y}/${m}`
+    month = `${y}/${m}`;
   }
 
   const notes = await notesService.getNotes(branchID, month, req.user);

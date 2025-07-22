@@ -695,3 +695,50 @@ $(document).ready(function () {
     $(this).data("original-value", $(this).val());
   });
 });
+
+// Auto-calculate net income for each row on page load
+function recalculateAllNetIncomeRows() {
+  $("#add-financial-table tbody tr").each(function () {
+    let row = $(this);
+    let incomeValue = $(".income", row).val();
+    let expensesValue = $(".expenses", row).val();
+    let rentValue = $(".rent", row).val();
+    let bankRatioValue = $(".bank-ratio", row).val();
+    let salariesValue = $(".salaries", row).val();
+    let saudizationSalaryValue = $(".saudization-salary", row).val();
+    let billsValue = $(".bills", row).val();
+    let bills1Value = $(".bills1", row).val();
+    let bills2Value = $(".bills2", row).val();
+
+    // Use the same validation as validateFinancialInput
+    const validate = (v) => (!v || isNaN(v) ? 0 : parseFloat(v));
+    let income = validate(incomeValue);
+    let rent = validate(rentValue);
+    let expenses = validate(expensesValue);
+    let bankRatio = validate(bankRatioValue);
+    let salaries = validate(salariesValue);
+    let saudizationSalary = validate(saudizationSalaryValue);
+    let bills = validate(billsValue);
+    let bills1 = validate(bills1Value);
+    let bills2 = validate(bills2Value);
+
+    let netIncome = (
+      income -
+      rent -
+      expenses -
+      bankRatio -
+      salaries -
+      saudizationSalary -
+      bills -
+      bills1 -
+      bills2
+    ).toFixed(2);
+
+    $(".net-income", row).val(netIncome);
+  });
+  calculateTotalIncomeColumntTotal();
+}
+
+$(document).ready(function () {
+  recalculateAllNetIncomeRows();
+});

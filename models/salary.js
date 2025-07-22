@@ -32,7 +32,7 @@ const salarySchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    advancePayment: {
+    extraWork: {
       type: Number,
       required: true,
       default: 0,

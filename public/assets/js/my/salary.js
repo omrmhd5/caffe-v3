@@ -1,7 +1,6 @@
 if (document.getElementById("month")) {
   if (!document.getElementById("month").value) {
-    document.getElementById("month").value =
-      moment().format("YYYY/MM");
+    document.getElementById("month").value = moment().format("YYYY/MM");
   }
 }
 
@@ -19,14 +18,14 @@ $(".edit-button").on("click", function () {
     let amountDecrease = $(".amount-decrease", tr).text();
     let daysIncrease = $(".days-increase", tr).text();
     let daysDecrease = $(".days-decrease", tr).text();
-    let advancePayment = $(".advance-payment", tr).text();
+    let extraWork = $(".extra-work", tr).text();
 
     modal.find(".modal-body #modal-salary").val(salary);
     modal.find(".modal-body #modal-amount-increase").val(amountIncrease);
     modal.find(".modal-body #modal-amount-decrease").val(amountDecrease);
     modal.find(".modal-body #modal-days-increase").val(daysIncrease);
     modal.find(".modal-body #modal-days-decrease").val(daysDecrease);
-    modal.find(".modal-body #modal-advance-payment").val(advancePayment);
+    modal.find(".modal-body #modal-extra-work").val(extraWork);
     modal.find(".modal-body #modal-branch-id").text(branchID);
     modal.find(".modal-body #modal-employee-id").text(employeeID);
     modal.find(".modal-body #modal-date").text(date);
@@ -38,8 +37,7 @@ if (addNoteButton) {
   addNoteButton.addEventListener("click", addNote);
 }
 
-
-function addNote (event) {
+function addNote(event) {
   event.preventDefault();
   let wrapper = $("#notes-body");
   let input = null;
@@ -52,7 +50,7 @@ function addNote (event) {
     '<input type="text" class="form-control text-right note-input" placeholder="أكتب ملاحظة">' +
     "</div></div>";
   $(wrapper).append(input);
-};
+}
 
 const sendData = (event) => {
   event.preventDefault();
@@ -72,7 +70,7 @@ const sendData = (event) => {
     let amountIncreaseValue = $(".amount-increase", row).val();
     let daysDecreaseValue = $(".days-decrease", row).val();
     let daysIncreaseValue = $(".days-increase", row).val();
-    let advancePaymentValue = $(".advance-payment", row).val();
+    let extraWorkValue = $(".extra-work", row).val();
 
     const {
       salary,
@@ -80,14 +78,14 @@ const sendData = (event) => {
       amountIncrease,
       daysDecrease,
       daysIncrease,
-      advancePayment,
+      extraWork,
     } = validateSalaryInput(
       salaryValue,
       amountDecreaseValue,
       amountIncreaseValue,
       daysDecreaseValue,
       daysIncreaseValue,
-      advancePaymentValue
+      extraWorkValue
     );
 
     let employeeName = $(".name", row).val();
@@ -98,7 +96,7 @@ const sendData = (event) => {
       salaryData.amountIncrease = amountIncrease;
       salaryData.daysDecrease = daysDecrease;
       salaryData.daysIncrease = daysIncrease;
-      salaryData.advancePayment = advancePayment;
+      salaryData.extraWork = extraWork;
       salaryData.branchID = $(".branch-id", row).val();
       salaryData.employeeID = $(".employee-id", row).val();
       salaryData.netSalary = $(".net-salary", row).val() || 0;
@@ -122,9 +120,9 @@ const sendData = (event) => {
     });
   }
 
-  callUrl(url, method, { 
-    data: JSON.stringify(data), 
-    notes: JSON.stringify(notes) 
+  callUrl(url, method, {
+    data: JSON.stringify(data),
+    notes: JSON.stringify(notes),
   });
 };
 
@@ -182,7 +180,7 @@ const validateSalaryInput = (
   amountIncrease,
   daysDecrease,
   daysIncrease,
-  advancePayment
+  extraWork
 ) => {
   if (!salary || isNaN(salary)) {
     salary = "0";
@@ -214,10 +212,10 @@ const validateSalaryInput = (
     daysIncrease = parseFloat(daysIncrease).toFixed(2);
   }
 
-  if (!advancePayment || isNaN(advancePayment)) {
-    advancePayment = "0";
+  if (!extraWork || isNaN(extraWork)) {
+    extraWork = "0";
   } else {
-    advancePayment = parseFloat(advancePayment).toFixed(2);
+    extraWork = parseFloat(extraWork).toFixed(2);
   }
 
   return {
@@ -226,7 +224,7 @@ const validateSalaryInput = (
     amountIncrease,
     daysDecrease,
     daysIncrease,
-    advancePayment,
+    extraWork,
   };
 };
 
@@ -238,7 +236,7 @@ $("#add-salary-table").delegate("input", "keyup", "change", function (e) {
   let amountIncreaseValue = $(".amount-increase", row).val();
   let daysDecreaseValue = $(".days-decrease", row).val();
   let daysIncreaseValue = $(".days-increase", row).val();
-  let advancePaymentValue = $(".advance-payment", row).val();
+  let extraWorkValue = $(".extra-work", row).val();
 
   const {
     salary,
@@ -246,14 +244,14 @@ $("#add-salary-table").delegate("input", "keyup", "change", function (e) {
     amountIncrease,
     daysDecrease,
     daysIncrease,
-    advancePayment,
+    extraWork,
   } = validateSalaryInput(
     salaryValue,
     amountDecreaseValue,
     amountIncreaseValue,
     daysDecreaseValue,
     daysIncreaseValue,
-    advancePaymentValue
+    extraWorkValue
   );
 
   let netSalary = (
@@ -262,7 +260,7 @@ $("#add-salary-table").delegate("input", "keyup", "change", function (e) {
     parseFloat(amountIncrease) -
     parseFloat(daysDecrease * (salary / 30)) +
     parseFloat(daysIncrease * (salary / 30)) -
-    parseFloat(advancePayment)
+    parseFloat(extraWork)
   ).toFixed(2);
 
   $(".net-salary", row).val(netSalary);
@@ -271,7 +269,7 @@ $("#add-salary-table").delegate("input", "keyup", "change", function (e) {
 
   $("tr .net-salary").each(function (index, value) {
     let currentValue = numeral($(this).val()).value();
-    console.log(currentValue)
+    console.log(currentValue);
 
     totalSalaries += currentValue;
   });

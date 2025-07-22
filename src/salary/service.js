@@ -22,7 +22,7 @@ exports.getAllSalaries = async (
   if (branchID._id) {
     branchID = branchID._id;
   }
-  
+
   const branch = await branchService.getBranchById(branchID);
 
   const currentDate = new Date();
@@ -51,7 +51,7 @@ exports.getAllSalaries = async (
         salary = {
           branchID,
           employeeID: employee._id,
-          advancePayment: 0,
+          extraWork: 0,
           amountDecrease: 0,
           amountIncrease: 0,
           daysDecrease: 0,
@@ -61,7 +61,10 @@ exports.getAllSalaries = async (
         };
       }
 
-      if (employee.branchID.toString() != branchID || employee.status != "working") {
+      if (
+        employee.branchID.toString() != branchID ||
+        employee.status != "working"
+      ) {
         salary.disabled = "disabled";
       }
 
@@ -133,7 +136,7 @@ exports.createSalary = async (
   employeeID,
   date,
   salary,
-  advancePayment,
+  extraWork,
   amountIncrease,
   daysIncrease,
   amountDecrease,
@@ -158,7 +161,7 @@ exports.createSalary = async (
     daysIncrease * (salary / 30) -
     amountDecrease -
     daysDecrease * (salary / 30) -
-    advancePayment;
+    extraWork;
 
   const foundedSalary = await Salary.findOne({
     employeeID,
@@ -168,7 +171,7 @@ exports.createSalary = async (
   if (foundedSalary) {
     await Salary.findByIdAndUpdate(foundedSalary._id, {
       salary,
-      advancePayment,
+      extraWork,
       amountIncrease,
       daysIncrease,
       amountDecrease,
@@ -183,7 +186,7 @@ exports.createSalary = async (
         employeeID,
         date,
         salary,
-        advancePayment,
+        extraWork,
         amountIncrease,
         daysIncrease,
         amountDecrease,
@@ -202,7 +205,7 @@ exports.updateSalary = async (
   id,
   branchID,
   salary,
-  advancePayment,
+  extraWork,
   amountIncrease,
   daysIncrease,
   amountDecrease,
@@ -224,8 +227,8 @@ exports.updateSalary = async (
     update.salary = salary;
   }
 
-  if (advancePayment) {
-    update.advancePayment = advancePayment;
+  if (extraWork) {
+    update.extraWork = extraWork;
   }
 
   if (daysIncrease) {
@@ -284,6 +287,6 @@ exports.updateBulk = async (user, salaries) => {
     salaries[0].date,
     user._id
   );
-  
+
   return;
 };
