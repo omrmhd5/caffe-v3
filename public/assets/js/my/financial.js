@@ -139,6 +139,7 @@ function callUrl(url, method, data) {
         },
       }).then((OK) => {
         if (OK) {
+          $(window).scrollTop(0);
           location.reload();
         }
       });
@@ -324,6 +325,7 @@ const sendData = async () => {
           },
         }
       );
+      $(window).scrollTop(0);
       isSubmittingFinancials = false;
     });
 };
