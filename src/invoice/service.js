@@ -81,7 +81,7 @@ exports.getCount = (
 
   if (fromDate && toDate) {
     toDate = getToDate(toDate);
-    
+
     find.date = {
       $gt: fromDate,
       $lt: toDate,
@@ -102,7 +102,9 @@ exports.getInvoiceByDescription = async (
   branchID,
   description,
   warrantyStatus,
-  page
+  page,
+  fromDate,
+  toDate
 ) => {
   let find = {};
 
@@ -114,6 +116,15 @@ exports.getInvoiceByDescription = async (
     find.warranty = true;
   } else if (warrantyStatus == 2) {
     find.warranty = false;
+  }
+
+  if (fromDate && toDate) {
+    toDate = getToDate(toDate);
+
+    find.date = {
+      $gte: fromDate,
+      $lte: toDate,
+    };
   }
 
   find.branchID = branchID;
@@ -178,7 +189,11 @@ exports.createInvoice = async (
     throw new BadRequestException("الرجاء إدخال القيمة");
   }
 
-  if (taxValue && taxValue > 0 && (!supplierName || !invoiceNumber || !supplierTaxNumber)) {
+  if (
+    taxValue &&
+    taxValue > 0 &&
+    (!supplierName || !invoiceNumber || !supplierTaxNumber)
+  ) {
     throw new BadRequestException("الرجاء إدخال اسم المورد ورقم الفاتورة");
   }
 
@@ -253,7 +268,7 @@ exports.updateInvoice = async (
   image,
   supplierTaxNumber,
   supplierName,
-  invoiceNumber,
+  invoiceNumber
 ) => {
   let invoice = await Invoice.findById(id).populate("branchID").lean();
 
@@ -295,18 +310,24 @@ exports.updateInvoice = async (
     update.image = image;
   }
 
-  if (taxValue && taxValue > 0 && (!supplierName || !invoiceNumber || !supplierTaxNumber)) {
+  if (
+    taxValue &&
+    taxValue > 0 &&
+    (!supplierName || !invoiceNumber || !supplierTaxNumber)
+  ) {
     throw new BadRequestException("الرجاء إدخال اسم المورد ورقم الفاتورة");
   }
 
   if ((!taxValue || taxValue <= 0) && (supplierName || supplierTaxNumber)) {
-    throw new BadRequestException(" الرجاء حذف اسم ورقم المورد ورقم الفاتورة أو إضافة قيمة الضريبة");
+    throw new BadRequestException(
+      " الرجاء حذف اسم ورقم المورد ورقم الفاتورة أو إضافة قيمة الضريبة"
+    );
   }
 
   update.supplierTaxNumber = supplierTaxNumber;
   update.supplierName = supplierName;
   update.invoiceNumber = invoiceNumber;
-  
+
   invoice = await Invoice.findByIdAndUpdate(id, update, {
     new: true,
   }).populate("branchID");
@@ -316,7 +337,12 @@ exports.updateInvoice = async (
   return invoice;
 };
 
-exports.getReport = async (branchID = null, fromDate, toDate, taxStatus = null) => {
+exports.getReport = async (
+  branchID = null,
+  fromDate,
+  toDate,
+  taxStatus = null
+) => {
   let find = {};
   let total = 0;
   let taxTotal = 0;
@@ -326,24 +352,24 @@ exports.getReport = async (branchID = null, fromDate, toDate, taxStatus = null) 
 
   if (taxStatus == 1) {
     find = {
-      $and :[
-        {supplierTaxNumber: {$exists: true}},
-        {supplierTaxNumber: { $ne: null}},
-        {supplierTaxNumber: { $ne: ""}},
-        {supplierTaxNumber: { $ne: " "}},
-      ]
-    }
+      $and: [
+        { supplierTaxNumber: { $exists: true } },
+        { supplierTaxNumber: { $ne: null } },
+        { supplierTaxNumber: { $ne: "" } },
+        { supplierTaxNumber: { $ne: " " } },
+      ],
+    };
   }
 
   if (taxStatus == 2) {
     find = {
       $or: [
-        {supplierTaxNumber: {$exists: false}},
-        {supplierTaxNumber: { $eq: null}},
-        {supplierTaxNumber: { $eq: ""}},
-        {supplierTaxNumber: { $eq: " "}},
-      ]
-    }
+        { supplierTaxNumber: { $exists: false } },
+        { supplierTaxNumber: { $eq: null } },
+        { supplierTaxNumber: { $eq: "" } },
+        { supplierTaxNumber: { $eq: " " } },
+      ],
+    };
   }
 
   if (branchID) {

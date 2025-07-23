@@ -11,7 +11,6 @@ const branchService = require("../branch/service");
 let warrantyStatuses = require("../common/constants").WARRANTY_STATUS;
 let taxStatuses = require("../common/constants").TAX_STATUS;
 
-
 exports.getAllInvoices = async (req, res) => {
   let branchID = null;
   let fromDate = null;
@@ -74,7 +73,9 @@ exports.getAllInvoices = async (req, res) => {
       branchID,
       description,
       warrantyStatus,
-      page
+      page,
+      fromDate,
+      toDate
     );
   } else if (serialNumber) {
     invoices = await invoiceService.getInvoiceBySerialNumber(
@@ -270,7 +271,7 @@ exports.updateInvoice = async (req, res) => {
     let taxValue = req.body.taxValue;
     let supplierTaxNumber = req.body.supplierTaxNumber;
     let invoiceNumber = req.body.invoiceNumber;
-    let supplierName = req.body.supplierName
+    let supplierName = req.body.supplierName;
 
     if (req.files.image) {
       image = "uploads/" + req.files.image[0].filename;
@@ -356,12 +357,13 @@ exports.report = async (req, res) => {
   let fromDate = null;
   let toDate = null;
   let taxStatus = 0;
-  
+
   let branches = await branchService.getAllBranches(req.user.companyID);
-  branches.unshift({ //hardcode all @TODO find a better way to do this ??
+  branches.unshift({
+    //hardcode all @TODO find a better way to do this ??
     _id: null,
-    branchname: 'الكل',
-    companyID: '61fb9a9055372857247e7bdc'
+    branchname: "الكل",
+    companyID: "61fb9a9055372857247e7bdc",
   });
 
   if (req.user.branchedRole) {
@@ -386,10 +388,11 @@ exports.report = async (req, res) => {
   if (branchID) {
     branch = await branchService.getBranchById(branchID);
   } else {
-    branch = { //hardcode all @TODO find a better way to do this ??
+    branch = {
+      //hardcode all @TODO find a better way to do this ??
       _id: null,
-      branchname: 'الكل',
-      selected: 'selected'
+      branchname: "الكل",
+      selected: "selected",
     };
   }
 
@@ -413,11 +416,10 @@ exports.report = async (req, res) => {
     });
   }
 
-
   let { invoices, total, taxTotal, invoicesTotal } =
     await invoiceService.getReport(branchID, fromDate, toDate, taxStatus);
 
-    res.render("invoice/invoiceReport.hbs", {
+  res.render("invoice/invoiceReport.hbs", {
     branches,
     invoices,
     total,
@@ -439,10 +441,11 @@ exports.excelReport = async (req, response) => {
   let toDate = null;
   let taxStatus = 0;
   let branches = await branchService.getAllBranches(req.user.companyID);
-  branches.unshift({ //hardcode all @TODO find a better way to do this ??
+  branches.unshift({
+    //hardcode all @TODO find a better way to do this ??
     _id: null,
-    branchname: 'الكل',
-    companyID: '61fb9a9055372857247e7bdc'
+    branchname: "الكل",
+    companyID: "61fb9a9055372857247e7bdc",
   });
 
   if (req.user.branchedRole) {
@@ -467,10 +470,11 @@ exports.excelReport = async (req, response) => {
   if (branchID) {
     branch = await branchService.getBranchById(branchID);
   } else {
-    branch = { //hardcode all @TODO find a better way to do this ??
+    branch = {
+      //hardcode all @TODO find a better way to do this ??
       _id: null,
-      branchname: 'الكل',
-      selected: 'selected'
+      branchname: "الكل",
+      selected: "selected",
     };
   }
 
@@ -494,15 +498,11 @@ exports.excelReport = async (req, response) => {
     });
   }
 
-  const { invoices, total, taxTotal, invoicesTotal } = await invoiceService.getReport(
-    branchID,
-    fromDate,
-    toDate,
-    taxStatus
-  );
+  const { invoices, total, taxTotal, invoicesTotal } =
+    await invoiceService.getReport(branchID, fromDate, toDate, taxStatus);
 
   const workbook = new excelJS.Workbook();
-  const worksheet = workbook.addWorksheet("Invoices"); 
+  const worksheet = workbook.addWorksheet("Invoices");
 
   worksheet.columns = [
     { header: "تاريخ الفاتورة", key: "date", width: 10 },
@@ -514,57 +514,56 @@ exports.excelReport = async (req, response) => {
     { header: "اسم المورد", key: "supplierName", width: 10 },
   ];
 
-  worksheet.views = [{rightToLeft: true}]
+  worksheet.views = [{ rightToLeft: true }];
   // Making first line in excel bold
   worksheet.getRow(1).eachCell((cell) => {
     cell.font = { bold: true };
   });
 
   if (invoices) {
-  for (const day of invoices) {
-    for (const invoice of day) {
-      if (!invoice.date ) {
-        continue;
+    for (const day of invoices) {
+      for (const invoice of day) {
+        if (!invoice.date) {
+          continue;
+        }
+        worksheet.addRow({
+          date: invoice.date,
+          taxValue: invoice.taxValue,
+          supplierTaxNumber: invoice.supplierTaxNumber,
+          amount: invoice.amount,
+          totalAmount: invoice.amount + invoice.taxValue,
+          invoiceNumber: invoice.invoiceNumber,
+          supplierName: invoice.supplierName,
+        });
       }
-      worksheet.addRow({
-        date: invoice.date,
-        taxValue: invoice.taxValue,
-        supplierTaxNumber: invoice.supplierTaxNumber,
-        amount: invoice.amount,
-        totalAmount: invoice.amount + invoice.taxValue,
-        invoiceNumber: invoice.invoiceNumber,
-        supplierName: invoice.supplierName
-      });
     }
+
+    for (let i = 0; i < 3; i++) {
+      worksheet.addRow(); //adding three empty lines to the sheet
+    }
+
+    worksheet.addRow({
+      date: "إجمالي الفواتير",
+      invoiceNumber: invoicesTotal,
+      amount: "إجمالي الضرائب",
+      totalAmount: taxTotal,
+      taxValue: null,
+      supplierTaxNumber: "إجمالي المصروفات",
+      supplierName: total,
+    });
+
+    response.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+
+    response.setHeader(
+      "Content-Disposition",
+      "attachment; filename=" + "data.xlsx"
+    );
+
+    return workbook.xlsx.write(response).then(function () {
+      response.status(200).end();
+    });
   }
-
-  for (let i = 0; i < 3; i++) {
-    worksheet.addRow(); //adding three empty lines to the sheet
-  }
-
-  worksheet.addRow({
-    date: 'إجمالي الفواتير',
-    invoiceNumber: invoicesTotal,
-    amount: 'إجمالي الضرائب',
-    totalAmount: taxTotal,
-    taxValue:null,
-    supplierTaxNumber:  'إجمالي المصروفات',
-    supplierName: total
-  });
-
-  
-  response.setHeader(
-    "Content-Type",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-  );
-
-  response.setHeader(
-    "Content-Disposition",
-    "attachment; filename=" + "data.xlsx"
-  );
-
-  return workbook.xlsx.write(response).then(function () {
-    response.status(200).end();
-  });
-}
 };
