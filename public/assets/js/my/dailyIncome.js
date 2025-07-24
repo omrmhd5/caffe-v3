@@ -1,16 +1,16 @@
-const madaRatio = document.getElementById('mada-ratio');
-const madaRatioSum = document.getElementById('mada-ratio-sum');
-const madaRatioTotal = document.getElementById('mada-ratio-total');
-const madaTax = document.getElementById('mada-tax');
+const madaRatio = document.getElementById("mada-ratio");
+const madaRatioSum = document.getElementById("mada-ratio-sum");
+const madaRatioTotal = document.getElementById("mada-ratio-total");
+const madaTax = document.getElementById("mada-tax");
 
-const visaRatio = document.getElementById('visa-ratio');
-const visaRatioSum = document.getElementById('visa-ratio-sum');
-const visaRatioTotal = document.getElementById('visa-ratio-total');
-const visaTax = document.getElementById('visa-tax');
+const visaRatio = document.getElementById("visa-ratio");
+const visaRatioSum = document.getElementById("visa-ratio-sum");
+const visaRatioTotal = document.getElementById("visa-ratio-total");
+const visaTax = document.getElementById("visa-tax");
 
-const taxRatioTotal = document.getElementById('tax-ratio-total');
+const taxRatioTotal = document.getElementById("tax-ratio-total");
 
-const taxButton = document.getElementById('tax-button');
+const taxButton = document.getElementById("tax-button");
 
 const sendTaxRatioData = () => {
   let url = "/taxValue";
@@ -29,15 +29,15 @@ const sendTaxRatioData = () => {
     visaRatioSum: visaRatioSum.value,
     visaRatioTotal: visaRatioTotal.value,
     visaTax: visaTax.value,
-    date: date
-  }
+    date: date,
+  };
 
   callUrl(url, method, {
-    taxValue: JSON.stringify(taxValue)
+    taxValue: JSON.stringify(taxValue),
   });
-}
+};
 
-taxButton.addEventListener('click', e => {
+taxButton.addEventListener("click", (e) => {
   sendTaxRatioData();
 });
 
@@ -62,9 +62,8 @@ const sendData = (button) => {
       addedIncomeValue,
       madaValue,
       visaValue,
-      bankTransferValue,
+      bankTransferValue
     );
-
 
   callUrl(url, method, {
     data: JSON.stringify({
@@ -75,7 +74,7 @@ const sendData = (button) => {
       visa,
       bankTransfer,
       branchID,
-      date
+      date,
     }),
   });
 
@@ -83,28 +82,28 @@ const sendData = (button) => {
 };
 
 const calculateMadaTaxes = () => {
-  const madaTotal = $('.total-mada').val() || 0;
+  const madaTotal = $(".total-mada").val() || 0;
   const madaRatioValue = madaRatio.value;
   const sum = parseFloat(madaRatioValue * madaTotal).toFixed(2);
-  const tax = document.getElementById('mada-tax').value / 100;
+  const tax = document.getElementById("mada-tax").value / 100;
 
   madaRatioSum.value = sum;
   madaRatioTotal.value = parseFloat(tax * sum + +sum).toFixed(2);
 
   taxRatioTotal.innerHTML = +madaRatioTotal.value + +visaRatioTotal.value;
-}
+};
 
 const calculateVisaTaxes = () => {
-  const visaTotal = $('.total-visa').val() || 0;
+  const visaTotal = $(".total-visa").val() || 0;
   const visaRatioValue = visaRatio.value / 100;
   const sum = parseFloat(visaRatioValue * visaTotal).toFixed(2);
-  const tax = document.getElementById('visa-tax').value / 100;
+  const tax = document.getElementById("visa-tax").value / 100;
 
   visaRatioSum.value = sum;
   visaRatioTotal.value = parseFloat(tax * sum + +sum).toFixed(2);
 
   taxRatioTotal.innerHTML = +madaRatioTotal.value + +visaRatioTotal.value;
-}
+};
 
 const submitSearchForm = function () {
   let form = document.getElementById("search-form");
@@ -132,6 +131,7 @@ function callUrl(url, method, data) {
         },
       }).then((OK) => {
         if (OK) {
+          $(window).scrollTop(0);
           location.reload();
         }
       });
@@ -165,7 +165,7 @@ const validateDailyIncomeInput = (
   addedIncome,
   mada,
   visa,
-  bankTransfer,
+  bankTransfer
 ) => {
   if (!cash || isNaN(cash)) {
     cash = parseFloat(0).toFixed(2);
@@ -219,7 +219,7 @@ const validateInputValue = (value) => {
   } else {
     return value;
   }
-}
+};
 
 const calculateColumnsTotal = () => {
   let totalCash = 0;
@@ -287,7 +287,7 @@ const calculateColumnsTotal = () => {
   $(".total-bank-transfer").val(parseFloat(totalBankTransfer).toFixed(2));
   $(".total-arbitrage").val(parseFloat(totalArbitrage).toFixed(2));
   $(".total-daily-total").val(parseFloat(totalDailyTotal).toFixed(2));
-}
+};
 
 calculateMadaTaxes();
 calculateVisaTaxes();
@@ -309,7 +309,7 @@ $("#daily-income-table").delegate("input", "keyup", "change", function (e) {
       addedIncomeValue,
       madaValue,
       visaValue,
-      bankTransferValue,
+      bankTransferValue
     );
 
   let dailyTotal = (
@@ -321,10 +321,7 @@ $("#daily-income-table").delegate("input", "keyup", "change", function (e) {
     parseFloat(bankTransfer)
   ).toFixed(2);
 
-  let arbitrage = (
-    parseFloat(mada) +
-    parseFloat(visa)
-  ).toFixed(2);
+  let arbitrage = (parseFloat(mada) + parseFloat(visa)).toFixed(2);
 
   $(".daily-total", row).val(dailyTotal);
   $(".arbitrage", row).val(arbitrage);
@@ -337,23 +334,22 @@ $("#daily-income-table").delegate("input", "keyup", "change", function (e) {
 
 if (document.getElementById("month")) {
   if (!document.getElementById("month").value) {
-    document.getElementById("month").value =
-      moment().format("YYYY/MM");
+    document.getElementById("month").value = moment().format("YYYY/MM");
   }
 }
 
-madaRatio.addEventListener('change', (e) => {
+madaRatio.addEventListener("change", (e) => {
   calculateMadaTaxes();
 });
 
-visaRatio.addEventListener('change', (e) => {
+visaRatio.addEventListener("change", (e) => {
   calculateVisaTaxes();
 });
 
-madaTax.addEventListener('change', (e) => {
+madaTax.addEventListener("change", (e) => {
   calculateMadaTaxes();
 });
 
-visaTax.addEventListener('change', (e) => {
+visaTax.addEventListener("change", (e) => {
   calculateVisaTaxes();
 });

@@ -59,7 +59,6 @@ function callUrl(
   cancelText,
   button = null
 ) {
-
   const branchID = document.getElementById("branchID").value;
 
   swal({
@@ -135,6 +134,7 @@ function callFormSubmitUrl(url, method, data) {
         },
       }).then((OK) => {
         if (OK) {
+          $(window).scrollTop(0);
           location.reload();
         }
       });

@@ -53,6 +53,7 @@ function deleteBranch(id) {
             },
           }).then((OK) => {
             if (OK) {
+              $(window).scrollTop(0);
               location.reload();
             }
           });

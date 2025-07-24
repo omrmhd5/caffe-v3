@@ -9,7 +9,8 @@ $("#store-table").delegate("input", "keyup", "change", function (e) {
   $(".bought-quantity", row).val(updatedQuantity);
   $(".current-quantity", row).val(updatedQuantity - soldQuantity);
 
-  const realCurrentQuantity = parseInt($(".real-current-quantity", row).val()) || 0;
+  const realCurrentQuantity =
+    parseInt($(".real-current-quantity", row).val()) || 0;
   const currentQuantity = parseInt($(".current-quantity", row).val()) || 0;
   const itemPrice = parseInt($(".item-price", row).val()) || 0;
 
@@ -99,6 +100,7 @@ function callUrl(url, method, data) {
         },
       }).then((OK) => {
         if (OK) {
+          $(window).scrollTop(0);
           location.reload();
         }
       });

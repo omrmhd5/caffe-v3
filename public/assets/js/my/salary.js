@@ -142,6 +142,7 @@ function callUrl(url, method, data) {
         },
       }).then((OK) => {
         if (OK) {
+          $(window).scrollTop(0);
           location.reload();
         }
       });

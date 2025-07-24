@@ -16,19 +16,19 @@ const calculateTax = () => {
   const invoiceTotal = document.getElementById("totalAmount");
 
   if (invoiceAmount && taxRatio) {
-    taxValue.value = invoiceAmount * taxRatio / 100;
+    taxValue.value = (invoiceAmount * taxRatio) / 100;
 
     invoiceTotal.value = parseFloat(taxValue.value) + parseFloat(invoiceAmount);
-    invoiceTotal.value = parseFloat(invoiceTotal.value).toFixed(2); 
-  } 
-}
+    invoiceTotal.value = parseFloat(invoiceTotal.value).toFixed(2);
+  }
+};
 
 if (document.getElementById("amount")) {
-  document.getElementById("amount").addEventListener('change', calculateTax);
+  document.getElementById("amount").addEventListener("change", calculateTax);
 }
 
 if (document.getElementById("taxRatio")) {
-  document.getElementById("taxRatio").addEventListener('change', calculateTax);
+  document.getElementById("taxRatio").addEventListener("change", calculateTax);
 }
 
 function callUrl(
@@ -73,6 +73,7 @@ function callUrl(
             },
           }).then((OK) => {
             if (OK) {
+              $(window).scrollTop(0);
               location.reload();
             }
           });
@@ -133,27 +134,24 @@ if (document.getElementById("fromDate")) {
 
 if (document.getElementById("toDate")) {
   if (!document.getElementById("toDate").value) {
-    document.getElementById("toDate").value =
-      moment().format("MM/DD/YYYY");
+    document.getElementById("toDate").value = moment().format("MM/DD/YYYY");
   }
 }
 
 if (document.getElementById("date")) {
   if (!document.getElementById("date").value) {
-    document.getElementById("date").value = moment().format('YYYY-MM-DD');
+    document.getElementById("date").value = moment().format("YYYY-MM-DD");
   }
 }
 
-const showImage = (image) => {
+const showImage = (image) => {};
 
-}
-
-$('#modal-image').on('show.bs.modal', function (event) {
+$("#modal-image").on("show.bs.modal", function (event) {
   const button = $(event.relatedTarget);
-  const image = button.data('whatever');
+  const image = button.data("whatever");
 
-  const modal = $(this)
+  const modal = $(this);
 
   let img = modal.find("#modal-image-content");
   img.attr("src", image);
-})
+});

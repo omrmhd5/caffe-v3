@@ -111,22 +111,19 @@ if (document.getElementById("fromDate")) {
 
 if (document.getElementById("toDate")) {
   if (!document.getElementById("toDate").value) {
-    document.getElementById("toDate").value =
-      moment().format("MM/DD/YYYY");
+    document.getElementById("toDate").value = moment().format("MM/DD/YYYY");
   }
 }
 
 if (document.getElementById("query-date")) {
   if (!document.getElementById("query-date").value) {
-    document.getElementById("query-date").value =
-      moment().format("YYYY-MM-DD");
+    document.getElementById("query-date").value = moment().format("YYYY-MM-DD");
   }
 }
 
 if (document.getElementById("month")) {
   if (!document.getElementById("month").value) {
-    document.getElementById("month").value =
-      moment().format("YYYY/MM");
+    document.getElementById("month").value = moment().format("YYYY/MM");
   }
 }
 
@@ -187,6 +184,7 @@ function callUrl(url, method, data) {
         },
       }).then((OK) => {
         if (OK) {
+          $(window).scrollTop(0);
           location.reload();
           return false;
         }
@@ -226,7 +224,6 @@ const calculateColumnsTotal = () => {
     currentValue = currentValue || 0;
     amountTotal += currentValue;
   });
-
 
   $("#todaySaleTotal").html(amountTotal);
 
