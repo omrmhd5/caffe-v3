@@ -120,6 +120,24 @@ exports.updateFinance = async (date, branchID, financial) => {
   ) {
     financial.rent = await getRentForMonth(branch, date);
   }
+
+  // Always recalculate salaries from Salary collection for this branch/month
+  const month = new Date(date).getMonth() + 1;
+  const year = new Date(date).getFullYear();
+  const startOfMonth = new Date(year, month - 1, 1);
+  const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+  const salariesForMonth = await Salary.find({
+    branchID: branch._id,
+    date: {
+      $gte: startOfMonth,
+      $lte: endOfMonth,
+    },
+  }).lean();
+  financial.salaries = salariesForMonth.reduce(
+    (sum, salary) => sum + salary.netSalary,
+    0
+  );
+
   let netIncome = (
     parseFloat(financial.income) -
     parseFloat(financial.rent) -
@@ -182,6 +200,32 @@ exports.getFinanceByBranchId = async (branchID, date) => {
   let branch = await branchService.getBranchById(branchID);
   let rent = await getRentForMonth(branch, date);
 
+  // Auto-calculate salaries for the branch/month
+  const month = new Date(date).getMonth() + 1;
+  const year = new Date(date).getFullYear();
+
+  // First, let's see what salary records exist for this branch
+  const allSalariesForBranch = await Salary.find({
+    branchID: branch._id,
+  }).lean();
+
+  // Use a simpler approach - direct query with date range
+  const startOfMonth = new Date(year, month - 1, 1);
+  const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
+  const salariesForMonth = await Salary.find({
+    branchID: branch._id,
+    date: {
+      $gte: startOfMonth,
+      $lte: endOfMonth,
+    },
+  }).lean();
+
+  const calculatedSalaries = salariesForMonth.reduce(
+    (sum, salary) => sum + salary.netSalary,
+    0
+  );
+
   if (!financial) {
     return {
       branchID: { branchname: branch.branchname },
@@ -190,7 +234,7 @@ exports.getFinanceByBranchId = async (branchID, date) => {
       rent: rent,
       expenses: 0,
       bankRatio: 0,
-      salaries: 0,
+      salaries: calculatedSalaries, // Use calculated salaries instead of 0
       bills: 0,
       bills1: 0,
       bills2: 0,
@@ -202,6 +246,9 @@ exports.getFinanceByBranchId = async (branchID, date) => {
   if (branch && branch.rentHistory) {
     financial.rent = rent;
   }
+  // Always use calculated salaries instead of stored value
+  financial.salaries = calculatedSalaries;
+
   return financial;
 };
 

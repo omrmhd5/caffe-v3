@@ -366,10 +366,10 @@ const validateFinancialInput = (
   bills1,
   bills2
 ) => {
-  if (!income || isNaN(income)) {
+  if (!income || isNaN(numeral(income).value())) {
     income = "0";
   } else {
-    income = parseFloat(income).toFixed(2);
+    income = numeral(income).value().toFixed(2);
   }
 
   if (!rent || isNaN(rent)) {
@@ -378,10 +378,10 @@ const validateFinancialInput = (
     rent = parseFloat(rent).toFixed(2);
   }
 
-  if (!expenses || isNaN(expenses)) {
+  if (!expenses || isNaN(numeral(expenses).value())) {
     expenses = "0";
   } else {
-    expenses = parseFloat(expenses).toFixed(2);
+    expenses = numeral(expenses).value().toFixed(2);
   }
 
   if (!bankRatio || isNaN(bankRatio)) {
@@ -390,10 +390,10 @@ const validateFinancialInput = (
     bankRatio = parseFloat(bankRatio).toFixed(2);
   }
 
-  if (!salaries || isNaN(salaries)) {
+  if (!salaries || isNaN(numeral(salaries).value())) {
     salaries = "0";
   } else {
-    salaries = parseFloat(salaries).toFixed(2);
+    salaries = numeral(salaries).value().toFixed(2);
   }
 
   if (!saudizationSalary || isNaN(saudizationSalary)) {
@@ -551,7 +551,6 @@ const calculateTotalIncomeColumntTotal = () => {
     } else {
       currentValue = numeral(currentValue).value();
     }
-
     totalNetIncome += currentValue * 1;
   });
 
@@ -743,4 +742,87 @@ function recalculateAllNetIncomeRows() {
 
 $(document).ready(function () {
   recalculateAllNetIncomeRows();
+});
+
+$(document).ready(function () {
+  $("#add-financial-table tbody tr").each(function () {
+    let row = $(this);
+    let incomeValue = $(".income", row).val();
+    let expensesValue = $(".expenses", row).val();
+    let rentValue = $(".rent", row).val();
+    let bankRatioValue = $(".bank-ratio", row).val();
+    let salariesValue = $(".salaries", row).val();
+    let saudizationSalaryValue = $(".saudization-salary", row).val();
+    let billsValue = $(".bills", row).val();
+    let bills1Value = $(".bills1", row).val();
+    let bills2Value = $(".bills2", row).val();
+
+    // Only recalculate for rows with a valid salaries value
+    if (salariesValue !== undefined && salariesValue !== "") {
+      // Use the same calculation logic as the delegate handler
+      const {
+        income,
+        rent,
+        expenses,
+        bankRatio,
+        salaries,
+        saudizationSalary,
+        bills,
+        bills1,
+        bills2,
+      } = validateFinancialInput(
+        incomeValue,
+        rentValue,
+        expensesValue,
+        bankRatioValue,
+        salariesValue,
+        saudizationSalaryValue,
+        billsValue,
+        bills1Value,
+        bills2Value
+      );
+
+      let netIncome = (
+        parseFloat(income) -
+        parseFloat(rent) -
+        parseFloat(expenses) -
+        parseFloat(bankRatio) -
+        parseFloat(salaries) -
+        parseFloat(saudizationSalary) -
+        parseFloat(bills) -
+        parseFloat(bills1) -
+        parseFloat(bills2)
+      ).toFixed(2);
+
+      netIncome = numeral(netIncome).format("0,0.00");
+      $(".net-income", row).val(netIncome);
+    }
+  });
+  // Now that all rows are recalculated, update the total
+  calculateTotalIncomeColumntTotal();
+});
+
+const calculateTotalSalariesColumntTotal = () => {
+  let totalSalaries = 0;
+  $("tr .salaries").each(function (index, value) {
+    let currentValue = $(this).val();
+    if (!currentValue) {
+      currentValue = 0;
+    } else {
+      currentValue = numeral(currentValue).value();
+    }
+    totalSalaries += currentValue * 1;
+  });
+  document.getElementById("total-salaries").innerHTML =
+    numeral(totalSalaries).format("0,0.00");
+};
+
+// Attach live update event
+$(document).on("input change", ".salaries", function () {
+  calculateTotalSalariesColumntTotal();
+});
+
+// Also recalculate on page load
+$(document).ready(function () {
+  calculateTotalSalariesColumntTotal();
 });

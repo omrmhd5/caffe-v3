@@ -107,7 +107,7 @@
                 <td><input type="number" value="{{checkOrZeror rent }}" class="form-control rent"></td>
                 <td><input type="text" value="{{numeral expenses }}" class="form-control expenses" disabled></td>
                 <td><input type="number" value="{{checkOrZeror bankRatio }}" class="form-control bank-ratio" disabled></td>
-                <td><input type="text" value="{{numeral salaries }}" class="form-control salaries" disabled></td>
+                <td><input type="text" value="{{numeral salaries }}" class="form-control salaries" readonly></td>
                 <td><input type="number" value="{{checkOrZeror saudizationSalary }}"
                     class="form-control saudization-salary">
                 </td>
@@ -126,7 +126,7 @@
                 <th scope="col" id="total-rent"> {{numeral totals.totalRent }}</th>
                 <th scope="col"> {{numeral totals.totalExpenses }}</th>
                 <th scope="col" id="total-bank-ratio"> {{numeral totals.totalBankRatio }}</th>
-                <th scope="col"> {{numeral totals.totalSalaries }}</th>
+                <th scope="col" id="total-salaries"> {{numeral totals.totalSalaries }}</th>
                 <th scope="col" id="total-saudization-salary"> {{numeral totals.totalSaudizationSalary }}</th>
                 <th scope="col" id="total-bills"> {{numeral totals.totalBills }}</th>
                 <th scope="col" id="total-bills1"> {{numeral totals.totalBills1 }}</th>
