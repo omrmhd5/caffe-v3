@@ -171,14 +171,6 @@ exports.unhideCompany = async (id) => {
   return company;
 };
 
-exports.updateRentHistory = async (id, value, fromDate) => {
-  const company = await Company.findById(id);
-  if (!company) throw new NotFoundException("الشركة غير موجودة");
-  company.rentHistory.push({ value, fromDate });
-  await company.save();
-  return company;
-};
-
 exports.isCompanyEditable = async (id, date) => {
   const company = await Company.findById(id);
   if (!company) throw new NotFoundException("الشركة غير موجودة");

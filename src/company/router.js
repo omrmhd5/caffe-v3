@@ -52,11 +52,5 @@ router
 
 router.post("/:id/hide", auth, isSuperAdmin, companyController.hideCompany);
 router.post("/:id/unhide", auth, isSuperAdmin, companyController.unhideCompany);
-router.post(
-  "/:id/rent",
-  auth,
-  isSuperAdmin,
-  companyController.updateRentHistory
-);
 
 module.exports = router;

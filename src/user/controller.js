@@ -191,7 +191,7 @@ exports.createUser = async (req, res) => {
       companyID = req.user.companyID;
     }
 
-    companies = await companyService.getAllCompanies({}).populate("branches");
+    companies = await companyService.getAllCompanies().populate("branches");
     await userService.createUser(
       req.user,
       role,

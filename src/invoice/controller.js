@@ -418,7 +418,9 @@ exports.report = async (req, res) => {
 
   let { invoices, total, taxTotal, invoicesTotal } =
     await invoiceService.getReport(branchID, fromDate, toDate, taxStatus);
-
+  total = (total ?? 0).toFixed(2);
+  taxTotal = (taxTotal ?? 0).toFixed(2);
+  invoicesTotal = (invoicesTotal ?? 0).toFixed(2);
   res.render("invoice/invoiceReport.hbs", {
     branches,
     invoices,

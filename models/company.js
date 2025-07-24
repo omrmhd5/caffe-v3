@@ -37,12 +37,6 @@ const companySchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-    rentHistory: [
-      {
-        value: { type: Number, required: true },
-        fromDate: { type: Date, required: true },
-      },
-    ],
   },
   {
     toJSON: { virtuals: true },
