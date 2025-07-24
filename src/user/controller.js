@@ -178,6 +178,7 @@ exports.createAdmin = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   let companies = null;
+  let branches = null;
   try {
     let role = req.body.role;
     let fullName = req.body.fullName ? req.body.fullName : null;
@@ -192,6 +193,8 @@ exports.createUser = async (req, res) => {
     }
 
     companies = await companyService.getAllCompanies().populate("branches");
+    branches = await branchService.getAllBranches(companyID);
+
     await userService.createUser(
       req.user,
       role,
@@ -206,10 +209,15 @@ exports.createUser = async (req, res) => {
     res.render("user/addUser.hbs", {
       successMessage: "أضيف المستخدم بنجاح",
       companies,
+      branches,
       roles: ROLES,
     });
   } catch (error) {
-    console.log(error);
+    // Always fetch branches for the error case
+    if (!branches) {
+      let companyID = req.body.companyID || req.user.companyID;
+      branches = await branchService.getAllBranches(companyID);
+    }
     res.render("user/addUser.hbs", {
       errorMessage: error.message,
       userName: req.body.userName,
@@ -217,6 +225,7 @@ exports.createUser = async (req, res) => {
       email: req.body.email,
       role: req.body.role,
       companies,
+      branches,
       roles: ROLES,
     });
   }
