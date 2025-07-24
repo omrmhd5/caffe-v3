@@ -32,6 +32,11 @@ const salarySchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    allowance: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
     extraWork: {
       type: Number,
       required: true,

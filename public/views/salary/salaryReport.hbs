@@ -83,13 +83,16 @@
                   <p class="tableheader mb-0 width8rem"> زيادة بالايام </p>
                 </th>
                 <th>
+                  <p class="tableheader mb-0 width8rem"> بدل</p>
+                </th>
+                <th>
+                  <p class="tableheader mb-0 width8rem"> عمل اضافي</p>
+                </th>
+                <th>
                   <p class="tableheader mb-0 width8rem"> خصم بالقيمة </p>
                 </th>
                 <th>
                   <p class="tableheader mb-0 width8rem"> خصم بالأيام </p>
-                </th>
-                <th>
-                  <p class="tableheader mb-0 px-4 px-md-0 width8rem"> سلفة</p>
                 </th>
                 <th>
                   <p class="tableheader mb-0 width8rem"> صافي الراتب </p>
@@ -112,13 +115,16 @@
                 <td><input value="{{checkOrZeror daysIncrease}}" type="number" class="form-control days-increase"
                     {{disabled}}>
                 </td>
+                <td><input value="{{checkOrZeror allowance}}" type="number" class="form-control allowance"
+                    {{disabled}}>
+                </td>
+                <td><input value="{{checkOrZeror extraWork}}" type="number" class="form-control extra-work"
+                    {{disabled}}>
+                </td>
                 <td><input value="{{checkOrZeror amountDecrease}}" type="number" class="form-control amount-decrease"
                     {{disabled}}>
                 </td>
                 <td><input value="{{checkOrZeror daysDecrease}}" type="number" class="form-control days-decrease"
-                    {{disabled}}>
-                </td>
-                <td><input value="{{checkOrZeror advancePayment}}" type="number" class="form-control advance-payment"
                     {{disabled}}>
                 </td>
                 <td><input value="{{numeral netSalary}}" type="text" class="form-control net-salary" disabled></td>

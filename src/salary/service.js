@@ -52,6 +52,7 @@ exports.getAllSalaries = async (
           branchID,
           employeeID: employee._id,
           extraWork: 0,
+          allowance: 0,
           amountDecrease: 0,
           amountIncrease: 0,
           daysDecrease: 0,
@@ -137,6 +138,7 @@ exports.createSalary = async (
   date,
   salary,
   extraWork,
+  allowance,
   amountIncrease,
   daysIncrease,
   amountDecrease,
@@ -158,10 +160,11 @@ exports.createSalary = async (
   const netSalary =
     salary +
     amountIncrease +
-    daysIncrease * (salary / 30) -
+    daysIncrease * (salary / 30) +
+    allowance +
+    extraWork -
     amountDecrease -
-    daysDecrease * (salary / 30) -
-    extraWork;
+    daysDecrease * (salary / 30);
 
   const foundedSalary = await Salary.findOne({
     employeeID,
@@ -172,6 +175,7 @@ exports.createSalary = async (
     await Salary.findByIdAndUpdate(foundedSalary._id, {
       salary,
       extraWork,
+      allowance,
       amountIncrease,
       daysIncrease,
       amountDecrease,
@@ -187,6 +191,7 @@ exports.createSalary = async (
         date,
         salary,
         extraWork,
+        allowance,
         amountIncrease,
         daysIncrease,
         amountDecrease,
@@ -206,6 +211,7 @@ exports.updateSalary = async (
   branchID,
   salary,
   extraWork,
+  allowance,
   amountIncrease,
   daysIncrease,
   amountDecrease,
@@ -229,6 +235,10 @@ exports.updateSalary = async (
 
   if (extraWork) {
     update.extraWork = extraWork;
+  }
+
+  if (allowance) {
+    update.allowance = allowance;
   }
 
   if (daysIncrease) {

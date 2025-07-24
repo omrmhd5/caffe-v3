@@ -70,6 +70,7 @@ const sendData = (event) => {
     let amountIncreaseValue = $(".amount-increase", row).val();
     let daysDecreaseValue = $(".days-decrease", row).val();
     let daysIncreaseValue = $(".days-increase", row).val();
+    let allowanceValue = $(".allowance", row).val();
     let extraWorkValue = $(".extra-work", row).val();
 
     const {
@@ -78,6 +79,7 @@ const sendData = (event) => {
       amountIncrease,
       daysDecrease,
       daysIncrease,
+      allowance,
       extraWork,
     } = validateSalaryInput(
       salaryValue,
@@ -85,6 +87,7 @@ const sendData = (event) => {
       amountIncreaseValue,
       daysDecreaseValue,
       daysIncreaseValue,
+      allowanceValue,
       extraWorkValue
     );
 
@@ -96,6 +99,7 @@ const sendData = (event) => {
       salaryData.amountIncrease = amountIncrease;
       salaryData.daysDecrease = daysDecrease;
       salaryData.daysIncrease = daysIncrease;
+      salaryData.allowance = allowance;
       salaryData.extraWork = extraWork;
       salaryData.branchID = $(".branch-id", row).val();
       salaryData.employeeID = $(".employee-id", row).val();
@@ -181,6 +185,7 @@ const validateSalaryInput = (
   amountIncrease,
   daysDecrease,
   daysIncrease,
+  allowance,
   extraWork
 ) => {
   if (!salary || isNaN(salary)) {
@@ -213,6 +218,12 @@ const validateSalaryInput = (
     daysIncrease = parseFloat(daysIncrease).toFixed(2);
   }
 
+  if (!allowance || isNaN(allowance)) {
+    allowance = "0";
+  } else {
+    allowance = parseFloat(allowance).toFixed(2);
+  }
+
   if (!extraWork || isNaN(extraWork)) {
     extraWork = "0";
   } else {
@@ -225,6 +236,7 @@ const validateSalaryInput = (
     amountIncrease,
     daysDecrease,
     daysIncrease,
+    allowance,
     extraWork,
   };
 };
@@ -237,6 +249,7 @@ $("#add-salary-table").delegate("input", "keyup", "change", function (e) {
   let amountIncreaseValue = $(".amount-increase", row).val();
   let daysDecreaseValue = $(".days-decrease", row).val();
   let daysIncreaseValue = $(".days-increase", row).val();
+  let allowanceValue = $(".allowance", row).val();
   let extraWorkValue = $(".extra-work", row).val();
 
   const {
@@ -245,6 +258,7 @@ $("#add-salary-table").delegate("input", "keyup", "change", function (e) {
     amountIncrease,
     daysDecrease,
     daysIncrease,
+    allowance,
     extraWork,
   } = validateSalaryInput(
     salaryValue,
@@ -252,16 +266,18 @@ $("#add-salary-table").delegate("input", "keyup", "change", function (e) {
     amountIncreaseValue,
     daysDecreaseValue,
     daysIncreaseValue,
+    allowanceValue,
     extraWorkValue
   );
 
   let netSalary = (
-    parseFloat(salary) -
-    parseFloat(amountDecrease) +
-    parseFloat(amountIncrease) -
-    parseFloat(daysDecrease * (salary / 30)) +
-    parseFloat(daysIncrease * (salary / 30)) -
-    parseFloat(extraWork)
+    parseFloat(salary) +
+    parseFloat(amountIncrease) +
+    parseFloat(daysIncrease * (salary / 30)) +
+    parseFloat(allowance) +
+    parseFloat(extraWork) -
+    parseFloat(amountDecrease) -
+    parseFloat(daysDecrease * (salary / 30))
   ).toFixed(2);
 
   $(".net-salary", row).val(netSalary);

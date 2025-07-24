@@ -85,6 +85,7 @@ exports.updateSalary = async (req, res) => {
     const employeeID = req.body.employeeID;
     const salary = req.body.salary;
     const extraWork = req.body.extraWork;
+    const allowance = req.body.allowance;
     const amountIncrease = req.body.amountIncrease;
     const amountDecrease = req.body.amountDecrease;
     const daysIncrease = req.body.daysIncrease;
@@ -99,6 +100,7 @@ exports.updateSalary = async (req, res) => {
       branchID,
       salary,
       extraWork,
+      allowance,
       amountIncrease,
       daysIncrease,
       amountDecrease,
