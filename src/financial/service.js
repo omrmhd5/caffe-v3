@@ -152,9 +152,17 @@ exports.updateFinance = async (date, branchID, financial) => {
 
   financial.netIncome = netIncome;
 
-  await Financial.findOneAndUpdate({ date, branchID }, financial, {
-    upsert: true,
-  });
+  // Convert date string to proper Date object for database query
+  const queryDate = new Date(date + "-01"); // Convert "2025-07" to "2025-07-01" then to Date
+
+  await Financial.findOneAndUpdate(
+    {
+      date: queryDate,
+      branchID,
+    },
+    financial,
+    { upsert: true }
+  );
 
   return;
 };
@@ -192,9 +200,12 @@ exports.updateRentNote = async (branchID, note) => {
 };
 
 exports.getFinanceByBranchId = async (branchID, date) => {
+  // Convert date string to proper Date object for database query
+  const queryDate = new Date(date + "-01"); // Convert "2025-07" to "2025-07-01" then to Date
+
   const financial = await Financial.findOne({
     branchID,
-    date: new Date(date).toDateInputValue(),
+    date: queryDate,
   }).populate("branchID");
 
   let branch = await branchService.getBranchById(branchID);
