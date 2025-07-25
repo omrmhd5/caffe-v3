@@ -46,7 +46,7 @@ exports.getAll = async (branchID, date, user) => {
 
     if (dailyResult.length === 0) {
       const dailyIncomeDate = new Date(loop);
-      const currentDate = new Date().setHours(00, 00);
+      const currentDate = new Date().setHours(0, 0);
       const hours = (currentDate - dailyIncomeDate) / 36e5;
       let disabled = false;
 

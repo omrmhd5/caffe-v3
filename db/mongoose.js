@@ -16,9 +16,6 @@ const DB_PASS = process.env.DB_PASS;
 let connectionString = process.env.MONGO_URI;
 
 mongoose
-  .connect(connectionString, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(connectionString)
   .then((r) => console.log("Connected to mongo"))
   .catch((e) => console.log("could not connect", e));

@@ -248,10 +248,6 @@
             <td><input class="form-control tax-title" disabled value="مبلغ مدفوع 3" /></td>
             <td><input type="number" class="form-control paid-field" value="0"></td>
           </tr>
-          <tr>
-            <td><input class="form-control tax-title" disabled value="المجموع" /></td>
-            <td><input class="form-control" id="paid-total" value="0" disabled></td>
-          </tr>
         </tbody>
       </table>
       <!-- New Received Amount Table -->
@@ -269,12 +265,13 @@
             <td><input class="form-control tax-title" disabled value="مبلغ مستلم 3" /></td>
             <td><input type="number" class="form-control received-field" value="0"></td>
           </tr>
-          <tr>
-            <td><input class="form-control tax-title" disabled value="المجموع" /></td>
-            <td><input class="form-control" id="received-total" value="0" disabled></td>
-          </tr>
         </tbody>
       </table>
+      <!-- Grand total field below, centered -->
+      <div class="w-100 d-flex flex-column align-items-center justify-content-center my-2">
+        <label class="form-control tax-title text-center" style="max-width:160px;margin-bottom:8px;">المجموع الكلي</label>
+        <input class="form-control text-center" id="grand-total" value="0" disabled style="font-weight:bold;max-width:160px;">
+      </div>
     </div>
     <div class="card-footer d-print-block mt-3">
       <div class="totaldiv" style="width: 100%;">

@@ -418,6 +418,19 @@ $(document).on("input", ".received-field", function () {
   $("#received-total").val(total.toFixed(2));
 });
 
+function updateGrandTotal() {
+  let total = 0;
+  $(".paid-field, .received-field").each(function () {
+    let val = parseFloat($(this).val());
+    if (!isNaN(val)) total += val;
+  });
+  $("#grand-total").val(total.toFixed(2));
+}
+
+$(document).on("input", ".paid-field, .received-field", function () {
+  updateGrandTotal();
+});
+
 $(document).ready(function () {
   // Populate paid and received fields from backend if present
   if (typeof taxValue !== "undefined") {
@@ -427,8 +440,6 @@ $(document).ready(function () {
           taxValue.paidValues[i] !== undefined ? taxValue.paidValues[i] : 0
         );
       });
-      // Trigger total calculation
-      $(".paid-field").first().trigger("input");
     }
     if (taxValue.receivedValues && Array.isArray(taxValue.receivedValues)) {
       $(".received-field").each(function (i) {
@@ -438,8 +449,8 @@ $(document).ready(function () {
             : 0
         );
       });
-      // Trigger total calculation
-      $(".received-field").first().trigger("input");
     }
+    // Always update grand total on load
+    updateGrandTotal();
   }
 });
