@@ -122,6 +122,14 @@ hbs.registerHelper("numeral", function (value) {
 hbs.registerHelper("today", function () {
   return moment().format("YYYY-MM-DD");
 });
+hbs.registerHelper("sum", function () {
+  let total = 0;
+  for (let i = 0; i < arguments.length - 1; i++) {
+    // last arg is options
+    total += Number(arguments[i]) || 0;
+  }
+  return total;
+});
 
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "./public")));

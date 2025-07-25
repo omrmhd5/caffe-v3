@@ -2,7 +2,8 @@ const dailyIncomService = require("./service");
 const branchService = require("../branch/service");
 const financialService = require("../financial/service");
 const taxValueService = require("../taxValue/service");
-const moment = require('moment');
+const paymentValueService = require("../paymentValue/service");
+const moment = require("moment");
 
 exports.report = async (req, res) => {
   let branchID = null;
@@ -52,7 +53,15 @@ exports.report = async (req, res) => {
     req.user
   );
 
-  const disableSaveRatio = new Date(month).getMonth() < new Date().getMonth() && req.user.branchedRole ? "disabled" : "";
+  const paymentValue = await paymentValueService.getPaymentValue(
+    branchID,
+    month
+  );
+
+  const disableSaveRatio =
+    new Date(month).getMonth() < new Date().getMonth() && req.user.branchedRole
+      ? "disabled"
+      : "";
 
   res.render("dailyIncome/dailyIncomeReport.hbs", {
     branches,
@@ -64,7 +73,8 @@ exports.report = async (req, res) => {
     branchID,
     branchedRole: req.user.branchedRole,
     month,
-    disableSaveRatio
+    disableSaveRatio,
+    paymentValue,
   });
 };
 
