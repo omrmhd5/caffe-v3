@@ -266,11 +266,27 @@ exports.getFinanceByBranchId = async (branchID, date) => {
 exports.calculateTotalsByDate = async (date, branches) => {
   let totals = await Financial.aggregate([
     {
+      $project: {
+        income: 1,
+        rent: 1,
+        salaries: 1,
+        expenses: 1,
+        bankRatio: 1,
+        bills: 1,
+        bills1: 1,
+        bills2: 1,
+        saudizationSalary: 1,
+        netIncome: 1,
+        branchID: 1,
+        month: { $month: "$date" },
+        year: { $year: "$date" },
+      },
+    },
+    {
       $match: {
-        date: new Date(date),
-        branchID: {
-          $in: branches.map((b) => b._id),
-        },
+        branchID: { $in: branches.map((b) => b._id) },
+        month: new Date(date).getMonth() + 1,
+        year: new Date(date).getFullYear(),
       },
     },
     {

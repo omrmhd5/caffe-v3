@@ -453,6 +453,7 @@ $(document).on("input", ".paid-field, .received-field", function () {
 $(document).ready(function () {
   let date = $("#month").val();
   let branchID = $("#branchID").val();
+  if (!branchID) return; // Don't fetch if branchID is not selected
   $.ajax({
     url: "/paymentValue",
     type: "GET",

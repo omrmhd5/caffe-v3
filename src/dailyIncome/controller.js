@@ -37,7 +37,11 @@ exports.report = async (req, res) => {
 
   let financials = null;
   if (branch) {
-    financials = await financialService.calculateTotalsByDate(month, [branch]);
+    const dateObj = new Date(month + "-01"); // Ensures YYYY-MM-01 format
+    financials = await financialService.calculateTotalsByDate(dateObj, [
+      branch,
+    ]);
+
     if (!financials) {
       financials = {
         totalSalaries: 0.0,
