@@ -26,9 +26,6 @@ exports.addTaxValue = async (taxValue) => {
       {
         $set: {
           madaRatio: taxValue.madaRatio,
-          // madaRatioSum: taxValue.madaRatioSum,
-          // madaTax: taxValue.madaTax,
-          // madaRatioTotal: taxValue.madaRatioTotal,
         },
       },
       { upsert: true }

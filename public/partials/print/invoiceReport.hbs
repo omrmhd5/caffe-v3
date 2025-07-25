@@ -1,68 +1,31 @@
 <style>
-  .table {
-    border-collapse: collapse;
-    color: black;
-  }
-
-  th p {
-    color: black;
-  }
-
-  .table td,
-  .table th {
-    height: 75% !important;
-    padding: .2rem !important;
-    text-align: center;
-  }
-
-  #page-title {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: auto;
-    color: black;
-    height: 75px;
-    width: 680px;
-    margin: 50px auto;
-  }
-
-  .tail-border {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: black;
-    height: 60px;
-    width: 320px;
-    margin: 50px auto;
-  }
-
-  .table-bordered td,
-  .table-bordered th {
-    text-align: center;
-    border-color: black !important;
-  }
-
-  .print-font {
-    font-size: 24px;
-  }
-
-  .print-border {
-    border: 1px solid black;
-  }
+  .table { border-collapse: collapse; color: black; } th p { color: black; }
+  .table td, .table th { height: 75% !important; padding: .2rem !important;
+  text-align: center; } #page-title { border: 1px solid black; display: flex;
+  justify-content: center; align-items: center; padding: auto; color: black;
+  height: 75px; width: 680px; margin: 50px auto; } .tail-border { border: 1px
+  solid black; display: flex; justify-content: center; align-items: center;
+  color: black; height: 60px; width: 320px; margin: 50px auto; } .table-bordered
+  td, .table-bordered th { text-align: center; border-color: black !important; }
+  .print-font { font-size: 24px; } .print-border { border: 1px solid black; }
 </style>
 
-<div class="container d-none d-print-block" dir="rtl" style="border: 1px solid white;">
+<div
+  class="container d-none d-print-block"
+  dir="rtl"
+  style="border: 1px solid white;"
+>
   <div id="page-title">
     <h2 style="text-align: center;">
       تقرير الفواتير
       {{!-- {{#if branch}} --}}
       {{!-- فرع {{branch.branchname}} --}}
       {{!-- {{/if}} --}}
-      <br>
-      من {{fromDate}}
-      إلى {{toDate}}
+      <br />
+      من
+      {{fromDate}}
+      إلى
+      {{toDate}}
     </h2>
   </div>
 
@@ -91,24 +54,24 @@
           <p> الوصف </p>
         </th>
         <th scope="col">
-          <p> المجموع الكلي </p>
+          <p> المجموع المستلم </p>
         </th>
       </tr>
     </thead>
     <tbody>
       {{#each invoices}}
-      {{#each this}}
-      <tr>
-        <td>{{formatDate key}}</td>
-        <td>{{invoiceNumber}}</td>
-        <td>{{amount}}</td>
-        <td>{{taxValue}}</td>
-        <td>{{supplierTaxNumber}}</td>
-        <td>{{supplierName}}</td>
-        <td>{{description}}</td>
-        <td>{{dayTotal}}</td>
-      </tr>
-      {{/each}}
+        {{#each this}}
+          <tr>
+            <td>{{formatDate key}}</td>
+            <td>{{invoiceNumber}}</td>
+            <td>{{amount}}</td>
+            <td>{{taxValue}}</td>
+            <td>{{supplierTaxNumber}}</td>
+            <td>{{supplierName}}</td>
+            <td>{{description}}</td>
+            <td>{{dayTotal}}</td>
+          </tr>
+        {{/each}}
       {{/each}}
 
     </tbody>

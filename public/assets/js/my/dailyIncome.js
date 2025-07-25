@@ -42,12 +42,31 @@ const sendTaxRatioData = () => {
     visaRatioTotal: visaRatioTotal.value,
     visaTax: visaTax.value,
     date: date,
-    paidValues: paidValues,
-    receivedValues: receivedValues,
   };
 
+  // Send to taxValue backend
   callUrl(url, method, {
     taxValue: JSON.stringify(taxValue),
+  });
+
+  // Send to paymentValue backend
+  $.ajax({
+    url: "/paymentValue",
+    type: "POST",
+    data: {
+      paymentValue: JSON.stringify({
+        branchID: branchID,
+        date: date,
+        paidValues: paidValues,
+        receivedValues: receivedValues,
+      }),
+    },
+    success: function (data) {
+      // Optionally handle success
+    },
+    error: function (jqXhr) {
+      // Optionally handle error
+    },
   });
 };
 
@@ -432,25 +451,28 @@ $(document).on("input", ".paid-field, .received-field", function () {
 });
 
 $(document).ready(function () {
-  // Populate paid and received fields from backend if present
-  if (typeof taxValue !== "undefined") {
-    if (taxValue.paidValues && Array.isArray(taxValue.paidValues)) {
-      $(".paid-field").each(function (i) {
-        $(this).val(
-          taxValue.paidValues[i] !== undefined ? taxValue.paidValues[i] : 0
-        );
-      });
-    }
-    if (taxValue.receivedValues && Array.isArray(taxValue.receivedValues)) {
-      $(".received-field").each(function (i) {
-        $(this).val(
-          taxValue.receivedValues[i] !== undefined
-            ? taxValue.receivedValues[i]
-            : 0
-        );
-      });
-    }
-    // Always update grand total on load
-    updateGrandTotal();
-  }
+  let date = $("#month").val();
+  let branchID = $("#branchID").val();
+  $.ajax({
+    url: "/paymentValue",
+    type: "GET",
+    data: { branchID: branchID, date: date },
+    success: function (data) {
+      if (data && data.paidValues && Array.isArray(data.paidValues)) {
+        $(".paid-field").each(function (i) {
+          $(this).val(
+            data.paidValues[i] !== undefined ? data.paidValues[i] : 0
+          );
+        });
+      }
+      if (data && data.receivedValues && Array.isArray(data.receivedValues)) {
+        $(".received-field").each(function (i) {
+          $(this).val(
+            data.receivedValues[i] !== undefined ? data.receivedValues[i] : 0
+          );
+        });
+      }
+      updateGrandTotal();
+    },
+  });
 });

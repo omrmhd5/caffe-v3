@@ -43,14 +43,6 @@ const taxValueSchema = new mongoose.Schema(
       type: Number,
       default: 0.0,
     },
-    paidValues: {
-      type: [Number],
-      default: [0, 0, 0],
-    },
-    receivedValues: {
-      type: [Number],
-      default: [0, 0, 0],
-    },
     date: {
       type: Date,
       required: true,

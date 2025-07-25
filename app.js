@@ -25,6 +25,7 @@ const financialRoutes = require("./src/financial/router");
 const dailyIncomeRoutes = require("./src/dailyIncome/router");
 const indexRoutes = require("./src/routes/index");
 const taxValueRoutes = require("./src/taxValue/router");
+const paymentValueRouter = require("./src/paymentValue/router");
 
 const cookieParser = require("cookie-parser");
 
@@ -147,6 +148,7 @@ app.use("/invoice", invoiceRoutes);
 app.use("/financial", financialRoutes);
 app.use("/dailyIncome", dailyIncomeRoutes);
 app.use("/taxValue", taxValueRoutes);
+app.use("/paymentValue", paymentValueRouter);
 
 app.use("/", indexRoutes);
 
