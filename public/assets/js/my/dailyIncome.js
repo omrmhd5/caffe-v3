@@ -19,6 +19,18 @@ const sendTaxRatioData = () => {
   let date = $("#month").val();
   let branchID = $("#branchID").val();
 
+  // Collect paid and received values
+  const paidValues = [];
+  $(".paid-field").each(function () {
+    let val = parseFloat($(this).val());
+    paidValues.push(isNaN(val) ? 0 : val);
+  });
+  const receivedValues = [];
+  $(".received-field").each(function () {
+    let val = parseFloat($(this).val());
+    receivedValues.push(isNaN(val) ? 0 : val);
+  });
+
   const taxValue = {
     branchID: branchID,
     madaRatio: madaRatio.value,
@@ -30,6 +42,8 @@ const sendTaxRatioData = () => {
     visaRatioTotal: visaRatioTotal.value,
     visaTax: visaTax.value,
     date: date,
+    paidValues: paidValues,
+    receivedValues: receivedValues,
   };
 
   callUrl(url, method, {
@@ -383,4 +397,49 @@ madaTax.addEventListener("change", (e) => {
 
 visaTax.addEventListener("change", (e) => {
   calculateVisaTaxes();
+});
+
+// Live sum for Paid Amount
+$(document).on("input", ".paid-field", function () {
+  let total = 0;
+  $(".paid-field").each(function () {
+    let val = parseFloat($(this).val());
+    if (!isNaN(val)) total += val;
+  });
+  $("#paid-total").val(total.toFixed(2));
+});
+// Live sum for Received Amount
+$(document).on("input", ".received-field", function () {
+  let total = 0;
+  $(".received-field").each(function () {
+    let val = parseFloat($(this).val());
+    if (!isNaN(val)) total += val;
+  });
+  $("#received-total").val(total.toFixed(2));
+});
+
+$(document).ready(function () {
+  // Populate paid and received fields from backend if present
+  if (typeof taxValue !== "undefined") {
+    if (taxValue.paidValues && Array.isArray(taxValue.paidValues)) {
+      $(".paid-field").each(function (i) {
+        $(this).val(
+          taxValue.paidValues[i] !== undefined ? taxValue.paidValues[i] : 0
+        );
+      });
+      // Trigger total calculation
+      $(".paid-field").first().trigger("input");
+    }
+    if (taxValue.receivedValues && Array.isArray(taxValue.receivedValues)) {
+      $(".received-field").each(function (i) {
+        $(this).val(
+          taxValue.receivedValues[i] !== undefined
+            ? taxValue.receivedValues[i]
+            : 0
+        );
+      });
+      // Trigger total calculation
+      $(".received-field").first().trigger("input");
+    }
+  }
 });

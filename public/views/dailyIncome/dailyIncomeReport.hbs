@@ -168,68 +168,110 @@
       </div>
     </div>
     <div class="row d-flex justify-content-center">
-      <table id="daily-income-table" class="col-md-5 col-10 inline-table mx-2">
+      <table id="daily-income-table" class="col-md-3 col-6 inline-table mx-1" style="min-width:220px;max-width:260px;">
         <tbody>
           <tr>
             <td>
               <input class="form-control tax-title" disabled value="نسبة مدى" />
-              </th>
+            </td>
             <td><input type="number" class="form-control" {{taxValue.disabled}} id="mada-ratio"
                 value="{{checkOrZeror taxValue.madaRatio}}"></td>
           </tr>
           <tr>
             <td>
               <input class="form-control tax-title" disabled value="مجموع نسبة مدى" />
-              </th>
+            </td>
             <td><input class="form-control" value="{{checkOrZeror taxValue.madaRatioSum}}" id="mada-ratio-sum" disabled>
             </td>
           </tr>
           <tr>
             <td>
               <input class="form-control tax-title" disabled value="قيمة الضريبة (%)" />
-              </th>
+            </td>
             <td><input type="number" class="form-control" id="mada-tax" {{taxValue.disabled}}
                 value="{{checkOrZeror taxValue.madaTax}}"></td>
           </tr>
           <tr>
             <td>
               <input class="form-control tax-title" disabled value="إجمالي نسبة مدى" />
-              </th>
+            </td>
             <td><input class="form-control" id="mada-ratio-total" value="{{checkOrZeror taxValue.madaRatioTotal}}"
                 disabled>
             </td>
           </tr>
         </tbody>
       </table>
-      <table id="daily-income-table" class="col-md-5 col-10 inline-table mx-2">
+      <table id="daily-income-table" class="col-md-3 col-6 inline-table mx-1" style="min-width:220px;max-width:260px;">
         <tbody>
           <tr>
             <td>
               <input class=" form-control tax-title" disabled value="نسبة البنك للفيزا" />
-              </th>
+            </td>
             <td><input type="number" id="visa-ratio" class="form-control" {{taxValue.disabled}}
                 value="{{checkOrZeror taxValue.visaRatio}}"></td>
           </tr>
           <tr>
             <td>
               <input class=" form-control tax-title " disabled value="مجموع نسبة الفيزا" />
-              </th>
+            </td>
             <td><input type="number" class="form-control" id="visa-ratio-sum"
                 value="{{checkOrZeror taxValue.visaRatioSum}}" disabled></td>
           </tr>
           <tr>
             <td>
               <input class=" form-control tax-title" disabled value=" قيمة الضريبة (%)" />
-              </th>
+            </td>
             <td><input class="form-control" type="number" id="visa-tax" value="{{checkOrZeror taxValue.visaTax}}"
                 {{taxValue.disabled}}></td>
           </tr>
           <tr>
             <td>
               <input class=" form-control tax-title" disabled value="إجمالي نسبة الفيزا" />
-              </th>
+            </td>
             <td><input class="form-control" id="visa-ratio-total" value="{{checkOrZeror taxValue.visaRatioTotal}}"
                 disabled></td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- New Paid Amount Table -->
+      <table class="col-md-3 col-6 inline-table mx-1" style="min-width:220px;max-width:260px;">
+        <tbody>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مدفوع 1" /></td>
+            <td><input type="number" class="form-control paid-field" value="0"></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مدفوع 2" /></td>
+            <td><input type="number" class="form-control paid-field" value="0"></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مدفوع 3" /></td>
+            <td><input type="number" class="form-control paid-field" value="0"></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="المجموع" /></td>
+            <td><input class="form-control" id="paid-total" value="0" disabled></td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- New Received Amount Table -->
+      <table class="col-md-3 col-6 inline-table mx-1" style="min-width:220px;max-width:260px;">
+        <tbody>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 1" /></td>
+            <td><input type="number" class="form-control received-field" value="0"></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 2" /></td>
+            <td><input type="number" class="form-control received-field" value="0"></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 3" /></td>
+            <td><input type="number" class="form-control received-field" value="0"></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="المجموع" /></td>
+            <td><input class="form-control" id="received-total" value="0" disabled></td>
           </tr>
         </tbody>
       </table>
@@ -287,6 +329,7 @@
 {{> footer}}
 
 <script>
+  window.taxValue = {{{json taxValue}}};
   $('#month').datetimepicker({
     format: 'YYYY/MM',
     icons: {
