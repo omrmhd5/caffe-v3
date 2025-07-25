@@ -1,7 +1,9 @@
 const TaxValue = require("../../models/taxValue");
+const moment = require("moment");
 
-exports.addTaxValue = (taxValue) => {
-  return TaxValue.updateOne(
+exports.addTaxValue = async (taxValue) => {
+  // Save/update for the current month
+  await TaxValue.updateOne(
     {
       branchID: taxValue.branchID,
       date: taxValue.date,
@@ -11,6 +13,28 @@ exports.addTaxValue = (taxValue) => {
       upsert: true,
     }
   );
+
+  // Overwrite this and all future months (even if they already have a value)
+  let currentMonth = moment(taxValue.date).startOf("month");
+  // Propagate up to 24 months in the future (arbitrary limit)
+  for (let i = 0; i < 24; i++) {
+    const futureDate = moment(currentMonth).add(i, "month").toDate();
+    await TaxValue.updateOne(
+      {
+        branchID: taxValue.branchID,
+        date: futureDate,
+      },
+      {
+        $set: {
+          madaRatio: taxValue.madaRatio,
+          madaRatioSum: taxValue.madaRatioSum,
+          madaTax: taxValue.madaTax,
+          madaRatioTotal: taxValue.madaRatioTotal,
+        },
+      },
+      { upsert: true }
+    );
+  }
 };
 
 exports.getTaxValue = async (branchID, date, user) => {

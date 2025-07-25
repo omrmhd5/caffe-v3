@@ -338,8 +338,39 @@ if (document.getElementById("month")) {
   }
 }
 
-madaRatio.addEventListener("change", (e) => {
-  calculateMadaTaxes();
+let originalMadaRatio = madaRatio.value;
+
+madaRatio.addEventListener("focus", function () {
+  originalMadaRatio = madaRatio.value;
+});
+
+madaRatio.addEventListener("change", function (e) {
+  const newValue = madaRatio.value;
+  swal({
+    title: "تغيير نسبة مدى",
+    text: "هل أنت متأكد أنك تريد تغيير نسبة مدى لهذا الشهر؟ سيؤثر ذلك على هذا الشهر وكل الشهور القادمة.",
+    icon: "warning",
+    buttons: {
+      confirm: {
+        text: "نعم",
+        className: "btn btn-success",
+      },
+      cancel: {
+        text: "لا",
+        visible: true,
+        className: "btn btn-danger",
+      },
+    },
+  }).then((confirmed) => {
+    if (confirmed) {
+      // Keep the new value and enable save
+      calculateMadaTaxes();
+    } else {
+      // Revert to original value
+      madaRatio.value = originalMadaRatio;
+      calculateMadaTaxes();
+    }
+  });
 });
 
 visaRatio.addEventListener("change", (e) => {
