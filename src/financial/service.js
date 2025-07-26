@@ -688,3 +688,75 @@ exports.updateExpenses = async (branchID, date, userID = null) => {
     console.log("#####################################");
   }
 };
+
+exports.updateTaxValuesAndNetIncome = async (branchID, date, userID) => {
+  try {
+    let branch = await branchService.getBranchById(branchID);
+    const normalizedDate = toMonthStartDate(date);
+
+    // Get the latest tax value for this branch and date
+    const taxValue = await taxValueService.getTaxValue(branchID, date);
+    const taxRatioTotal = taxValue ? taxValue.taxRatioTotal : 0;
+
+    let financial = await Financial.findOne({
+      branchID,
+      date: normalizedDate,
+    });
+
+    if (financial) {
+      let netIncome = financial.netIncome;
+      let oldBankRatio = financial.bankRatio;
+
+      // Adjust net income: remove old bank ratio and add new one
+      netIncome =
+        parseFloat(netIncome) +
+        parseFloat(oldBankRatio) -
+        parseFloat(taxRatioTotal);
+
+      await Financial.findOneAndUpdate(
+        {
+          branchID,
+          date: normalizedDate,
+        },
+        {
+          netIncome,
+          bankRatio: taxRatioTotal,
+        },
+        {
+          upsert: true,
+        }
+      );
+    } else {
+      // Only create if tax ratio is non-zero
+      if (taxRatioTotal !== 0) {
+        await Financial.create({
+          branchID,
+          date: normalizedDate,
+          expenses: 0,
+          income: 0,
+          salaries: 0,
+          rent: 0,
+          bankRatio: taxRatioTotal,
+          saudizationSalary: 0,
+          bills: 0,
+          bills1: 0,
+          bills2: 0,
+          netIncome: -taxRatioTotal, // Tax ratio reduces net income
+          comment: 0,
+          partners: 0,
+          accounter: userID,
+        });
+      }
+    }
+  } catch (error) {
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    console.log(
+      "something went wrong while executing updateTaxValuesAndNetIncome"
+    );
+    console.log("error", error);
+    console.log("branchID", branchID);
+    console.log("date", date);
+    console.log("userID", userID);
+    console.log("#####################################");
+  }
+};

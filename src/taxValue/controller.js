@@ -1,4 +1,5 @@
 const taxValueService = require("./service");
+const financialService = require("../financial/service");
 
 exports.addTaxValue = async (req, res) => {
   try {
@@ -9,6 +10,13 @@ exports.addTaxValue = async (req, res) => {
     ).toFixed(2);
 
     await taxValueService.addTaxValue(taxValue);
+
+    // Update financial records with the new tax values
+    await financialService.updateTaxValuesAndNetIncome(
+      taxValue.branchID,
+      taxValue.date,
+      req.user._id
+    );
 
     res.send({ message: "أضيفت البيانات بنجاح" });
   } catch (error) {
