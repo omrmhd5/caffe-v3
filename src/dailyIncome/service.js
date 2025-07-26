@@ -10,11 +10,21 @@ exports.getAll = async (branchID, date, user) => {
 
   const branch = await branchService.getBranchById(branchID);
 
-  let start = new Date(date);
+  // Normalize the input date to first day of month
+  const normalizedDate = dateUtility.toMonthStartDate(date);
+  let start = new Date(normalizedDate);
   let end = new Date(dateUtility.addMonth(start));
 
   let loop = new Date(start);
+  let dayCounter = 0;
+
   while (loop < end) {
+    dayCounter++;
+    // Create a date for the current day at midnight UTC
+    const currentDayDate = new Date(
+      Date.UTC(loop.getFullYear(), loop.getMonth(), loop.getDate())
+    );
+
     let dailyResult = await DailyIncome.aggregate([
       {
         $project: {
@@ -37,15 +47,15 @@ exports.getAll = async (branchID, date, user) => {
       {
         $match: {
           branchID: branch._id,
-          month: new Date(date).getMonth() + 1,
-          day: loop.getUTCDate(),
-          year: new Date(date).getFullYear(),
+          month: currentDayDate.getUTCMonth() + 1,
+          day: currentDayDate.getUTCDate(),
+          year: currentDayDate.getUTCFullYear(),
         },
       },
     ]);
 
     if (dailyResult.length === 0) {
-      const dailyIncomeDate = new Date(loop);
+      const dailyIncomeDate = new Date(currentDayDate);
       const currentDate = new Date().setHours(0, 0);
       const hours = (currentDate - dailyIncomeDate) / 36e5;
       let disabled = false;
@@ -61,7 +71,7 @@ exports.getAll = async (branchID, date, user) => {
           _id: "",
           isSet: false,
           disabled,
-          date: new Date(loop),
+          date: currentDayDate,
           mada: 0,
           visa: 0,
           coffeeShop: 0,
@@ -113,8 +123,8 @@ exports.getAll = async (branchID, date, user) => {
     {
       $match: {
         branchID: branch._id,
-        month: new Date(date).getMonth() + 1,
-        year: new Date(date).getFullYear(),
+        month: normalizedDate.getUTCMonth() + 1,
+        year: normalizedDate.getUTCFullYear(),
       },
     },
     {
@@ -147,7 +157,6 @@ exports.addDailyIncome = async (branchID, date, data) => {
   let arbitrage = 0;
 
   dailyTotal += data.cash ? parseFloat(data.cash) : 0;
-
   dailyTotal += data.mada ? parseFloat(data.mada) : 0;
   dailyTotal += data.visa ? parseFloat(data.visa) : 0;
   dailyTotal += data.coffeShop ? parseFloat(data.coffeShop) : 0;
@@ -160,25 +169,45 @@ exports.addDailyIncome = async (branchID, date, data) => {
   dailyTotal = dailyTotal.toFixed(2);
   arbitrage = arbitrage.toFixed(2);
 
-  await DailyIncome.findOneAndUpdate(
+  // Normalize the date to ensure consistent storage
+  const normalizedDate = dateUtility.toMonthStartDate(date);
+  const dayOfMonth = new Date(date).getDate();
+  const targetDate = new Date(
+    Date.UTC(
+      normalizedDate.getFullYear(),
+      normalizedDate.getMonth(),
+      dayOfMonth
+    )
+  );
+
+  // Check if record already exists
+  const existingRecord = await DailyIncome.findOne({
+    branchID,
+    date: targetDate,
+  });
+
+  const updateData = {
+    date: targetDate,
+    branchID: data.branchID,
+    cash: data.cash,
+    coffeeShop: data.coffeShop,
+    addedIncome: data.addedIncome,
+    mada: data.mada,
+    visa: data.visa,
+    bankTransfer: data.bankTransfer,
+    dailyTotal,
+    arbitrage,
+  };
+
+  const result = await DailyIncome.findOneAndUpdate(
     {
       branchID,
-      date: new Date(date),
+      date: targetDate,
     },
-    {
-      date: new Date(data.date),
-      branchID: data.branchID,
-      cash: data.cash,
-      coffeeShop: data.coffeShop,
-      addedIncome: data.addedIncome,
-      mada: data.mada,
-      visa: data.visa,
-      bankTransfer: data.bankTransfer,
-      dailyTotal,
-      arbitrage,
-    },
+    updateData,
     {
       upsert: true,
+      new: true,
     }
   );
 };

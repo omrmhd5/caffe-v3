@@ -88,8 +88,8 @@ exports.report = async (req, res) => {
 exports.addDailyIncome = async (req, res) => {
   try {
     let data = JSON.parse(req.body.data);
-
     await dailyIncomService.addDailyIncome(data.branchID, data.date, data);
+
     await financialService.updateIncomeAndNetIncome(
       data.branchID,
       data.date,
@@ -98,7 +98,6 @@ exports.addDailyIncome = async (req, res) => {
 
     res.send({ message: "أضيفت البيانات بنجاح" });
   } catch (error) {
-    console.log(error, error.status, error.message);
     res.status(error.status).send({ errorMessage: error.message });
   }
 };

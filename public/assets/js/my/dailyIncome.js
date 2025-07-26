@@ -75,7 +75,12 @@ taxButton.addEventListener("click", (e) => {
 });
 
 const sendData = (button) => {
+  console.log("=== FRONTEND SENDDATA DEBUG ===");
+  console.log("Button clicked:", button);
+
   let row = button.closest(".d-income-tr");
+  console.log("Row element:", row);
+
   let url = "/dailyIncome";
   let method = "POST";
 
@@ -98,7 +103,7 @@ const sendData = (button) => {
       bankTransferValue
     );
 
-  callUrl(url, method, {
+  const requestData = {
     data: JSON.stringify({
       cash,
       coffeShop,
@@ -109,7 +114,9 @@ const sendData = (button) => {
       branchID,
       date,
     }),
-  });
+  };
+
+  callUrl(url, method, requestData);
 
   sendTaxRatioData();
 };
