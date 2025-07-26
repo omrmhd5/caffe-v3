@@ -7,6 +7,7 @@ const {
   BadRequestException,
 } = require("../common/errors/exceptions");
 const PAGE_SIZE = require("../common/constants").PAGE_SIZE;
+const { toMonthStartDate } = require("../common/date");
 
 exports.getAllSalaries = async (
   branchID = null,
@@ -24,7 +25,7 @@ exports.getAllSalaries = async (
   }
 
   const branch = await branchService.getBranchById(branchID);
-
+  const normalizedDate = toMonthStartDate(date);
   const currentDate = new Date();
 
   const employees = await Employee.find();
@@ -32,7 +33,7 @@ exports.getAllSalaries = async (
     let salary = await Salary.findOne({
       employeeID: employee._id,
       branchID,
-      date,
+      date: normalizedDate,
     }).lean();
 
     if (salary) {
@@ -77,7 +78,7 @@ exports.getAllSalaries = async (
   }
 
   let salaryTotal = await Salary.aggregate([
-    { $match: { date: new Date(date), branchID: branch._id } },
+    { $match: { date: normalizedDate, branchID: branch._id } },
     {
       $group: {
         _id: null,
@@ -123,11 +124,6 @@ exports.getSalaryById = async (id) => {
 };
 
 exports.deleteSalary = async (id) => {
-  const salary = await Salary.findById(id);
-  if (!salary) {
-    throw new NotFoundException("الراتب غير موجود");
-  }
-
   await Salary.findByIdAndDelete(id);
   return;
 };
@@ -157,6 +153,7 @@ exports.createSalary = async (
     throw new BadRequestException("الرجاء كتابة الراتب");
   }
 
+  const normalizedDate = toMonthStartDate(date);
   const netSalary =
     salary +
     amountIncrease +
@@ -168,7 +165,7 @@ exports.createSalary = async (
 
   const foundedSalary = await Salary.findOne({
     employeeID,
-    date,
+    date: normalizedDate,
   });
 
   if (foundedSalary) {
@@ -183,12 +180,13 @@ exports.createSalary = async (
       netSalary: netSalary.toFixed(2),
       branchID,
       accounter: userID,
+      date: normalizedDate,
     });
   } else {
     if (netSalary !== 0) {
       await Salary.create({
         employeeID,
-        date,
+        date: normalizedDate,
         salary,
         extraWork,
         allowance,
@@ -216,8 +214,10 @@ exports.updateSalary = async (
   daysIncrease,
   amountDecrease,
   daysDecrease,
-  netSalary
+  netSalary,
+  date
 ) => {
+  const { toMonthStartDate } = require("../common/date");
   let result = await Salary.findById(id).populate("branchID").lean();
   if (!result) {
     throw new NotFoundException("الراتب غير موجود");
@@ -261,6 +261,10 @@ exports.updateSalary = async (
     update.netSalary = netSalary;
   }
 
+  if (date) {
+    update.date = toMonthStartDate(date);
+  }
+
   salary = await Salary.findByIdAndUpdate(id, update, {
     new: true,
   }).populate("branchID");
@@ -279,13 +283,14 @@ exports.updateBulk = async (user, salaries) => {
   }
 
   for (let salary of salaries) {
+    const normalizedDate = toMonthStartDate(salary.date);
     await Salary.findOneAndUpdate(
       {
-        date: salary.date,
+        date: normalizedDate,
         branchID: salary.branchID,
         employeeID: salary.employeeID,
       },
-      salary,
+      { ...salary, date: normalizedDate },
       {
         upsert: true,
       }
@@ -294,7 +299,7 @@ exports.updateBulk = async (user, salaries) => {
 
   await financialService.updateSalariesAndNetIncome(
     salaries[0].branchID,
-    salaries[0].date,
+    toMonthStartDate(salaries[0].date),
     user._id
   );
 

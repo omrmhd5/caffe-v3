@@ -1,16 +1,19 @@
 const PaymentValue = require("../../models/paymentValue");
+const { toMonthStartDate } = require("../common/date");
 
 exports.addPaymentValue = async (paymentValue) => {
+  const normalizedDate = toMonthStartDate(paymentValue.date);
   await PaymentValue.updateOne(
     {
       branchID: paymentValue.branchID,
-      date: paymentValue.date,
+      date: normalizedDate,
     },
-    paymentValue,
+    { ...paymentValue, date: normalizedDate },
     { upsert: true }
   );
 };
 
 exports.getPaymentValue = async (branchID, date) => {
-  return PaymentValue.findOne({ branchID, date }).lean();
+  const normalizedDate = toMonthStartDate(date);
+  return PaymentValue.findOne({ branchID, date: normalizedDate }).lean();
 };

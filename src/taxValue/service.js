@@ -1,23 +1,27 @@
 const TaxValue = require("../../models/taxValue");
 const moment = require("moment");
+const { toMonthStartDate } = require("../common/date");
 
 exports.addTaxValue = async (taxValue) => {
+  const normalizedDate = toMonthStartDate(taxValue.date);
   // Save/update for the current month
   await TaxValue.updateOne(
     {
       branchID: taxValue.branchID,
-      date: taxValue.date,
+      date: normalizedDate,
     },
-    taxValue,
+    { ...taxValue, date: normalizedDate },
     {
       upsert: true,
     }
   );
 
   // Overwrite madaRatio and related fields for all future months (even if they already have a value)
-  let currentMonth = moment(taxValue.date, "YYYY-MM").startOf("month");
+  let currentMonth = toMonthStartDate(normalizedDate);
   for (let i = 0; i < 24; i++) {
-    const futureDate = moment(currentMonth).add(i, "month").toDate();
+    const futureDate = toMonthStartDate(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + i, 1)
+    );
     await TaxValue.updateOne(
       {
         branchID: taxValue.branchID,
@@ -34,10 +38,15 @@ exports.addTaxValue = async (taxValue) => {
 };
 
 exports.getTaxValue = async (branchID, date, user) => {
+  const normalizedDate = toMonthStartDate(date);
+  if (!date || isNaN(new Date(date).getTime())) {
+    return null;
+  }
   let result = await TaxValue.findOne({
     branchID,
-    date,
+    date: normalizedDate,
   }).lean();
+  console.log(result);
 
   if (result) {
     const taxDate = new Date(result.createdAt);

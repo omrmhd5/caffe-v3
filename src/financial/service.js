@@ -9,7 +9,7 @@ const taxValueService = require("../taxValue/service");
 const { NotFoundException } = require("../common/errors/exceptions");
 const Salary = require("../../models/salary");
 const Invoice = require("../../models/invoice");
-require("../common/date");
+const { toMonthStartDate } = require("../common/date");
 
 // Helper to get rent for a branch for a specific date
 async function getRentForMonth(branch, date) {
@@ -106,6 +106,7 @@ exports.deleteFinance = async (id) => {
 };
 
 exports.updateFinance = async (date, branchID, financial) => {
+  const normalizedDate = toMonthStartDate(date);
   // Prevent update if branch is not editable for this date
   const editable = await branchService.isBranchEditable(branchID, date);
   if (!editable) {
@@ -152,12 +153,9 @@ exports.updateFinance = async (date, branchID, financial) => {
 
   financial.netIncome = netIncome;
 
-  // Convert date string to proper Date object for database query
-  const queryDate = new Date(date + "-01"); // Convert "2025-07" to "2025-07-01" then to Date
-
   await Financial.findOneAndUpdate(
     {
-      date: queryDate,
+      date: normalizedDate,
       branchID,
     },
     financial,
@@ -168,8 +166,9 @@ exports.updateFinance = async (date, branchID, financial) => {
 };
 
 exports.updateComment = async (date, branchID, comment, rentComment) => {
+  const normalizedDate = toMonthStartDate(date);
   await Financial.findOneAndUpdate(
-    { date, branchID },
+    { date: normalizedDate, branchID },
     {
       comment,
     },
@@ -188,6 +187,7 @@ exports.updateComment = async (date, branchID, comment, rentComment) => {
 };
 
 exports.updateRentNote = async (branchID, note) => {
+  const normalizedDate = toMonthStartDate(new Date());
   await Rent.findOneAndUpdate(
     { branchID },
     {
@@ -200,12 +200,11 @@ exports.updateRentNote = async (branchID, note) => {
 };
 
 exports.getFinanceByBranchId = async (branchID, date) => {
-  // Convert date string to proper Date object for database query
-  const queryDate = new Date(date + "-01"); // Convert "2025-07" to "2025-07-01" then to Date
+  const normalizedDate = toMonthStartDate(date);
 
   const financial = await Financial.findOne({
     branchID,
-    date: queryDate,
+    date: normalizedDate,
   }).populate("branchID");
 
   let branch = await branchService.getBranchById(branchID);
@@ -336,14 +335,16 @@ exports.showAdd = async (date, user) => {
     if (rent) {
       financial.rentComment = rent.rentDate;
     }
-
+    console.log(date);
     const taxValue = await taxValueService.getTaxValue(
       branch._id,
       new Date(date)
     );
+    console.log(taxValue);
 
     financial.bankRatio = taxValue ? taxValue.taxRatioTotal : 0;
     totalBankRatio += financial.bankRatio;
+    console.log(totalBankRatio);
 
     data.push(financial);
   }
@@ -412,9 +413,10 @@ exports.showAdd = async (date, user) => {
 exports.updateSalariesAndNetIncome = async (branchID, date, userID) => {
   try {
     let branch = await branchService.getBranchById(branchID);
+    const normalizedDate = toMonthStartDate(date);
 
     let salaries = await Salary.aggregate([
-      { $match: { date: new Date(date), branchID: branch._id } },
+      { $match: { date: normalizedDate, branchID: branch._id } },
       {
         $group: {
           _id: null,
@@ -425,7 +427,7 @@ exports.updateSalariesAndNetIncome = async (branchID, date, userID) => {
 
     let financial = await Financial.findOne({
       branchID,
-      date,
+      date: normalizedDate,
     });
 
     if (financial) {
@@ -440,7 +442,7 @@ exports.updateSalariesAndNetIncome = async (branchID, date, userID) => {
       await Financial.findOneAndUpdate(
         {
           branchID,
-          date,
+          date: normalizedDate,
         },
         {
           netIncome,
@@ -453,7 +455,7 @@ exports.updateSalariesAndNetIncome = async (branchID, date, userID) => {
     } else {
       await Financial.create({
         branchID,
-        date: new Date(date),
+        date: normalizedDate,
         expenses: 0,
         income: 0,
         netIncome: -salaries[0].totalSalaries,
@@ -485,6 +487,7 @@ exports.updateSalariesAndNetIncome = async (branchID, date, userID) => {
 exports.updateIncomeAndNetIncome = async (branchID, date, userID) => {
   try {
     let branch = await branchService.getBranchById(branchID);
+    const normalizedDate = toMonthStartDate(date);
     let incomes = await DailyIncome.aggregate([
       {
         $project: {
@@ -520,7 +523,7 @@ exports.updateIncomeAndNetIncome = async (branchID, date, userID) => {
 
     let financial = await Financial.findOne({
       branchID,
-      date: new Date(date).toDateInputValue(),
+      date: normalizedDate,
     });
 
     if (financial) {
@@ -535,7 +538,7 @@ exports.updateIncomeAndNetIncome = async (branchID, date, userID) => {
       await Financial.findOneAndUpdate(
         {
           branchID,
-          date: new Date(date).toDateInputValue(),
+          date: normalizedDate,
         },
         {
           netIncome,
@@ -548,7 +551,7 @@ exports.updateIncomeAndNetIncome = async (branchID, date, userID) => {
     } else {
       await Financial.create({
         branchID,
-        date: new Date(date).toDateInputValue(),
+        date: normalizedDate,
         expenses: 0,
         income: incomes[0].dailyTotal,
         salaries: 0,
@@ -580,6 +583,7 @@ exports.updateIncomeAndNetIncome = async (branchID, date, userID) => {
 exports.updateExpenses = async (branchID, date, userID = null) => {
   try {
     let branch = await branchService.getBranchById(branchID);
+    const normalizedDate = toMonthStartDate(date);
 
     let expenses = await Invoice.aggregate([
       {
@@ -595,8 +599,8 @@ exports.updateExpenses = async (branchID, date, userID = null) => {
       {
         $match: {
           branchID: branch._id,
-          month: new Date(date).getMonth() + 1,
-          year: new Date(date).getFullYear(),
+          month: normalizedDate.getMonth() + 1,
+          year: normalizedDate.getFullYear(),
         },
       },
       {
@@ -609,7 +613,7 @@ exports.updateExpenses = async (branchID, date, userID = null) => {
 
     let financial = await Financial.findOne({
       branchID,
-      date: new Date(date).toDateInputValue(),
+      date: normalizedDate,
     });
 
     if (financial) {
@@ -624,7 +628,7 @@ exports.updateExpenses = async (branchID, date, userID = null) => {
       await Financial.findOneAndUpdate(
         {
           branchID,
-          date: new Date(date).toDateInputValue(),
+          date: normalizedDate,
         },
         {
           netIncome,
@@ -637,7 +641,7 @@ exports.updateExpenses = async (branchID, date, userID = null) => {
     } else {
       await Financial.create({
         branchID,
-        date: new Date(date).toDateInputValue(),
+        date: normalizedDate,
         expenses: expenses[0] ? expenses[0].amountTotal : 0,
         income: 0,
         salaries: 0,
