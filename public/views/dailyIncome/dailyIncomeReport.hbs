@@ -38,6 +38,35 @@
   }
 
   .inlineTable {display: inline-block;}
+
+  /* Sticky table headers */
+  .table-responsive {
+    max-height: 80vh;
+    overflow-y: auto;
+    margin-bottom: 2rem;
+  }
+
+  #daily-income-table {
+    position: relative;
+  }
+
+  #daily-income-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: white;
+  }
+
+  #daily-income-table thead th {
+    background: white;
+    border-bottom: 2px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  /* Ensure the sticky header works properly */
+  #daily-income-table tbody tr:first-child td {
+    border-top: none;
+  }
 </style>
 
 <div class="col-md-12 d-print-none p-0" dir="rtl" style="padding: 0px 28px;">
