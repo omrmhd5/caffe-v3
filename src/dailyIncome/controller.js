@@ -79,6 +79,9 @@ exports.report = async (req, res) => {
     month,
     disableSaveRatio,
     paymentValue,
+    userRole: req.user.role,
+    isManager:
+      req.user.role === "Manager" || req.user.role === "AccountantManager",
   });
 };
 

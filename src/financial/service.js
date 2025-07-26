@@ -153,14 +153,29 @@ exports.updateFinance = async (date, branchID, financial) => {
 
   financial.netIncome = netIncome;
 
-  await Financial.findOneAndUpdate(
-    {
-      date: normalizedDate,
-      branchID,
-    },
-    financial,
-    { upsert: true }
-  );
+  // Only upsert if at least one main field is non-zero
+  const hasData = [
+    financial.income,
+    financial.rent,
+    financial.expenses,
+    financial.bankRatio,
+    financial.salaries,
+    financial.saudizationSalary,
+    financial.bills,
+    financial.bills1,
+    financial.bills2,
+  ].some((v) => parseFloat(v) && parseFloat(v) !== 0);
+
+  if (hasData) {
+    await Financial.findOneAndUpdate(
+      {
+        date: normalizedDate,
+        branchID,
+      },
+      financial,
+      { upsert: true }
+    );
+  }
 
   return;
 };
@@ -335,16 +350,13 @@ exports.showAdd = async (date, user) => {
     if (rent) {
       financial.rentComment = rent.rentDate;
     }
-    console.log(date);
     const taxValue = await taxValueService.getTaxValue(
       branch._id,
       new Date(date)
     );
-    console.log(taxValue);
 
     financial.bankRatio = taxValue ? taxValue.taxRatioTotal : 0;
     totalBankRatio += financial.bankRatio;
-    console.log(totalBankRatio);
 
     data.push(financial);
   }
@@ -453,23 +465,26 @@ exports.updateSalariesAndNetIncome = async (branchID, date, userID) => {
         }
       );
     } else {
-      await Financial.create({
-        branchID,
-        date: normalizedDate,
-        expenses: 0,
-        income: 0,
-        netIncome: -salaries[0].totalSalaries,
-        salaries: salaries[0].totalSalaries,
-        rent: 0,
-        bankRatio: 0,
-        saudizationSalary: 0,
-        bills: 0,
-        bills1: 0,
-        bills2: 0,
-        comment: 0,
-        partners: 0,
-        accounter: userID,
-      });
+      // Only create if salaries is non-zero
+      if (salaries[0] && salaries[0].totalSalaries !== 0) {
+        await Financial.create({
+          branchID,
+          date: normalizedDate,
+          expenses: 0,
+          income: 0,
+          netIncome: -salaries[0].totalSalaries,
+          salaries: salaries[0].totalSalaries,
+          rent: 0,
+          bankRatio: 0,
+          saudizationSalary: 0,
+          bills: 0,
+          bills1: 0,
+          bills2: 0,
+          comment: 0,
+          partners: 0,
+          accounter: userID,
+        });
+      }
     }
   } catch (error) {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -549,23 +564,26 @@ exports.updateIncomeAndNetIncome = async (branchID, date, userID) => {
         }
       );
     } else {
-      await Financial.create({
-        branchID,
-        date: normalizedDate,
-        expenses: 0,
-        income: incomes[0].dailyTotal,
-        salaries: 0,
-        rent: 0,
-        bankRatio: 0,
-        saudizationSalary: 0,
-        bills: 0,
-        bills1: 0,
-        bills2: 0,
-        netIncome: incomes[0].dailyTotal,
-        comment: 0,
-        partners: 0,
-        accounter: userID,
-      });
+      // Only create if income is non-zero
+      if (incomes[0] && incomes[0].dailyTotal !== 0) {
+        await Financial.create({
+          branchID,
+          date: normalizedDate,
+          expenses: 0,
+          income: incomes[0].dailyTotal,
+          salaries: 0,
+          rent: 0,
+          bankRatio: 0,
+          saudizationSalary: 0,
+          bills: 0,
+          bills1: 0,
+          bills2: 0,
+          netIncome: incomes[0].dailyTotal,
+          comment: 0,
+          partners: 0,
+          accounter: userID,
+        });
+      }
     }
   } catch (error) {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -639,23 +657,26 @@ exports.updateExpenses = async (branchID, date, userID = null) => {
         }
       );
     } else {
-      await Financial.create({
-        branchID,
-        date: normalizedDate,
-        expenses: expenses[0] ? expenses[0].amountTotal : 0,
-        income: 0,
-        salaries: 0,
-        rent: 0,
-        bankRatio: 0,
-        saudizationSalary: 0,
-        bills: 0,
-        bills1: 0,
-        bills2: 0,
-        netIncome: -expenses[0].amountTotal,
-        comment: 0,
-        partners: 0,
-        accounter: userID,
-      });
+      // Only create if expenses is non-zero
+      if (expenses[0] && expenses[0].amountTotal !== 0) {
+        await Financial.create({
+          branchID,
+          date: normalizedDate,
+          expenses: expenses[0] ? expenses[0].amountTotal : 0,
+          income: 0,
+          salaries: 0,
+          rent: 0,
+          bankRatio: 0,
+          saudizationSalary: 0,
+          bills: 0,
+          bills1: 0,
+          bills2: 0,
+          netIncome: -expenses[0].amountTotal,
+          comment: 0,
+          partners: 0,
+          accounter: userID,
+        });
+      }
     }
   } catch (error) {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");

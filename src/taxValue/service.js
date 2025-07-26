@@ -46,7 +46,6 @@ exports.getTaxValue = async (branchID, date, user) => {
     branchID,
     date: normalizedDate,
   }).lean();
-  console.log(result);
 
   if (result) {
     const taxDate = new Date(result.createdAt);

@@ -174,8 +174,8 @@
             <td>
               <input class="form-control tax-title" disabled value="نسبة مدى" />
             </td>
-            <td><input type="number" class="form-control" {{taxValue.disabled}} id="mada-ratio"
-                value="{{checkOrZeror taxValue.madaRatio}}"></td>
+            <td><input type="number" class="form-control" id="mada-ratio"
+                value="{{checkOrZeror taxValue.madaRatio}}" {{#unless isManager}}disabled{{/unless}}></td>
           </tr>
           <tr>
             <td>
@@ -188,8 +188,8 @@
             <td>
               <input class="form-control tax-title" disabled value="قيمة الضريبة (%)" />
             </td>
-            <td><input type="number" class="form-control" id="mada-tax" {{taxValue.disabled}}
-                value="{{checkOrZeror taxValue.madaTax}}"></td>
+            <td><input type="number" class="form-control" id="mada-tax"
+                value="{{checkOrZeror taxValue.madaTax}}" {{#unless isManager}}disabled{{/unless}}></td>
           </tr>
           <tr>
             <td>
@@ -207,8 +207,8 @@
             <td>
               <input class=" form-control tax-title" disabled value="نسبة البنك للفيزا" />
             </td>
-            <td><input type="number" id="visa-ratio" class="form-control" {{taxValue.disabled}}
-                value="{{checkOrZeror taxValue.visaRatio}}"></td>
+            <td><input type="number" id="visa-ratio" class="form-control"
+                value="{{checkOrZeror taxValue.visaRatio}}" {{#unless isManager}}disabled{{/unless}}></td>
           </tr>
           <tr>
             <td>
@@ -222,7 +222,7 @@
               <input class=" form-control tax-title" disabled value=" قيمة الضريبة (%)" />
             </td>
             <td><input class="form-control" type="number" id="visa-tax" value="{{checkOrZeror taxValue.visaTax}}"
-                {{taxValue.disabled}}></td>
+                {{#unless isManager}}disabled{{/unless}}></td>
           </tr>
           <tr>
             <td>
@@ -233,6 +233,7 @@
           </tr>
         </tbody>
       </table>
+      {{#if isManager}}
       <!-- New Paid Amount Table -->
       <table class="col-md-3 col-6 inline-table mx-1" style="min-width:220px;max-width:260px;">
         <tbody>
@@ -267,17 +268,19 @@
           </tr>
         </tbody>
       </table>
-      <!-- Grand total field below, centered -->
+      {{/if}}
+      {{#if isManager}}
       <div class="w-100 d-flex flex-column align-items-center justify-content-center my-2">
         <label class="form-control tax-title text-center" style="max-width:160px;margin-bottom:8px;">المجموع المستلم</label>
         <input class="form-control text-center" id="grand-total" value="0" disabled style="font-weight:bold;max-width:160px;">
       </div>
+      {{/if}}
     </div>
     <div class="card-footer d-print-block mt-3">
       <div class="totaldiv" style="width: 100%;">
         <div>
           <center>
-            <button class="btn btn-lg mb-2 btnclass" id="tax-button" {{disableSaveRatio}}> حفظ النسبة </button>
+            <button class="btn btn-lg mb-2 btnclass" id="tax-button" {{disableSaveRatio}} {{#unless isManager}}disabled style="display:none"{{/unless}}> حفظ النسبة </button>
           </center>
           <center>
             <div class="total-ratio">
