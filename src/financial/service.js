@@ -11,6 +11,26 @@ const Salary = require("../../models/salary");
 const Invoice = require("../../models/invoice");
 const { toMonthStartDate } = require("../common/date");
 
+// Simple in-memory cache for branch data
+const branchCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Helper to get cached branch data
+async function getCachedBranch(branchId) {
+  const cached = branchCache.get(branchId);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
+  const branch = await branchService.getBranchById(branchId);
+  branchCache.set(branchId, {
+    data: branch,
+    timestamp: Date.now(),
+  });
+
+  return branch;
+}
+
 // Helper to get rent for a branch for a specific date
 async function getRentForMonth(branch, date) {
   if (!branch.rentHistory || branch.rentHistory.length === 0) return 0;
@@ -221,17 +241,12 @@ exports.getFinanceByBranchId = async (branchID, date) => {
     date: normalizedDate,
   }).populate("branchID");
 
-  let branch = await branchService.getBranchById(branchID);
+  let branch = await getCachedBranch(branchID);
   let rent = await getRentForMonth(branch, date);
 
   // Auto-calculate salaries for the branch/month
   const month = new Date(date).getMonth() + 1;
   const year = new Date(date).getFullYear();
-
-  // First, let's see what salary records exist for this branch
-  const allSalariesForBranch = await Salary.find({
-    branchID: branch._id,
-  }).lean();
 
   // Use a simpler approach - direct query with date range
   const startOfMonth = new Date(year, month - 1, 1);
@@ -340,19 +355,44 @@ exports.showAdd = async (date, user) => {
   let totalBankRatio = 0;
   let totalRent = 0;
 
-  for (let branch of branches) {
-    let financial = await this.getFinanceByBranchId(branch._id, date);
+  // Batch all the queries for better performance
+  const branchIds = branches.map((b) => b._id);
+
+  // Get all financial data in parallel
+  const financialPromises = branches.map((branch) =>
+    this.getFinanceByBranchId(branch._id, date)
+  );
+
+  // Get all rent data in parallel
+  const rentPromises = branches.map((branch) =>
+    Rent.findOne({ branchID: branch._id }).lean()
+  );
+
+  // Get all tax values in parallel
+  const taxValuePromises = branches.map((branch) =>
+    taxValueService.getTaxValue(branch._id, new Date(date))
+  );
+
+  // Execute all queries in parallel
+  const [financialResults, rentResults, taxValueResults] = await Promise.all([
+    Promise.all(financialPromises),
+    Promise.all(rentPromises),
+    Promise.all(taxValuePromises),
+  ]);
+
+  // Process results
+  for (let i = 0; i < branches.length; i++) {
+    let financial = financialResults[i];
+    let rent = rentResults[i];
+    let taxValue = taxValueResults[i];
+    let branch = branches[i];
+
     financial.branchname = branch.branchname;
     financial.branchID = branch._id;
 
-    let rent = await Rent.findOne({ branchID: branch._id });
     if (rent) {
       financial.rentComment = rent.rentDate;
     }
-    const taxValue = await taxValueService.getTaxValue(
-      branch._id,
-      new Date(date)
-    );
 
     financial.bankRatio = taxValue ? taxValue.taxRatioTotal : 0;
     totalBankRatio += financial.bankRatio;
@@ -360,6 +400,7 @@ exports.showAdd = async (date, user) => {
     data.push(financial);
   }
 
+  // Get incomes data
   const incomes = await DailyIncome.aggregate([
     {
       $project: {
@@ -380,7 +421,7 @@ exports.showAdd = async (date, user) => {
         month: new Date(date).getMonth() + 1,
         year: new Date(date).getFullYear(),
         branchID: {
-          $in: branches.map((b) => b._id),
+          $in: branchIds,
         },
       },
     },

@@ -59,6 +59,11 @@ const salarySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Add indexes for better query performance
+salarySchema.index({ branchID: 1, date: 1 });
+salarySchema.index({ date: 1 });
+salarySchema.index({ branchID: 1 });
+
 const Salary = mongoose.model("Salary", salarySchema);
 
 module.exports = Salary;

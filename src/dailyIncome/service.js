@@ -15,88 +15,96 @@ exports.getAll = async (branchID, date, user) => {
   let start = new Date(normalizedDate);
   let end = new Date(dateUtility.addMonth(start));
 
-  let loop = new Date(start);
-  let dayCounter = 0;
+  // Single aggregation query to get all daily income records for the month
+  const dailyResults = await DailyIncome.aggregate([
+    {
+      $project: {
+        cash: 1,
+        visa: 1,
+        mada: 1,
+        coffeeShop: 1,
+        addedIncome: 1,
+        bankTransfer: 1,
+        dailyTotal: 1,
+        arbitrage: 1,
+        createdAt: 1,
+        day: { $dayOfMonth: "$date" },
+        month: { $month: "$date" },
+        year: { $year: "$date" },
+        branchID: 1,
+        date: 1,
+      },
+    },
+    {
+      $match: {
+        branchID: branch._id,
+        month: start.getUTCMonth() + 1,
+        year: start.getUTCFullYear(),
+      },
+    },
+  ]);
 
+  // Create a map for quick lookup
+  const dailyMap = new Map();
+  dailyResults.forEach((result) => {
+    const day = result.day;
+    dailyMap.set(day, result);
+  });
+
+  // Generate data for all days in the month
+  let loop = new Date(start);
   while (loop < end) {
-    dayCounter++;
-    // Create a date for the current day at midnight UTC
+    const dayOfMonth = loop.getDate();
     const currentDayDate = new Date(
-      Date.UTC(loop.getFullYear(), loop.getMonth(), loop.getDate())
+      Date.UTC(loop.getFullYear(), loop.getMonth(), dayOfMonth)
     );
 
-    let dailyResult = await DailyIncome.aggregate([
-      {
-        $project: {
-          cash: 1,
-          visa: 1,
-          mada: 1,
-          coffeeShop: 1,
-          addedIncome: 1,
-          bankTransfer: 1,
-          dailyTotal: 1,
-          arbitrage: 1,
-          createdAt: 1,
-          day: { $dayOfMonth: "$date" },
-          month: { $month: "$date" },
-          year: { $year: "$date" },
-          branchID: 1,
-          date: 1,
-        },
-      },
-      {
-        $match: {
-          branchID: branch._id,
-          month: currentDayDate.getUTCMonth() + 1,
-          day: currentDayDate.getUTCDate(),
-          year: currentDayDate.getUTCFullYear(),
-        },
-      },
-    ]);
+    const existingRecord = dailyMap.get(dayOfMonth);
 
-    if (dailyResult.length === 0) {
+    if (!existingRecord) {
       const dailyIncomeDate = new Date(currentDayDate);
       const currentDate = new Date().setHours(0, 0);
       const hours = (currentDate - dailyIncomeDate) / 36e5;
       let disabled = false;
 
-      (disabled =
+      disabled =
         (hours > 48 || hours < 1) &&
         (user.role === "Invoicer" ||
           user.role === "BranchAccountant" ||
           user.role === "Accountant")
           ? "disabled"
-          : ""),
-        data.push({
-          _id: "",
-          isSet: false,
-          disabled,
-          date: currentDayDate,
-          mada: 0,
-          visa: 0,
-          coffeeShop: 0,
-          addedIncome: 0,
-          bankTransfer: 0,
-          branchID: null,
-          cash: 0,
-          month: 0,
-          year: 0,
-        });
+          : "";
+
+      data.push({
+        _id: "",
+        isSet: false,
+        disabled,
+        date: currentDayDate,
+        mada: 0,
+        visa: 0,
+        coffeeShop: 0,
+        addedIncome: 0,
+        bankTransfer: 0,
+        branchID: null,
+        cash: 0,
+        month: 0,
+        year: 0,
+      });
     } else {
-      const dailyIncomeDate = new Date(dailyResult[0].createdAt);
+      const dailyIncomeDate = new Date(existingRecord.createdAt);
       const currentDate = new Date();
       const hours = Math.abs(currentDate - dailyIncomeDate) / 36e5;
 
-      dailyResult[0].isSet = true;
-
-      (dailyResult[0].disabled =
+      existingRecord.isSet = true;
+      existingRecord.disabled =
         hours > 6 &&
         (user.role === "Invoicer" ||
           user.role === "BranchAccountant" ||
           user.role === "Accountant")
           ? "disabled"
-          : ""),
-        data.push(dailyResult[0]);
+          : "";
+
+      data.push(existingRecord);
     }
 
     loop = new Date(loop.setDate(loop.getDate() + 1));

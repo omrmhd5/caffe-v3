@@ -5,7 +5,7 @@ const dailyIncomeSchema = new mongoose.Schema(
     branchID: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Branch",
-      required: true
+      required: true,
     },
     cash: {
       type: Number,
@@ -50,6 +50,10 @@ const dailyIncomeSchema = new mongoose.Schema(
     toJSON: { virtuals: true },
   }
 );
+
+// Add indexes for better query performance
+dailyIncomeSchema.index({ branchID: 1, date: 1 });
+dailyIncomeSchema.index({ date: 1 });
 
 const DailyIncome = mongoose.model("DailyIncome", dailyIncomeSchema);
 

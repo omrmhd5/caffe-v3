@@ -53,6 +53,11 @@ const taxValueSchema = new mongoose.Schema(
   }
 );
 
+// Add indexes for better query performance
+taxValueSchema.index({ branchID: 1, date: 1 });
+taxValueSchema.index({ date: 1 });
+taxValueSchema.index({ branchID: 1 });
+
 const TaxValue = mongoose.model("TaxValue", taxValueSchema);
 
 module.exports = TaxValue;
