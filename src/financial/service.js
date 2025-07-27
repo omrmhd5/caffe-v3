@@ -143,7 +143,6 @@ exports.updateFinance = async (date, branchID, financial) => {
     parseFloat(financial.income) -
     parseFloat(financial.rent) -
     parseFloat(financial.expenses) -
-    parseFloat(financial.bankRatio) -
     parseFloat(financial.salaries) -
     parseFloat(financial.saudizationSalary) -
     parseFloat(financial.bills) -
@@ -704,22 +703,13 @@ exports.updateTaxValuesAndNetIncome = async (branchID, date, userID) => {
     });
 
     if (financial) {
-      let netIncome = financial.netIncome;
-      let oldBankRatio = financial.bankRatio;
-
-      // Adjust net income: remove old bank ratio and add new one
-      netIncome =
-        parseFloat(netIncome) +
-        parseFloat(oldBankRatio) -
-        parseFloat(taxRatioTotal);
-
+      // Do not adjust netIncome by bankRatio/taxRatioTotal anymore
       await Financial.findOneAndUpdate(
         {
           branchID,
           date: normalizedDate,
         },
         {
-          netIncome,
           bankRatio: taxRatioTotal,
         },
         {
@@ -741,7 +731,7 @@ exports.updateTaxValuesAndNetIncome = async (branchID, date, userID) => {
           bills: 0,
           bills1: 0,
           bills2: 0,
-          netIncome: -taxRatioTotal, // Tax ratio reduces net income
+          netIncome: 0, // Tax ratio no longer reduces net income
           comment: 0,
           partners: 0,
           accounter: userID,

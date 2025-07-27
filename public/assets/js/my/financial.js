@@ -186,7 +186,6 @@ $("#modalFinancialForm").delegate("input", "keyup", "change", function (e) {
     parseFloat(income) -
     parseFloat(rent) -
     parseFloat(expenses) -
-    parseFloat(bankRatio) -
     parseFloat(salaries) -
     parseFloat(saudizationSalary) -
     parseFloat(bills) -
@@ -597,7 +596,6 @@ $("#add-financial-table").delegate("input", "keyup", "change", function (e) {
     parseFloat(income) -
     parseFloat(rent) -
     parseFloat(expenses) -
-    parseFloat(bankRatio) -
     parseFloat(salaries) -
     parseFloat(saudizationSalary) -
     parseFloat(bills) -
@@ -727,7 +725,6 @@ function recalculateAllNetIncomeRows() {
       income -
       rent -
       expenses -
-      bankRatio -
       salaries -
       saudizationSalary -
       bills -
@@ -786,12 +783,11 @@ $(document).ready(function () {
         parseFloat(income) -
         parseFloat(rent) -
         parseFloat(expenses) -
-        parseFloat(bankRatio) -
-        parseFloat(salaries) -
-        parseFloat(saudizationSalary) -
-        parseFloat(bills) -
-        parseFloat(bills1) -
-        parseFloat(bills2)
+        salaries -
+        saudizationSalary -
+        bills -
+        bills1 -
+        bills2
       ).toFixed(2);
 
       netIncome = numeral(netIncome).format("0,0.00");
