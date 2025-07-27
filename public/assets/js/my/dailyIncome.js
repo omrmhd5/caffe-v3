@@ -33,7 +33,7 @@ const sendTaxRatioData = () => {
 
   const taxValue = {
     branchID: branchID,
-    madaRatio: madaRatio.value,
+    madaRatio: madaRatio.value, // Include current mada ratio value
     madaRatioSum: madaRatioSum.value,
     madaRatioTotal: madaRatioTotal.value,
     madaTax: madaTax.value,
@@ -71,7 +71,43 @@ const sendTaxRatioData = () => {
 };
 
 taxButton.addEventListener("click", (e) => {
-  sendTaxRatioData();
+  // Check if mada ratio has changed
+  const currentMadaRatio = madaRatio.value;
+  const originalMadaRatio = $(madaRatio).data("original-value");
+
+  if (
+    originalMadaRatio !== undefined &&
+    parseFloat(currentMadaRatio) !== parseFloat(originalMadaRatio)
+  ) {
+    // Show confirmation dialog for mada ratio change
+    swal({
+      title: "تغيير نسبة مدى",
+      text: "هل أنت متأكد أنك تريد تغيير نسبة مدى لهذا الفرع؟ سيؤثر ذلك على هذا الشهر وكل الشهور القادمة.",
+      icon: "warning",
+      buttons: {
+        confirm: {
+          text: "نعم",
+          className: "btn btn-success",
+        },
+        cancel: {
+          text: "لا",
+          visible: true,
+          className: "btn btn-danger",
+        },
+      },
+    }).then((confirmed) => {
+      if (confirmed) {
+        sendTaxRatioData();
+      } else {
+        // Revert mada ratio to original value
+        madaRatio.value = originalMadaRatio;
+        calculateMadaTaxes();
+      }
+    });
+  } else {
+    // No mada ratio change, proceed normally
+    sendTaxRatioData();
+  }
 });
 
 const sendData = (button) => {
@@ -132,6 +168,32 @@ const calculateMadaTaxes = () => {
 
   taxRatioTotal.innerHTML = +madaRatioTotal.value + +visaRatioTotal.value;
 };
+
+// Mada ratio change handler - similar to rent change handler in financial.js
+$(document).on("change", "#mada-ratio", function () {
+  const newMadaRatio = $(this).val();
+  const originalMadaRatio = $(this).data("original-value") || newMadaRatio;
+
+  if (!newMadaRatio || isNaN(newMadaRatio)) return;
+
+  // Store original value if not already stored
+  if (!$(this).data("original-value")) {
+    $(this).data("original-value", originalMadaRatio);
+  }
+
+  // Update the original value to the new value
+  $(this).data("original-value", newMadaRatio);
+
+  // Recalculate taxes
+  calculateMadaTaxes();
+});
+
+// Store original mada ratio values when page loads
+$(document).ready(function () {
+  $("#mada-ratio").each(function () {
+    $(this).data("original-value", $(this).val());
+  });
+});
 
 const calculateVisaTaxes = () => {
   const visaTotal = $(".total-visa").val() || 0;

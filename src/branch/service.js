@@ -6,6 +6,35 @@ const {
 } = require("../common/errors/exceptions");
 const PAGE_SIZE = require("../common/constants").PAGE_SIZE;
 
+// Helper to get rent for a branch for a specific date
+async function getRentForMonth(branch, date) {
+  if (!branch.rentHistory || branch.rentHistory.length === 0) return 0;
+  const d = new Date(date);
+  // Find the most recent rent entry before or at the given date
+  let best = null;
+  for (const entry of branch.rentHistory) {
+    if (entry.fromDate <= d && (!best || entry.fromDate > best.fromDate)) {
+      best = entry;
+    }
+  }
+  return best ? best.value : 0;
+}
+
+// Helper to get mada ratio for a branch for a specific date
+async function getMadaRatioForMonth(branch, date) {
+  if (!branch.madaRatioHistory || branch.madaRatioHistory.length === 0)
+    return 0;
+  const d = new Date(date);
+  // Find the most recent mada ratio entry before or at the given date
+  let best = null;
+  for (const entry of branch.madaRatioHistory) {
+    if (entry.fromDate <= d && (!best || entry.fromDate > best.fromDate)) {
+      best = entry;
+    }
+  }
+  return best ? best.value : 0;
+}
+
 exports.getAllBranches = (companyID = null, forDate = null) => {
   if (!companyID) {
     return [];
@@ -130,6 +159,18 @@ exports.updateRentHistory = async (id, value, fromDate) => {
     (entry) => new Date(entry.fromDate) < new Date(fromDate)
   );
   branch.rentHistory.push({ value, fromDate });
+  await branch.save();
+  return branch;
+};
+
+exports.updateMadaRatioHistory = async (id, value, fromDate) => {
+  const branch = await Branch.findById(id);
+  if (!branch) throw new NotFoundException("الفرع غير موجود");
+  // Remove all future mada ratio history entries from this date forward
+  branch.madaRatioHistory = branch.madaRatioHistory.filter(
+    (entry) => new Date(entry.fromDate) < new Date(fromDate)
+  );
+  branch.madaRatioHistory.push({ value, fromDate });
   await branch.save();
   return branch;
 };

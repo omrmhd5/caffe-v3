@@ -161,3 +161,18 @@ exports.updateRentHistory = async (req, res) => {
     res.status(error.status || 500).send({ errorMessage: error.message });
   }
 };
+
+exports.updateMadaRatioHistory = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { value, fromDate } = req.body;
+    await branchService.updateMadaRatioHistory(
+      id,
+      value,
+      fromDate || new Date()
+    );
+    res.send({ message: "تم تحديث نسبة مدى بنجاح" });
+  } catch (error) {
+    res.status(error.status || 500).send({ errorMessage: error.message });
+  }
+};

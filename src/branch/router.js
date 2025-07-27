@@ -25,5 +25,11 @@ router.post(
   isSuperAdmin,
   branchController.updateRentHistory
 );
+router.post(
+  "/:id/mada-ratio",
+  auth,
+  isSuperAdmin,
+  branchController.updateMadaRatioHistory
+);
 
 module.exports = router;

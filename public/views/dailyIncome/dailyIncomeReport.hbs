@@ -75,7 +75,7 @@
           </label>
           <div class="col-sm-2" dir="ltr">
             <div class="input-group">
-              <input type="text" class="form-control" id="month" name="month" value="{{month}}">
+              <input type="text" class="form-control" id="month" name="month" onchange="submitSearchForm()" value="{{month}}">
               <div class="input-group-append">
                 <span class="input-group-text">
                   <i class="fa fa-calendar"></i>
@@ -326,7 +326,6 @@
 {{> footer}}
 
 <script>
-  window.taxValue = {{{json taxValue}}};
   $('#month').datetimepicker({
     format: 'YYYY/MM',
     icons: {
@@ -345,6 +344,7 @@
       $('#search-form').submit();
     }
   });
+
 </script>
 
 {{> footer/dailyIncomeFooter}}

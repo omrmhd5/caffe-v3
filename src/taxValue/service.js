@@ -1,40 +1,39 @@
 const TaxValue = require("../../models/taxValue");
 const moment = require("moment");
 const { toMonthStartDate } = require("../common/date");
+const branchService = require("../branch/service");
 
 exports.addTaxValue = async (taxValue) => {
   const normalizedDate = toMonthStartDate(taxValue.date);
-  // Save/update for the current month
+
+  // Update branch mada ratio history for future months only if madaRatio is valid
+  if (
+    taxValue.madaRatio !== undefined &&
+    !isNaN(parseFloat(taxValue.madaRatio))
+  ) {
+    await branchService.updateMadaRatioHistory(
+      taxValue.branchID,
+      parseFloat(taxValue.madaRatio),
+      normalizedDate
+    );
+  }
+
+  // Save/update the current month's tax value (including mada ratio)
+  const taxValueToSave = {
+    ...taxValue,
+    date: normalizedDate,
+  };
+
   await TaxValue.updateOne(
     {
       branchID: taxValue.branchID,
       date: normalizedDate,
     },
-    { ...taxValue, date: normalizedDate },
+    taxValueToSave,
     {
       upsert: true,
     }
   );
-
-  // Overwrite madaRatio and related fields for all future months (even if they already have a value)
-  let currentMonth = toMonthStartDate(normalizedDate);
-  for (let i = 0; i < 24; i++) {
-    const futureDate = toMonthStartDate(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + i, 1)
-    );
-    await TaxValue.updateOne(
-      {
-        branchID: taxValue.branchID,
-        date: futureDate,
-      },
-      {
-        $set: {
-          madaRatio: taxValue.madaRatio,
-        },
-      },
-      { upsert: true }
-    );
-  }
 };
 
 exports.getTaxValue = async (branchID, date, user) => {
@@ -46,6 +45,22 @@ exports.getTaxValue = async (branchID, date, user) => {
     branchID,
     date: normalizedDate,
   }).lean();
+
+  // Get mada ratio from branch history only if not available in TaxValue
+  if (!result || result.madaRatio === undefined) {
+    const branch = await branchService.getBranchById(branchID);
+    if (branch && branch.madaRatioHistory) {
+      const d = new Date(normalizedDate);
+      let best = null;
+      for (const entry of branch.madaRatioHistory) {
+        if (entry.fromDate <= d && (!best || entry.fromDate > best.fromDate)) {
+          best = entry;
+        }
+      }
+      result = result || {};
+      result.madaRatio = best ? best.value : 0;
+    }
+  }
 
   if (result) {
     const taxDate = new Date(result.createdAt);
