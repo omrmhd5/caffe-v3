@@ -149,7 +149,7 @@ exports.createAdmin = async (req, res) => {
     let password = req.body.password ? req.body.password : null;
     let companyID = req.body.companyID;
 
-    companies = await companyService.getAllCompanies({});
+    companies = await companyService.getAllCompanies();
     await userService.createUser(
       req.user,
       role,
