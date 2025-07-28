@@ -216,11 +216,9 @@ exports.updateUser = async ({
     throw new BadRequestException("البريد المستخدم موجود");
   }
 
-  user = await User.findByIdAndUpdate(
-    id,
-    update,
-    { new: true }
-  ).populate("branchID");
+  user = await User.findByIdAndUpdate(id, update, { new: true }).populate(
+    "branchID"
+  );
 
   return user;
 };
@@ -320,7 +318,8 @@ exports.resetPasswordRequest = async (email) => {
     );
   }
 
-  user.token = await generateAuthToken(user);
+  const token = await generateAuthToken(user);
+  user.token = token;
   await user.save();
   let baseUrl = process.env.BASE_URL;
   let url = `${baseUrl}/users/resetPassword?token=${user.token}`;
@@ -364,9 +363,6 @@ const generateAuthToken = async function (user) {
     "ASDSADKSADKSKLASNKLAS45",
     { expiresIn: "7 days" }
   );
-
-  user.token = token;
-  await user.save();
 
   return token;
 };

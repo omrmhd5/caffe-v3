@@ -309,7 +309,14 @@ exports.loginUser = async (req, res) => {
     let password = req.body.password;
 
     let user = await userService.loginUser(username, password);
-    res.cookie("auth_token", user.token);
+
+    res.clearCookie("auth_token");
+    res.cookie("auth_token", user.token, {
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
 
     res.redirect("/");
   } catch (error) {
@@ -401,6 +408,7 @@ exports.resetPassword = async (req, res) => {
 exports.logout = async (req, res) => {
   try {
     await userService.logout(req.user._id);
+    res.clearCookie("auth_token");
     res.redirect("/users/login");
   } catch (e) {
     res.status(500).render("error.hbs");

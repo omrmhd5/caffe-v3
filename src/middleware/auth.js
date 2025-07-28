@@ -9,6 +9,11 @@ const {
 const auth = async (req, res, next) => {
   try {
     const token = req.cookies["auth_token"];
+
+    if (!token) {
+      return res.render("login.hbs");
+    }
+
     const decoded = jwt.verify(token, "ASDSADKSADKSKLASNKLAS45");
     const user = await userService.getUser({
       _id: decoded._id,
@@ -16,14 +21,11 @@ const auth = async (req, res, next) => {
     });
 
     if (!user) {
+      res.clearCookie("auth_token");
       throw new UnauthenticatedException(
         "اسم المستخدم أو كلمة المرور غير صحيحة"
       );
     }
-
-    res.cookie("auth_token", user.token, {
-      maxAge: 1000 * 60 * 10,
-    });
 
     if (user.branchID) {
       user.branchedRole = true;
@@ -33,6 +35,7 @@ const auth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (e) {
+    res.clearCookie("auth_token");
     return res.render("login.hbs");
   }
 };
