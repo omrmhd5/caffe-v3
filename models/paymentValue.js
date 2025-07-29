@@ -13,17 +13,21 @@ const paymentValueSchema = new mongoose.Schema(
     },
     paidValues: {
       type: [Number],
-      default: [0, 0, 0],
+      default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
     receivedValues: {
       type: [Number],
-      default: [0, 0, 0],
+      default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
   },
   {
     timestamps: true,
   }
 );
+
+// Add indexes for better query performance
+paymentValueSchema.index({ branchID: 1, date: 1 });
+paymentValueSchema.index({ date: 1 });
 
 const PaymentValue = mongoose.model("PaymentValue", paymentValueSchema);
 

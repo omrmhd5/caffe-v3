@@ -142,31 +142,131 @@
       </table>
     </div>
 
-<div class="row">
+    <div class="row">
       <div class="col-md-12">
         <center>
-          <table class="table table-bordered" style="table table-bordered inline-table col-6">
+          <h2 style="font-weight: bold; color: black;">
+            تفاصيل المبالغ المحولة والمستلمة
+          </h2>
+        </center>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <center>
+          <h4 style="font-weight: bold; color: black;">المبالغ المحولة</h4>
+          <table class="table table-bordered" style="font-size: 12px;">
             <thead>
               <tr>
                 <th>مبلغ محول 1</th>
                 <th>مبلغ محول 2</th>
                 <th>مبلغ محول 3</th>
-                <th>مبلغ مستلم 1</th>
-                <th>مبلغ مستلم 2</th>
-                <th>مبلغ مستلم 3</th>
-                <th>المجموع المستلم</th>
+                <th>مبلغ محول 4</th>
+                <th>مبلغ محول 5</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>{{paymentValue.paidValues.[0]}}</td>
-                <td>{{paymentValue.paidValues.[1]}}</td>
-                <td>{{paymentValue.paidValues.[2]}}</td>
-                <td>{{paymentValue.receivedValues.[0]}}</td>
-                <td>{{paymentValue.receivedValues.[1]}}</td>
-                <td>{{paymentValue.receivedValues.[2]}}</td>
+                <td>{{toFixed paymentValue.paidValues.[0]}}</td>
+                <td>{{toFixed paymentValue.paidValues.[1]}}</td>
+                <td>{{toFixed paymentValue.paidValues.[2]}}</td>
+                <td>{{toFixed paymentValue.paidValues.[3]}}</td>
+                <td>{{toFixed paymentValue.paidValues.[4]}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table table-bordered" style="font-size: 12px;">
+            <thead>
+              <tr>
+                <th>مبلغ محول 6</th>
+                <th>مبلغ محول 7</th>
+                <th>مبلغ محول 8</th>
+                <th>مبلغ محول 9</th>
+                <th>مبلغ محول 10</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{toFixed paymentValue.paidValues.[5]}}</td>
+                <td>{{toFixed paymentValue.paidValues.[6]}}</td>
+                <td>{{toFixed paymentValue.paidValues.[7]}}</td>
+                <td>{{toFixed paymentValue.paidValues.[8]}}</td>
+                <td>{{toFixed paymentValue.paidValues.[9]}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </center>
+      </div>
+      <div class="col-md-6">
+        <center>
+          <h4 style="font-weight: bold; color: black;">المبالغ المستلمة</h4>
+          <table class="table table-bordered" style="font-size: 12px;">
+            <thead>
+              <tr>
+                <th>مبلغ مستلم 1</th>
+                <th>مبلغ مستلم 2</th>
+                <th>مبلغ مستلم 3</th>
+                <th>مبلغ مستلم 4</th>
+                <th>مبلغ مستلم 5</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{toFixed paymentValue.receivedValues.[0]}}</td>
+                <td>{{toFixed paymentValue.receivedValues.[1]}}</td>
+                <td>{{toFixed paymentValue.receivedValues.[2]}}</td>
+                <td>{{toFixed paymentValue.receivedValues.[3]}}</td>
+                <td>{{toFixed paymentValue.receivedValues.[4]}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table table-bordered" style="font-size: 12px;">
+            <thead>
+              <tr>
+                <th>مبلغ مستلم 6</th>
+                <th>مبلغ مستلم 7</th>
+                <th>مبلغ مستلم 8</th>
+                <th>مبلغ مستلم 9</th>
+                <th>مبلغ مستلم 10</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{toFixed paymentValue.receivedValues.[5]}}</td>
+                <td>{{toFixed paymentValue.receivedValues.[6]}}</td>
+                <td>{{toFixed paymentValue.receivedValues.[7]}}</td>
+                <td>{{toFixed paymentValue.receivedValues.[8]}}</td>
+                <td>{{toFixed paymentValue.receivedValues.[9]}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </center>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <center>
+          <h4 style="font-weight: bold; color: black;">الاجماليات</h4>
+          <table class="table table-bordered" style="font-size: 14px; font-weight: bold;">
+            <thead>
+              <tr>
+                <th>إجمالي المبالغ المحولة</th>
+                <th>إجمالي المبالغ المستلمة</th>
+                <th>المجموع الكلي</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
                 <td>
-                  {{sum paymentValue.paidValues.[0] paymentValue.paidValues.[1] paymentValue.paidValues.[2] paymentValue.receivedValues.[0] paymentValue.receivedValues.[1] paymentValue.receivedValues.[2]}}
+                  {{toFixed (sum paymentValue.paidValues.[0] paymentValue.paidValues.[1] paymentValue.paidValues.[2] paymentValue.paidValues.[3] paymentValue.paidValues.[4] paymentValue.paidValues.[5] paymentValue.paidValues.[6] paymentValue.paidValues.[7] paymentValue.paidValues.[8] paymentValue.paidValues.[9])}}
+                </td>
+                <td>
+                  {{toFixed (sum paymentValue.receivedValues.[0] paymentValue.receivedValues.[1] paymentValue.receivedValues.[2] paymentValue.receivedValues.[3] paymentValue.receivedValues.[4] paymentValue.receivedValues.[5] paymentValue.receivedValues.[6] paymentValue.receivedValues.[7] paymentValue.receivedValues.[8] paymentValue.receivedValues.[9])}}
+                </td>
+                <td>
+                  {{toFixed (sum paymentValue.paidValues.[0] paymentValue.paidValues.[1] paymentValue.paidValues.[2] paymentValue.paidValues.[3] paymentValue.paidValues.[4] paymentValue.paidValues.[5] paymentValue.paidValues.[6] paymentValue.paidValues.[7] paymentValue.paidValues.[8] paymentValue.paidValues.[9] paymentValue.receivedValues.[0] paymentValue.receivedValues.[1] paymentValue.receivedValues.[2] paymentValue.receivedValues.[3] paymentValue.receivedValues.[4] paymentValue.receivedValues.[5] paymentValue.receivedValues.[6] paymentValue.receivedValues.[7] paymentValue.receivedValues.[8] paymentValue.receivedValues.[9])}}
                 </td>
               </tr>
             </tbody>

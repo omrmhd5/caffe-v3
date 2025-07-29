@@ -25,11 +25,22 @@ const sendTaxRatioData = () => {
     let val = parseFloat($(this).val());
     paidValues.push(isNaN(val) ? 0 : val);
   });
+
+  // Ensure we have exactly 10 paid values
+  while (paidValues.length < 10) {
+    paidValues.push(0);
+  }
+
   const receivedValues = [];
   $(".received-field").each(function () {
     let val = parseFloat($(this).val());
     receivedValues.push(isNaN(val) ? 0 : val);
   });
+
+  // Ensure we have exactly 10 received values
+  while (receivedValues.length < 10) {
+    receivedValues.push(0);
+  }
 
   const taxValue = {
     branchID: branchID,
@@ -166,7 +177,9 @@ const calculateMadaTaxes = () => {
   madaRatioSum.value = sum;
   madaRatioTotal.value = parseFloat(tax * sum + +sum).toFixed(2);
 
-  taxRatioTotal.innerHTML = +madaRatioTotal.value + +visaRatioTotal.value;
+  taxRatioTotal.innerHTML = (
+    +madaRatioTotal.value + +visaRatioTotal.value
+  ).toFixed(2);
 };
 
 // Mada ratio change handler - similar to rent change handler in financial.js
@@ -204,7 +217,9 @@ const calculateVisaTaxes = () => {
   visaRatioSum.value = sum;
   visaRatioTotal.value = parseFloat(tax * sum + +sum).toFixed(2);
 
-  taxRatioTotal.innerHTML = +madaRatioTotal.value + +visaRatioTotal.value;
+  taxRatioTotal.innerHTML = (
+    +madaRatioTotal.value + +visaRatioTotal.value
+  ).toFixed(2);
 };
 
 const submitSearchForm = function () {

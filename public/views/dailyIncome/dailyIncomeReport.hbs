@@ -44,7 +44,6 @@
   .table-responsive {
     max-height: 30vh;
     overflow-y: auto;
-    margin-bottom: 2rem;
   }
 
   #daily-income-table {
@@ -71,7 +70,7 @@
 
 </style>
 
-<div class="col-md-12 d-print-none p-0" dir="rtl" style="padding: 0px 28px;">
+<div class=" bg-white col-md-12 d-print-none p-0" dir="rtl" style="padding: 0px 28px;">
   <div class="headerPage">
     <div class="Title">
       <h2 style="text-align: center;">
@@ -198,33 +197,33 @@
         </table>
       </div>
     </div>
-    <div class="row d-flex justify-content-center">
-      <table id="daily-income-table" class="col-md-3 col-6 inline-table mx-1" style="min-width:220px;max-width:260px;">
+    <div class="row d-flex justify-content-center mt-5">
+      <table id="daily-income-table" class="col-md-2 col-6 inline-table mx-1" style="min-width:180px;max-width:200px; font-size: 14px;">
         <tbody>
           <tr>
             <td>
-              <input class="form-control tax-title" disabled value="نسبة مدى" />
+              <input class="form-control tax-title" disabled value="نسبة مدى" style="font-size: 14px;" />
             </td>
             <td><input type="number" class="form-control" id="mada-ratio"
                 value="{{checkOrZeror taxValue.madaRatio}}" {{#unless isManager}}disabled{{/unless}}></td>
           </tr>
           <tr>
             <td>
-              <input class="form-control tax-title" disabled value="مجموع نسبة مدى" />
+              <input class="form-control tax-title" disabled value="مجموع نسبة مدى" style="font-size: 12px;" />
             </td>
             <td><input class="form-control" value="{{checkOrZeror taxValue.madaRatioSum}}" id="mada-ratio-sum" disabled>
             </td>
           </tr>
           <tr>
             <td>
-              <input class="form-control tax-title" disabled value="قيمة الضريبة (%)" />
+              <input class="form-control tax-title" disabled value="قيمة الضريبة (%)" style="font-size: 13px;" />
             </td>
             <td><input type="number" class="form-control" id="mada-tax"
                 value="{{checkOrZeror taxValue.madaTax}}" {{#unless isManager}}disabled{{/unless}}></td>
           </tr>
           <tr>
             <td>
-              <input class="form-control tax-title" disabled value="إجمالي نسبة مدى" />
+              <input class="form-control tax-title" disabled value="إجمالي نسبة مدى" style="font-size: 12px;" />
             </td>
             <td><input class="form-control" id="mada-ratio-total" value="{{checkOrZeror taxValue.madaRatioTotal}}"
                 disabled>
@@ -232,40 +231,40 @@
           </tr>
         </tbody>
       </table>
-      <table id="daily-income-table" class="col-md-3 col-6 inline-table mx-1" style="min-width:220px;max-width:260px;">
+      <table id="daily-income-table" class="col-md-2 col-6 inline-table mx-1" style="min-width:180px;max-width:200px; font-size: 14px;">
         <tbody>
           <tr>
             <td>
-              <input class=" form-control tax-title" disabled value="نسبة البنك للفيزا" />
+              <input class=" form-control tax-title" disabled value="نسبة البنك للفيزا" style="font-size: 14px;" />
             </td>
             <td><input type="number" id="visa-ratio" class="form-control"
                 value="{{checkOrZeror taxValue.visaRatio}}" {{#unless isManager}}disabled{{/unless}}></td>
           </tr>
           <tr>
             <td>
-              <input class=" form-control tax-title " disabled value="مجموع نسبة الفيزا" />
+              <input class=" form-control tax-title " disabled value="مجموع نسبة الفيزا" style="font-size: 12px;" />
             </td>
             <td><input type="number" class="form-control" id="visa-ratio-sum"
                 value="{{checkOrZeror taxValue.visaRatioSum}}" disabled></td>
           </tr>
           <tr>
             <td>
-              <input class=" form-control tax-title" disabled value=" قيمة الضريبة (%)" />
+              <input class=" form-control tax-title" disabled value=" قيمة الضريبة (%)" style="font-size: 13px;" />
             </td>
             <td><input class="form-control" type="number" id="visa-tax" value="{{checkOrZeror taxValue.visaTax}}"
                 {{#unless isManager}}disabled{{/unless}}></td>
           </tr>
           <tr>
             <td>
-              <input class=" form-control tax-title" disabled value="إجمالي نسبة الفيزا" />
+              <input class=" form-control tax-title" disabled value="إجمالي نسبة الفيزا" style="font-size: 12px;" />
             </td>
             <td><input class="form-control" id="visa-ratio-total" value="{{checkOrZeror taxValue.visaRatioTotal}}"
                 disabled></td>
           </tr>
         </tbody>
       </table>
-      <!-- New Paid Amount Table: Always visible, fields disabled unless isManager -->
-      <table class="col-md-3 col-6 inline-table mx-1" style="min-width:220px;max-width:260px;">
+      <!-- Paid Amount Table 1: مبلغ محول 1-5 -->
+      <table class="col-md-3 col-6 inline-table mx-1" style="min-width:200px;max-width:240px;">
         <tbody>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ محول 1" /></td>
@@ -279,10 +278,43 @@
             <td><input class="form-control tax-title" disabled value="مبلغ محول 3" /></td>
             <td><input type="number" class="form-control paid-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
           </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 4" /></td>
+            <td><input type="number" class="form-control paid-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 5" /></td>
+            <td><input type="number" class="form-control paid-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
         </tbody>
       </table>
-      <!-- New Received Amount Table: Always visible, fields disabled unless isManager -->
-      <table class="col-md-3 col-6 inline-table mx-1" style="min-width:220px;max-width:260px;">
+      <!-- Paid Amount Table 2: مبلغ محول 6-10 -->
+      <table class="col-md-3 col-6 inline-table mx-1" style="min-width:200px;max-width:240px;">
+        <tbody>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 6" /></td>
+            <td><input type="number" class="form-control paid-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 7" /></td>
+            <td><input type="number" class="form-control paid-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 8" /></td>
+            <td><input type="number" class="form-control paid-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 9" /></td>
+            <td><input type="number" class="form-control paid-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 10" /></td>
+            <td><input type="number" class="form-control paid-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Received Amount Table 1: مبلغ مستلم 1-5 -->
+      <table class="col-md-3 col-6 inline-table mx-1" style="min-width:200px;max-width:240px;">
         <tbody>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ مستلم 1" /></td>
@@ -296,58 +328,81 @@
             <td><input class="form-control tax-title" disabled value="مبلغ مستلم 3" /></td>
             <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
           </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 4" /></td>
+            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 5" /></td>
+            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
         </tbody>
       </table>
-      <div class="w-100 d-flex flex-column align-items-center justify-content-center my-2"  {{#unless isManager}}disabled{{/unless}}>
-        <label class="form-control tax-title text-center" style="max-width:160px;margin-bottom:8px;">المجموع المستلم</label>
-        <input class="form-control text-center" id="grand-total" value="0" disabled style="font-weight:bold;max-width:160px;">
-      </div>
+      <!-- Received Amount Table 2: مبلغ مستلم 6-10 -->
+      <table class="col-md-3 col-6 inline-table mx-1" style="min-width:200px;max-width:240px;">
+        <tbody>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 6" /></td>
+            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 7" /></td>
+            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 8" /></td>
+            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 9" /></td>
+            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 10" /></td>
+            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <div class="card-footer d-print-block mt-3">
-      <div class="totaldiv" style="width: 100%;">
-        <div>
-          <center>
-            <button class="btn btn-lg mb-2 btnclass" id="tax-button" {{disableSaveRatio}} {{#unless isManager}}disabled style="display:none"{{/unless}}> حفظ النسبة </button>
-          </center>
-          <center>
-            <div class="total-ratio">
-              <h4 class="select text-dark mt-2">اجمالي النسبة <p>
-                  <strong id="tax-ratio-total">{{checkOrZeror taxValue.taxRatioTotal}}</strong>
-                </p>
-              </h4>
-            </div>
-          </center>
+  </div>
+  <!-- Summary Fields Row - All in one row -->
+  <div class="row d-flex justify-content-center mt-3">
+    <!-- اجمالي النسبة -->
+    <div class="w-100 d-flex flex-column align-items-center justify-content-center my-2" style="max-width:200px;">
+      <label class="form-control tax-title text-center" style="max-width:160px;margin-bottom:8px;">اجمالي النسبة</label>
+      <input class="form-control text-center" id="tax-ratio-total" value="{{checkOrZeror taxValue.taxRatioTotal}}" disabled style="font-weight:bold;max-width:160px;">
+    </div>
+    
+    <!-- إجمالي الرواتب -->
+    <div class="w-100 d-flex flex-column align-items-center justify-content-center my-2" style="max-width:200px;">
+      <label class="form-control tax-title text-center" style="max-width:160px;margin-bottom:8px;">إجمالي الرواتب</label>
+      <input class="form-control text-center" value="{{financials.totalSalaries}}" disabled style="font-weight:bold;max-width:160px;">
+    </div>
+    
+    <!-- إجمالي المصروفات -->
+    <div class="w-100 d-flex flex-column align-items-center justify-content-center my-2" style="max-width:200px;">
+      <label class="form-control tax-title text-center" style="max-width:160px;margin-bottom:8px;">إجمالي المصروفات</label>
+      <input class="form-control text-center" value="{{financials.totalExpenses}}" disabled style="font-weight:bold;max-width:160px;">
+    </div>
+    
+    <!-- المجموع المستلم -->
+    <div class="w-100 d-flex flex-column align-items-center justify-content-center my-2" style="max-width:200px;" {{#unless isManager}}disabled{{/unless}}>
+      <label class="form-control tax-title text-center" style="max-width:160px;margin-bottom:8px;">المجموع المستلم</label>
+      <input class="form-control text-center" id="grand-total" value="0" disabled style="font-weight:bold;max-width:160px;">
+    </div>
+  </div>
+  
+  <!-- Buttons Row - Save and Print beside each other -->
+  <div class="card-footer d-print-block mt-3">
+    <div class="totaldiv" style="width: 100%;">
+      <div class="row d-flex justify-content-center">
+        <div class="col-md-6 text-center">
+          <button class="btn btn-lg mb-2 btnclass" id="tax-button" {{disableSaveRatio}} {{#unless isManager}}disabled style="display:none"{{/unless}}> حفظ النسبة </button>
+        </div>
+        <div class="col-md-6 text-center">
+          <button class="btnclass" id="print-button">اطبع</button>
         </div>
       </div>
-    </div>
-    <div class="card-footer d-print-block text-dark">
-      <div class="totaldiv">
-        <div>
-          <center>
-            <div class=" totalBtn ">
-              <h4 class="select" style="  margin-top: 10px;">إجمالي الرواتب <p>
-                  <strong>{{financials.totalSalaries}}</strong>
-                </p>
-              </h4>
-            </div>
-          </center>
-        </div>
-        <div>
-          <center>
-            <div class=" totalBtn ">
-              <h4 class="select" style="  margin-top: 10px;"> إجمالي المصروفات <p>
-                  <strong>{{financials.totalExpenses}}</strong>
-                </p>
-              </h4>
-            </div>
-          </center>
-        </div>
-      </div>
-    </div>
-    <div class="card-footer d-print-none">
-      <center>
-        <button class="btnclass" id="print-button">اطبع</button>
-      </center>
     </div>
   </div>
 </div>
