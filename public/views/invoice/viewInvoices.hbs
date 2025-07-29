@@ -223,6 +223,8 @@
       clear: 'fa fa-trash',
       close: 'fa fa-times'
     }
+  }).on('dp.change', () => {
+    adjustEndDateIfNeeded();
   });
 
   $('#toDate').datetimepicker({
@@ -242,6 +244,26 @@
     submitSearchForm();
   });
 
+  const adjustEndDateIfNeeded = () => {
+    let fromDate = $('#fromDate').val();
+    let toDate = $('#toDate').val();
+
+    if (fromDate && toDate && fromDate > toDate) {
+      let fromDateObj = new Date(fromDate);
+      let nextDay = new Date(fromDateObj);
+      nextDay.setDate(fromDateObj.getDate() + 1);
+      
+      // Format the next day as MM/DD/YYYY
+      let month = (nextDay.getMonth() + 1).toString().padStart(2, '0');
+      let day = nextDay.getDate().toString().padStart(2, '0');
+      let year = nextDay.getFullYear();
+      let nextDayFormatted = month + '/' + day + '/' + year;
+      
+      // Update the toDate input
+      $('#toDate').val(nextDayFormatted);
+    }
+  };
+
   const submitSearchForm = () => {
     let branchID = $('#branchID').val();
     let fromDate = $('#fromDate').val();
@@ -249,20 +271,7 @@
     let form = $('#search-form');
 
     if (fromDate && toDate && branchID) {
-      if (fromDate > toDate) {
-        $.notify({
-          title: ' الرجاء اختيار تاريخ صحيح ',
-          message: ''
-        }, {
-          type: 'danger',
-          placement: {
-            align: 'center'
-          },
-          delay: 2000,
-        });
-      } else {
-        form.submit();
-      }
+      form.submit();
     }
   }
 

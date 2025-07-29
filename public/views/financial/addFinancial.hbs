@@ -212,23 +212,15 @@
         <h2 class="text-right tableheader noBorder"> تواريخ الايجار </h2>
       </div>
       <div class="card-body" style="padding-right: 0; padding-left: 0;">
-        <table id="add-rent-note" class="table table-light">
-          <tbody>
-            <tr>
-              {{#each data}}
-              <td>
-                <p class="tableheader noBorder mb-0"> {{ branchname }}</p>
-              </td>
-              {{/each}}
-            </tr>
-            <tr>
-              {{#each data}}
-              <td class="rent-branch-id" hidden>{{branchID}}</td>
-              <td><input type="text" class="form-control rent-note-input" value="{{rentComment}}"></td>
-              {{/each}}
-            </tr>
-          </tbody>
-        </table>
+        <div class="d-flex flex-wrap justify-content-center" style="gap: 10px;">
+          {{#each data}}
+          <div style="min-width: 180px; max-width: 220px; flex: 0 0 auto;">
+            <p class="tableheader noBorder mb-0 text-center"> {{ branchname }}</p>
+            <input type="text" class="form-control rent-note-input" value="{{rentComment}}">
+            <div class="rent-branch-id" hidden>{{branchID}}</div>
+          </div>
+          {{/each}}
+        </div>
       </div>
     </div>
   </div>
