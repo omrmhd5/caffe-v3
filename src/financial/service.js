@@ -1,6 +1,6 @@
 require("../../db/mongoose");
 const Financial = require("../../models/financial");
-const Rent = require("../../models/rentBranch");
+
 const DailyIncome = require("../../models/dailyIncome");
 const branchService = require("../branch/service");
 const partnerService = require("../partner/service");
@@ -66,6 +66,9 @@ exports.report = async (date, user) => {
     if (f.branchID && f.branchID.rentHistory) {
       f.rent = await getRentForMonth(f.branchID, date);
     }
+
+    // Set rent comment directly from comment field
+    f.rentComment = f.comment || "";
   }
 
   return { financials, totals };
@@ -201,18 +204,11 @@ exports.updateFinance = async (date, branchID, financial) => {
 
 exports.updateComment = async (date, branchID, comment, rentComment) => {
   const normalizedDate = toMonthStartDate(date);
+
   await Financial.findOneAndUpdate(
     { date: normalizedDate, branchID },
     {
-      comment,
-    },
-    { upsert: true }
-  );
-
-  await Rent.findOneAndUpdate(
-    { branchID },
-    {
-      rentDate: rentComment,
+      comment: comment || "",
     },
     { upsert: true }
   );
@@ -220,13 +216,12 @@ exports.updateComment = async (date, branchID, comment, rentComment) => {
   return;
 };
 
-exports.updateRentNote = async (branchID, note) => {
-  const normalizedDate = toMonthStartDate(new Date());
-  await Rent.findOneAndUpdate(
-    { branchID },
-    {
-      rentDate: note,
-    },
+exports.updateRentNote = async (branchID, note, date) => {
+  const normalizedDate = toMonthStartDate(date);
+
+  await Financial.findOneAndUpdate(
+    { branchID, date: normalizedDate },
+    { comment: note || "" },
     { upsert: true }
   );
 
@@ -363,36 +358,28 @@ exports.showAdd = async (date, user) => {
     this.getFinanceByBranchId(branch._id, date)
   );
 
-  // Get all rent data in parallel
-  const rentPromises = branches.map((branch) =>
-    Rent.findOne({ branchID: branch._id }).lean()
-  );
-
   // Get all tax values in parallel
   const taxValuePromises = branches.map((branch) =>
     taxValueService.getTaxValue(branch._id, new Date(date))
   );
 
   // Execute all queries in parallel
-  const [financialResults, rentResults, taxValueResults] = await Promise.all([
+  const [financialResults, taxValueResults] = await Promise.all([
     Promise.all(financialPromises),
-    Promise.all(rentPromises),
     Promise.all(taxValuePromises),
   ]);
 
   // Process results
   for (let i = 0; i < branches.length; i++) {
     let financial = financialResults[i];
-    let rent = rentResults[i];
     let taxValue = taxValueResults[i];
     let branch = branches[i];
 
     financial.branchname = branch.branchname;
     financial.branchID = branch._id;
 
-    if (rent) {
-      financial.rentComment = rent.rentDate;
-    }
+    // Set rent comment directly from comment field
+    financial.rentComment = financial.comment || "";
 
     financial.bankRatio = taxValue ? taxValue.taxRatioTotal : 0;
     totalBankRatio += financial.bankRatio;

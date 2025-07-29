@@ -95,7 +95,11 @@ exports.createFinancials = async (req, res) => {
   await noteService.addBulk(date, notes, req.user.companyID._id);
 
   for (let rentNote of rentNotes) {
-    await financialService.updateRentNote(rentNote.branchID, rentNote.note);
+    await financialService.updateRentNote(
+      rentNote.branchID,
+      rentNote.note,
+      date
+    );
   }
 
   for (let financial of data) {
@@ -166,8 +170,8 @@ exports.updateComments = async (req, res) => {
   await financialService.updateComment(
     new Date(date).toDateInputValue(),
     branchID,
-    financialComment,
-    rentComment
+    rentComment,
+    null
   );
 
   res.send({ message: "أضيفت الملاحظات بنجاح" });
