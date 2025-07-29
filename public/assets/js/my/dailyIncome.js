@@ -534,6 +534,51 @@ $(document).on("input", ".paid-field, .received-field", function () {
   updateGrandTotal();
 });
 
+// Notes functionality
+let addNoteButton = document.getElementById("add-note-button");
+if (addNoteButton) {
+  addNoteButton.addEventListener("click", addNote);
+}
+
+function addNote(event) {
+  event.preventDefault();
+  let wrapper = $("#notes-body");
+  let input = null;
+  input =
+    '<div class="row form-group">' +
+    '<div class="col-6">' +
+    ' <input type="text" class="form-control text-right note-input" placeholder="أكتب ملاحظة"> ' +
+    "</div>" +
+    '<div class="col-6">' +
+    '<input type="text" class="form-control text-right note-input" placeholder="أكتب ملاحظة">' +
+    "</div></div>";
+  $(wrapper).append(input);
+}
+
+const saveNotes = (event) => {
+  event.preventDefault();
+
+  let url = "/dailyIncome/notes";
+  let notes = [];
+  let method = "POST";
+  let date = $("#month").val();
+  let branchID = $("#branchID").val();
+
+  let notesElements = document.getElementsByClassName("note-input");
+  for (let i = 0; i < notesElements.length; i++) {
+    // Send all notes (including empty ones) so backend can handle deletion
+    notes.push({
+      branchID: branchID,
+      note: notesElements[i].value || "",
+      date,
+    });
+  }
+
+  callUrl(url, method, {
+    notes: JSON.stringify(notes),
+  });
+};
+
 $(document).ready(function () {
   let date = $("#month").val();
   let branchID = $("#branchID").val();
@@ -560,4 +605,74 @@ $(document).ready(function () {
       updateGrandTotal();
     },
   });
+
+  // Scroll to last edited non-zero row
+  scrollToLastEditedNonZeroRow();
+
+  // Add event listener for save notes button
+  let saveNotesButton = document.getElementById("save-notes-button");
+  if (saveNotesButton) {
+    saveNotesButton.addEventListener("click", saveNotes);
+  }
 });
+
+// Function to scroll to the last edited non-zero row
+function scrollToLastEditedNonZeroRow() {
+  let lastEditedRow = null;
+  let lastEditedIndex = -1;
+
+  // Find all daily income rows (excluding the totals row)
+  $(".d-income-tr").each(function (index) {
+    let row = $(this);
+
+    // Skip the totals row (it doesn't have the same structure)
+    if (row.find(".income-date").length === 0) {
+      return;
+    }
+
+    // Check if this row has been edited (has data)
+    let cash = parseFloat(row.find(".cash").val()) || 0;
+    let coffeeShop = parseFloat(row.find(".coffe-shop").val()) || 0;
+    let addedIncome = parseFloat(row.find(".added-income").val()) || 0;
+    let mada = parseFloat(row.find(".mada").val()) || 0;
+    let visa = parseFloat(row.find(".visa").val()) || 0;
+    let bankTransfer = parseFloat(row.find(".bank-transfer").val()) || 0;
+
+    // Check if any field has a non-zero value
+    let hasNonZeroValue =
+      cash > 0 ||
+      coffeeShop > 0 ||
+      addedIncome > 0 ||
+      mada > 0 ||
+      visa > 0 ||
+      bankTransfer > 0;
+
+    if (hasNonZeroValue) {
+      lastEditedRow = row;
+      lastEditedIndex = index;
+    }
+  });
+
+  // If we found a last edited row, scroll to it
+  if (lastEditedRow && lastEditedIndex >= 0) {
+    // Add a small delay to ensure the page is fully loaded
+    setTimeout(function () {
+      // Get the table container
+      let tableContainer = $(".table-responsive");
+
+      // Calculate the position to scroll to
+      let rowTop = lastEditedRow.offset().top;
+      let containerTop = tableContainer.offset().top;
+      let scrollPosition = rowTop - containerTop - 100; // 100px offset for better visibility
+
+      // Scroll the table container to the row
+      tableContainer.scrollTop(scrollPosition);
+
+      // Highlight the row briefly to draw attention
+      lastEditedRow.addClass("highlight-row");
+      setTimeout(function () {
+        lastEditedRow.removeClass("highlight-row");
+      }, 2000);
+    }, 500);
+  }
+}

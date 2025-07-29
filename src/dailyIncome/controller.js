@@ -3,6 +3,7 @@ const branchService = require("../branch/service");
 const financialService = require("../financial/service");
 const taxValueService = require("../taxValue/service");
 const paymentValueService = require("../paymentValue/service");
+const notesService = require("../dailyIncomeNote/service");
 const moment = require("moment");
 
 exports.report = async (req, res) => {
@@ -62,6 +63,9 @@ exports.report = async (req, res) => {
     month
   );
 
+  // Get notes for the current month and branch
+  const notes = await notesService.getNotes(branchID, month, req.user);
+
   const disableSaveRatio =
     new Date(month).getMonth() < new Date().getMonth() && req.user.branchedRole
       ? "disabled"
@@ -82,6 +86,7 @@ exports.report = async (req, res) => {
     userRole: req.user.role,
     isManager:
       req.user.role === "Manager" || req.user.role === "AccountantManager",
+    notes,
   });
 };
 
@@ -97,6 +102,16 @@ exports.addDailyIncome = async (req, res) => {
     );
 
     res.send({ message: "أضيفت البيانات بنجاح" });
+  } catch (error) {
+    res.status(error.status).send({ errorMessage: error.message });
+  }
+};
+
+exports.saveNotes = async (req, res) => {
+  try {
+    let notes = JSON.parse(req.body.notes);
+    await notesService.addBulk(notes);
+    res.send({ message: "أضيفت الملاحظات بنجاح" });
   } catch (error) {
     res.status(error.status).send({ errorMessage: error.message });
   }

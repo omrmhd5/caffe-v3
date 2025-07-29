@@ -98,6 +98,34 @@
       </tbody>
     </table>
 
+    <!-- Daily Income Notes Section -->
+    {{#if notes}}
+    <div class="card mt-4">
+      <div
+        class="card-header text-center"
+        style="border: 1px solid black; background-color: #f8f9fa;"
+      >
+        <h4 class="mb-0" style="color: black;">الملاحظات</h4>
+      </div>
+      <div class="card-body" style="border: 1px solid black;">
+        <table class="table table-bordered" style="margin-bottom: 0;">
+          <tbody>
+            {{#each notes}}
+              <tr>
+                {{#each this}}
+                  <td
+                    class="text-right"
+                    style="border: 1px solid black; padding: 8px; color: black;"
+                  >{{note}}</td>
+                {{/each}}
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {{/if}}
+
     <div class="mt-1">
       <center>
         <h2 style="font-weight: bold; color: black;">

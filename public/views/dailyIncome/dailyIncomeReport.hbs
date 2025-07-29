@@ -68,6 +68,17 @@
     border-top: none;
   }
 
+  /* Highlight effect for the last edited row */
+  .highlight-row {
+    background-color: #fff3cd !important;
+    border: 2px solid #ffc107 !important;
+    transition: all 0.3s ease;
+  }
+
+  .highlight-row td {
+    background-color: #fff3cd !important;
+  }
+
 </style>
 
 <div class=" bg-white col-md-12 d-print-none p-0" dir="rtl" style="padding: 0px 28px;">
@@ -118,6 +129,9 @@
         </div>
       </form>
     </div>
+  </div>
+
+  <div class="card">
     <div class="card-body col-lg-12 p-0">
       <div class="table-responsive">
         <table id="daily-income-table" class="table table-striped  col-lg-12 d-print-none">
@@ -197,6 +211,35 @@
         </table>
       </div>
     </div>
+
+
+          <!-- Notes Section -->
+          <div class="card d-print-none mb-3">
+            <div class="card-header select">
+              <h2 class="text-right tableheader">الملاحظات : </h2>
+            </div>
+            <div class="card-body" id="notes-body">
+              <button class="btn btn-lg note" id="add-note-button" data-original-title=" إضافة ملاحظة ">
+                أضف ملاحظة <i class="fa fa-plus ml-2"> </i>
+              </button>
+              {{#each notes}}
+              <div class="row form-group">
+                {{#each this}}
+                <div class="col-6 mb-2">
+                  <input type="text" class="form-control text-right note-input" placeholder="أكتب ملاحظة" {{disabled}}
+                    value="{{note}}">
+                </div>
+                {{/each}}
+              </div>
+              {{/each}}
+            </div>
+            <div class="card-footer">
+              <center>
+                <button class="btnclass" id="save-notes-button">حفظ الملاحظات</button>
+              </center>
+            </div>
+          </div>
+
     <div class="row d-flex justify-content-center mt-5">
       <table id="daily-income-table" class="col-md-2 col-6 inline-table mx-1" style="min-width:180px;max-width:200px; font-size: 14px;">
         <tbody>
@@ -407,7 +450,7 @@
   </div>
 </div>
 
-{{> print/dailyIncome paymentValue=paymentValue}}
+{{> print/dailyIncome paymentValue=paymentValue notes=notes}}
 {{> footer}}
 
 <script>

@@ -8,4 +8,6 @@ router
   .get(auth, dailyIncomeController.report)
   .post(auth, dailyIncomeController.addDailyIncome);
 
+router.post("/notes", auth, dailyIncomeController.saveNotes);
+
 module.exports = router;
