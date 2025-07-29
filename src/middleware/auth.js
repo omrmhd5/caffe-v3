@@ -27,6 +27,13 @@ const auth = async (req, res, next) => {
       );
     }
 
+    if (user.blocked) {
+      res.clearCookie("auth_token");
+      throw new UnauthenticatedException(
+        "المستخدم محظور , الرجاء مراجعة الإدارة"
+      );
+    }
+
     if (user.branchID) {
       user.branchedRole = true;
     }
@@ -36,6 +43,13 @@ const auth = async (req, res, next) => {
     next();
   } catch (e) {
     res.clearCookie("auth_token");
+
+    if (e.name === "TokenExpiredError") {
+      return res.render("login.hbs", {
+        errorMessage: "انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى",
+      });
+    }
+
     return res.render("login.hbs");
   }
 };

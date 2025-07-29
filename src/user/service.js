@@ -361,7 +361,7 @@ const generateAuthToken = async function (user) {
   const token = jwt.sign(
     { _id: user._id.toString() },
     "ASDSADKSADKSKLASNKLAS45",
-    { expiresIn: "7 days" }
+    { expiresIn: "5m" }
   );
 
   return token;
