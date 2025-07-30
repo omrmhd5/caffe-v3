@@ -95,12 +95,18 @@ exports.getAllInvoices = async (req, res) => {
   const currentDate = new Date();
 
   invoices = invoices.map((invoice) => {
-    const invoiceDate = new Date(invoice.date);
-    const hours = parseInt(Math.abs(currentDate - invoiceDate) / 36e5);
-    invoice.disabled =
-      hours > 12 && !["AccountantManager", "Invoicer"].includes(req.user.role)
-        ? "disabled"
-        : "";
+    const createdAt = new Date(invoice.createdAt);
+    const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000); // Minutes since creation
+
+    // Only AccountantManager can edit/delete after time limit, others have 5 hour limit
+    if (req.user.role === "AccountantManager") {
+      invoice.canEdit = true;
+      invoice.canDelete = true;
+    } else {
+      // For non-managers: 5 hour limit (300 minutes)
+      invoice.canEdit = minutesSinceCreation <= 300;
+      invoice.canDelete = minutesSinceCreation <= 300;
+    }
 
     return invoice;
   });
@@ -242,14 +248,16 @@ exports.showInvoice = async (req, res) => {
   const id = req.params.id;
   const invoice = await invoiceService.getInvoiceById(id);
 
-  const invoiceDate = new Date(invoice.date);
+  const createdAt = new Date(invoice.createdAt);
   const currentDate = new Date();
-  const hours = parseInt(Math.abs(currentDate - invoiceDate) / 36e5);
+  const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000);
 
-  invoice.disabled =
-    hours > 12 && !["AccountantManager", "Invoicer"].includes(req.user.role)
-      ? "disabled"
-      : "";
+  // Only AccountantManager can edit after time limit, others have 5 hour limit
+  if (req.user.role === "AccountantManager") {
+    invoice.canEdit = true;
+  } else {
+    invoice.canEdit = minutesSinceCreation <= 300;
+  }
 
   res.render("invoice/showInvoice.hbs", { invoice });
 };
@@ -282,14 +290,11 @@ exports.updateInvoice = async (req, res) => {
       throw new NotFoundException("الفاتورة غير موجودة");
     }
 
-    const invoiceDate = new Date(invoice.date);
+    const createdAt = new Date(invoice.createdAt);
     const currentDate = new Date();
-    const hours = parseInt(Math.abs(currentDate - invoiceDate) / 36e5);
+    const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000);
 
-    if (
-      hours > 12 &&
-      !["AccountantManager", "Invoicer"].includes(req.user.role)
-    ) {
+    if (minutesSinceCreation > 300 && req.user.role !== "AccountantManager") {
       throw new UnauthorizedException(
         " ليس لديك الصلاحية لتعديل بيانات الفاتورة"
       );
@@ -332,13 +337,13 @@ exports.deleteInvoice = async (req, res) => {
     const id = req.params.id;
 
     const invoice = await invoiceService.getInvoiceById(id);
-    const invoiceDate = new Date(invoice.date);
+    const createdAt = new Date(invoice.createdAt);
     const currentDate = new Date();
-    const hours = parseInt(Math.abs(currentDate - invoiceDate) / 36e5);
+    const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000);
 
-    if (hours > 12 && req.user.role !== "AccountantManager") {
+    if (minutesSinceCreation > 300 && req.user.role !== "AccountantManager") {
       throw new UnauthorizedException(
-        " ليس لديك الصلاحية لتعديل بيانات الفاتورة"
+        " ليس لديك الصلاحية لحذف بيانات الفاتورة"
       );
     }
 

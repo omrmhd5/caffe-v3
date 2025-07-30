@@ -112,14 +112,22 @@
                 <td>{{spentCount}}</td>
                 <td>{{check invalidItemsNumber}}</td>
                 <td>{{#if warrantyYears}} {{warrantyYears}} سنوات {{else}} <p>-</p> {{/if}}</td>
-                <td><a class="btn btn-primary btn-lg" href="/custody/{{_id}}/edit"><i class="fa fa-pen"></i></a></td>
                 <td>
+                  {{#if canEdit}}
+                  <a class="btn btn-primary btn-lg" href="/custody/{{_id}}/edit">
+                    <i class="fa fa-pen"></i>
+                  </a>
+                  {{/if}}
+                </td>
+                <td>
+                  {{#if canDelete}}
                   <div class="form-button-action">
                     <a onclick="deleteCustody(`{{_id}}`)" data-toggle="tooltip" title="" class="btn btn-lg btn-danger2"
                       data-original-title="حذف الصنف">
                       <i class="fa fa-times"></i>
                     </a>
                   </div>
+                  {{/if}}
                 </td>
               </tr>
               {{#each addedCustodies }}

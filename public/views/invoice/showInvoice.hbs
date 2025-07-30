@@ -146,10 +146,11 @@
                 <h6 class="select"> عودة إلى قائمة الفواتير
                 </h6>
               </a>
-              <a type="button" href="/invoice/{{invoice._id}}/edit"  class=" btnclass"
-                {{invoice.disabled}}>
+              {{#if invoice.canEdit}}
+              <a type="button" href="/invoice/{{invoice._id}}/edit" class=" btnclass">
                 <h6 class="select"> تعديل الفاتورة </h6>
               </a>
+              {{/if}}
             </div>
           </form>
         </div>

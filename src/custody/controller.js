@@ -1,6 +1,7 @@
 const PAGE_SIZE = require("../common/constants").PAGE_SIZE;
 const custodyService = require("./service");
 const branchService = require("../branch/service");
+const { UnauthorizedException } = require("../common/errors/exceptions");
 
 exports.getAllCustodies = async (req, res) => {
   let branchID = null;
@@ -39,6 +40,25 @@ exports.getAllCustodies = async (req, res) => {
     toDate,
     page
   );
+
+  // Add time-based restrictions for edit/delete options
+  const currentDate = new Date();
+  custodies = custodies.map((custody) => {
+    const createdAt = new Date(custody.createdAt);
+    const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000); // Minutes since creation
+
+    // Only AccountantManager can edit/delete after time limit, others have 5 hour limit
+    if (req.user.role === "AccountantManager") {
+      custody.canEdit = true;
+      custody.canDelete = true;
+    } else {
+      // For non-managers: 5 hour limit (300 minutes)
+      custody.canEdit = minutesSinceCreation <= 300;
+      custody.canDelete = minutesSinceCreation <= 300;
+    }
+
+    return custody;
+  });
 
   let count = await custodyService.getCount(branchID, fromDate, toDate);
   count < PAGE_SIZE ? (count = 1) : (count = count);
@@ -173,6 +193,17 @@ exports.updateCustody = async (req, res) => {
     custody = await custodyService.getCustodyById(id);
     branches = await branchService.getAllBranches(req.user.companyID);
 
+    // Check time-based restrictions
+    const createdAt = new Date(custody.createdAt);
+    const currentDate = new Date();
+    const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000);
+
+    if (minutesSinceCreation > 300 && req.user.role !== "AccountantManager") {
+      throw new UnauthorizedException(
+        " ليس لديك الصلاحية لتعديل بيانات العهدة"
+      );
+    }
+
     custody = await custodyService.updateCustody(
       id,
       branchID,
@@ -207,6 +238,18 @@ exports.updateCustody = async (req, res) => {
 exports.deleteCustody = async (req, res) => {
   try {
     const id = req.params.id;
+
+    const custody = await custodyService.getCustodyById(id);
+
+    // Check time-based restrictions
+    const createdAt = new Date(custody.createdAt);
+    const currentDate = new Date();
+    const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000);
+
+    if (minutesSinceCreation > 300 && req.user.role !== "AccountantManager") {
+      throw new UnauthorizedException(" ليس لديك الصلاحية لحذف بيانات العهدة");
+    }
+
     await custodyService.deleteCustody(id);
 
     res.send({ message: "حُذِفَت العهدة بنجاح" });

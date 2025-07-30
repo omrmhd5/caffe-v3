@@ -153,18 +153,22 @@
                   </a>
                 </div>
               </td>
-              <td {{#if disabled}} class="disabled" {{/if}}>
-              <a class="btn btn-primary btn-lg"
-                  href="/invoice/{{_id}}/edit"><i class="fa fa-pen"></i>
-              </a>
+              <td>
+                {{#if canEdit}}
+                <a class="btn btn-primary btn-lg" href="/invoice/{{_id}}/edit">
+                  <i class="fa fa-pen"></i>
+                </a>
+                {{/if}}
               </td>
-              <td {{#if disabled}} class="disabled" {{/if}}>
+              <td>
+                {{#if canDelete}}
                 <div class="form-button-action">
-                  <a class="btn btn-danger2 text-white" {{disabled}} onclick="deleteInvoice(`{{_id}}`)" data-toggle="tooltip" title=""
+                  <a class="btn btn-danger2 text-white" onclick="deleteInvoice(`{{_id}}`)" data-toggle="tooltip" title=""
                    data-original-title="حذف الفاتورة">
                     <i class="fa fa-times"></i>
                   </a>
                 </div>
+                {{/if}}
               </td>
             </tr>
             {{/each}}
