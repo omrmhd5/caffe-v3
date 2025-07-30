@@ -179,3 +179,44 @@ exports.createEmployee = async (employeeName, branchID, companyID) => {
 exports.getEmployeeByName = async (employeeName) => {
   return Employee.findOne({ employeeName });
 };
+
+// Check if employee's branch is hidden
+exports.isEmployeeBranchHidden = async (employeeID) => {
+  const employee = await Employee.findById(employeeID);
+  if (!employee) {
+    throw new NotFoundException("الموظف غير موجود");
+  }
+
+  const Branch = require("../../models/branch");
+  const branch = await Branch.findById(employee.branchID);
+
+  if (branch && branch.hidden) {
+    return true;
+  }
+
+  return false;
+};
+
+// Get all employees affected by a branch being hidden
+exports.getEmployeesByBranch = async (branchID) => {
+  return Employee.find({ branchID }).populate("branchID").populate("companyID");
+};
+
+// Check if any employees are affected by branch being hidden
+exports.checkBranchEmployees = async (branchID) => {
+  const employees = await Employee.find({ branchID });
+  return employees.length > 0;
+};
+
+// Get all employees affected by a company being hidden
+exports.getEmployeesByCompany = async (companyID) => {
+  return Employee.find({ companyID })
+    .populate("branchID")
+    .populate("companyID");
+};
+
+// Check if any employees are affected by company being hidden
+exports.checkCompanyEmployees = async (companyID) => {
+  const employees = await Employee.find({ companyID });
+  return employees.length > 0;
+};

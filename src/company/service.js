@@ -133,16 +133,30 @@ exports.updateCompany = async (
 exports.hideCompany = async (id, fromDate) => {
   const company = await Company.findById(id);
   if (!company) throw new NotFoundException("الشركة غير موجودة");
+
+  // Check for affected users and employees
+  const userService = require("../user/service");
+  const employeeService = require("../employee/service");
+
+  const affectedUsers = await userService.checkCompanyUsers(id);
+  const affectedEmployees = await employeeService.checkCompanyEmployees(id);
+
   company.hidden = true;
   company.hiddenFromDate = fromDate || new Date();
   await company.save();
+
   // Cascade hide to all branches
   const Branch = require("../../models/branch");
   await Branch.updateMany(
     { companyID: id },
     { $set: { hidden: true, hiddenFromDate: fromDate || new Date() } }
   );
-  return company;
+
+  return {
+    company,
+    affectedUsers,
+    affectedEmployees,
+  };
 };
 
 exports.unhideCompany = async (id) => {
@@ -171,4 +185,33 @@ exports.isCompanyEditable = async (id, date) => {
     return false;
   }
   return true;
+};
+
+// Get detailed information about users and employees affected by company being hidden
+exports.getCompanyImpactInfo = async (companyID) => {
+  const userService = require("../user/service");
+  const employeeService = require("../employee/service");
+
+  const users = await userService.getUsersByCompany(companyID);
+  const employees = await employeeService.getEmployeesByCompany(companyID);
+
+  return {
+    users: users.map((user) => ({
+      _id: user._id,
+      fullName: user.fullName,
+      username: user.username,
+      role: user.role,
+      blocked: user.blocked,
+      branchID: user.branchID,
+    })),
+    employees: employees.map((employee) => ({
+      _id: employee._id,
+      employeeName: employee.employeeName,
+      employeeID: employee.employeeID,
+      status: employee.status,
+      branchID: employee.branchID,
+    })),
+    totalUsers: users.length,
+    totalEmployees: employees.length,
+  };
 };

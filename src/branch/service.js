@@ -126,10 +126,23 @@ exports.updateBranch = async (id, branchName, companyID) => {
 exports.hideBranch = async (id, fromDate) => {
   const branch = await Branch.findById(id);
   if (!branch) throw new NotFoundException("الفرع غير موجود");
+
+  // Check for affected users and employees
+  const userService = require("../user/service");
+  const employeeService = require("../employee/service");
+
+  const affectedUsers = await userService.checkBranchUsers(id);
+  const affectedEmployees = await employeeService.checkBranchEmployees(id);
+
   branch.hidden = true;
   branch.hiddenFromDate = fromDate || new Date();
   await branch.save();
-  return branch;
+
+  return {
+    branch,
+    affectedUsers,
+    affectedEmployees,
+  };
 };
 
 exports.unhideBranch = async (id) => {
@@ -172,4 +185,31 @@ exports.isBranchEditable = async (id, date) => {
     return false;
   }
   return true;
+};
+
+// Get detailed information about users and employees affected by branch being hidden
+exports.getBranchImpactInfo = async (branchID) => {
+  const userService = require("../user/service");
+  const employeeService = require("../employee/service");
+
+  const users = await userService.getUsersByBranch(branchID);
+  const employees = await employeeService.getEmployeesByBranch(branchID);
+
+  return {
+    users: users.map((user) => ({
+      _id: user._id,
+      fullName: user.fullName,
+      username: user.username,
+      role: user.role,
+      blocked: user.blocked,
+    })),
+    employees: employees.map((employee) => ({
+      _id: employee._id,
+      employeeName: employee.employeeName,
+      employeeID: employee.employeeID,
+      status: employee.status,
+    })),
+    totalUsers: users.length,
+    totalEmployees: employees.length,
+  };
 };

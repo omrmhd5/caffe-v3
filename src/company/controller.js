@@ -130,8 +130,17 @@ exports.hideCompany = async (req, res) => {
   try {
     const id = req.params.id;
     const fromDate = req.body.fromDate || new Date();
-    await companyService.hideCompany(id, fromDate);
-    res.send({ message: "تم إخفاء الشركة بنجاح" });
+    const result = await companyService.hideCompany(id, fromDate);
+
+    let message = "تم إخفاء الشركة بنجاح";
+    if (result.affectedUsers) {
+      message += " - سيتم منع المستخدمين من تسجيل الدخول";
+    }
+    if (result.affectedEmployees) {
+      message += " - الموظفون سيتأثرون أيضاً";
+    }
+
+    res.send({ message });
   } catch (error) {
     res.status(error.status || 500).send({ errorMessage: error.message });
   }

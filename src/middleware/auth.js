@@ -34,8 +34,32 @@ const auth = async (req, res, next) => {
       );
     }
 
+    // Check if user's branch is hidden on every request
     if (user.branchID) {
+      const Branch = require("../../models/branch");
+      const branch = await Branch.findById(user.branchID);
+
+      if (branch && branch.hidden) {
+        res.clearCookie("auth_token");
+        throw new UnauthenticatedException(
+          "الفرع معطل حالياً، لا يمكن تسجيل الدخول. الرجاء مراجعة الإدارة"
+        );
+      }
+
       user.branchedRole = true;
+    }
+
+    // Check if user's company is hidden on every request
+    if (user.companyID) {
+      const Company = require("../../models/company");
+      const company = await Company.findById(user.companyID);
+
+      if (company && company.hidden) {
+        res.clearCookie("auth_token");
+        throw new UnauthenticatedException(
+          "الشركة معطلة حالياً، لا يمكن تسجيل الدخول. الرجاء مراجعة الإدارة"
+        );
+      }
     }
 
     req.token = token;

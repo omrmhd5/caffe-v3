@@ -186,7 +186,7 @@ exports.updateUser = async ({
 }) => {
   let update = {};
 
-  if (branchID) update.branchID = mongoose.Types.ObjectId(branchID);
+  if (branchID) update.branchID = new mongoose.Types.ObjectId(branchID);
 
   if (role) {
     if (role == "Admin" || role == "AccountantManager" || role == "Manager") {
@@ -270,6 +270,30 @@ exports.loginUser = async (username, password) => {
     );
   }
 
+  // Check if user's branch is hidden
+  if (user.branchID) {
+    const Branch = require("../../models/branch");
+    const branch = await Branch.findById(user.branchID);
+
+    if (branch && branch.hidden) {
+      throw new UnauthenticatedException(
+        "الفرع معطل حالياً، لا يمكن تسجيل الدخول. الرجاء مراجعة الإدارة"
+      );
+    }
+  }
+
+  // Check if user's company is hidden
+  if (user.companyID) {
+    const Company = require("../../models/company");
+    const company = await Company.findById(user.companyID);
+
+    if (company && company.hidden) {
+      throw new UnauthenticatedException(
+        "الشركة معطلة حالياً، لا يمكن تسجيل الدخول. الرجاء مراجعة الإدارة"
+      );
+    }
+  }
+
   user.token = await generateAuthToken(user);
   await user.save();
 
@@ -304,6 +328,28 @@ exports.logout = async (id) => {
     await user.save();
   }
   return;
+};
+
+// Get all users affected by a branch being hidden
+exports.getUsersByBranch = async (branchID) => {
+  return User.find({ branchID }).populate("branchID").populate("companyID");
+};
+
+// Check if any users are affected by branch being hidden
+exports.checkBranchUsers = async (branchID) => {
+  const users = await User.find({ branchID });
+  return users.length > 0;
+};
+
+// Get all users affected by a company being hidden
+exports.getUsersByCompany = async (companyID) => {
+  return User.find({ companyID }).populate("branchID").populate("companyID");
+};
+
+// Check if any users are affected by company being hidden
+exports.checkCompanyUsers = async (companyID) => {
+  const users = await User.find({ companyID });
+  return users.length > 0;
 };
 
 exports.resetPasswordRequest = async (email) => {
