@@ -31,11 +31,18 @@
               <input type="text" id="employeeName" name="employeeName" class="form-control" placeholder="الاسم "
                 dir="rtl" value="{{employeeName}}" required>
             </div>
+            <div class="form-group col-md-6 col-12 float-right" id="employeeIDGroup">
+              <label for="employeeID" class="float-right">
+                <p class="select">رقم الموظف</p>
+              </label>
+              <input type="text" id="employeeID" name="employeeID" class="form-control" placeholder="رقم الموظف"
+                dir="rtl" value="{{employeeID}}" required>
+            </div>
             <div class="form-group col-md-6 col-12 float-right" dir="rtl" id="branchGroup">
               <label for="branchID" class="float-right">
                 <p class="select">اختر الفرع</p>
               </label>
-              <select class="form-control form-control" id="branchID" name="branchID">
+              <select class="form-control form-control" id="branchID" name="branchID" required>
                 {{#unless branchID}}
                 <option value="" selected>اختار...</option>
                 {{/unless}}
@@ -43,6 +50,27 @@
                 <option value="{{_id}}" {{selected}}>{{branchname}}</option>
                 {{/each}}
               </select>
+            </div>
+            <div class="form-group col-md-6 col-12 float-right" id="nationalityGroup">
+              <label for="nationality" class="float-right">
+                <p class="select">الجنسية</p>
+              </label>
+              <input type="text" id="nationality" name="nationality" class="form-control" placeholder="الجنسية"
+                dir="rtl" value="{{nationality}}" required>
+            </div>
+            <div class="form-group col-md-6 col-12 float-right" id="idNumberGroup">
+              <label for="idNumber" class="float-right">
+                <p class="select">رقم الهوية/الإقامة</p>
+              </label>
+              <input type="text" id="idNumber" name="idNumber" class="form-control" placeholder="رقم الهوية/الإقامة"
+                dir="rtl" value="{{idNumber}}" required>
+            </div>
+            <div class="form-group col-md-6 col-12 float-right" id="residencyExpiryDateGroup">
+              <label for="residencyExpiryDate" class="float-right">
+                <p class="select">تاريخ انتهاء الإقامة</p>
+              </label>
+              <input type="date" id="residencyExpiryDate" name="residencyExpiryDate" class="form-control" 
+                dir="rtl" value="{{residencyExpiryDate}}" required min="{{today}}">
             </div>
             <div class="modal-footer border-0 center Center row">
               <a href="/employees" class=" btnclass btn-round">
@@ -60,4 +88,11 @@
 </div>
 
 {{> footer}}
+
+<script>
+  // Set minimum date to today for residency expiry date
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('residencyExpiryDate').setAttribute('min', today);
+</script>
+
 {{> footer/employeeFooter}}

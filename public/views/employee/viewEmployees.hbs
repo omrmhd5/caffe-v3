@@ -52,6 +52,15 @@
                   <p class="tableheader"> الشركة </p>
                 </th>
                 <th scope="col">
+                  <p class="tableheader"> الجنسية </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> رقم الهوية/الإقامة </p>
+                </th>
+                <th scope="col">
+                  <p class="tableheader"> تاريخ انتهاء الإقامة </p>
+                </th>
+                <th scope="col">
                   <p class="tableheader"> الحالة </p>
                 </th>
                 <th scope="col">
@@ -69,6 +78,9 @@
                 <td>{{employeeName}}</td>
                 <td>{{check branchID.branchname}}</td>
                 <td>{{check companyID.companyname}}</td>
+                <td>{{check nationality}}</td>
+                <td>{{check idNumber}}</td>
+                <td>{{formatDate residencyExpiryDate}}</td>
                 <td>{{check statusMessage}}</td>
                 <td>
                   <div class="form-button-action">

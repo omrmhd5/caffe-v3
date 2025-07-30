@@ -25,11 +25,21 @@
         <div class="card-body p-0">
           <form action="/employees/{{employee._id}}/edit" method="POST">
             <div class="form-group" id="employeeIDGroup">
-              <label for="employeeID" class="float-right">
-                <p class="select">الرقم الوظيفي</p>
-              </label>
-              <input id="employeeID" name="employeeID" class="form-control" dir="rtl"
-                value="{{check employee.employeeID}}" disabled>
+              <div class="row">
+                <div class="col-md col-12">
+                  <label for="employeeID" class="float-right">
+                    <p class="select">الرقم الوظيفي الجديد</p>
+                  </label>
+                  <input type="text" id="employeeID" name="employeeID" class="form-control" dir="rtl"
+                    placeholder="الرقم الوظيفي الجديد">
+                </div>
+                <div class="col-md col-12">
+                  <label class="float-right">
+                    <p class="select">الرقم الوظيفي الحالي</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{check employee.employeeID}}" disabled>
+                </div>
+              </div>
             </div>
             <div class="form-group" id="employeeNameGroup">
               <div class="row">
@@ -90,6 +100,57 @@
                 </div>
               </div>
             </div>
+            <div class="form-group" id="nationalityGroup">
+              <div class="row">
+                <div class="col-md col-12">
+                  <label for="nationality" class="float-right">
+                    <p class="select">الجنسية الجديدة</p>
+                  </label>
+                  <input type="text" id="nationality" name="nationality" class="form-control"
+                    placeholder="الجنسية الجديدة" dir="rtl">
+                </div>
+                <div class="col-md col-12">
+                  <label class="float-right">
+                    <p class="select">الجنسية الحالية</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{check employee.nationality}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" id="idNumberGroup">
+              <div class="row">
+                <div class="col-md col-12">
+                  <label for="idNumber" class="float-right">
+                    <p class="select">رقم الهوية/الإقامة الجديد</p>
+                  </label>
+                  <input type="text" id="idNumber" name="idNumber" class="form-control"
+                    placeholder="رقم الهوية/الإقامة الجديد" dir="rtl">
+                </div>
+                <div class="col-md col-12">
+                  <label class="float-right">
+                    <p class="select">رقم الهوية/الإقامة الحالي</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{check employee.idNumber}}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" id="residencyExpiryDateGroup">
+              <div class="row">
+                <div class="col-md col-12">
+                  <label for="residencyExpiryDate" class="float-right">
+                    <p class="select">تاريخ انتهاء الإقامة الجديد</p>
+                  </label>
+                  <input type="date" id="residencyExpiryDate" name="residencyExpiryDate" class="form-control" 
+                    dir="rtl" min="{{today}}">
+                </div>
+                <div class="col-md col-12">
+                  <label class="float-right">
+                    <p class="select">تاريخ انتهاء الإقامة الحالي</p>
+                  </label>
+                  <input class="form-control" dir="rtl" value="{{formatDate employee.residencyExpiryDate}}" disabled>
+                </div>
+              </div>
+            </div>
             <div class="modal-footer border-0 center Center row">
               <a href="/employees" class="btnclass btn-round">
                 <h6 class="select"> رجوع </h6>
@@ -108,5 +169,8 @@
 {{> footer}}
 
 <script>
+  // Set minimum date to today for residency expiry date
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('residencyExpiryDate').setAttribute('min', today);
 </script>
-{{> footer/userFooter}}
+{{> footer/employeeFooter}}

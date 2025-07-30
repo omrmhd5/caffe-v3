@@ -7,6 +7,7 @@ const employeeSchema = new mongoose.Schema({
   },
   employeeID: {
     type: String,
+    required: true,
   },
   branchID: {
     type: mongoose.Schema.Types.ObjectId,
@@ -25,6 +26,18 @@ const employeeSchema = new mongoose.Schema({
   status: {
     type: String,
     default: "working",
+  },
+  nationality: {
+    type: String,
+    required: true,
+  },
+  idNumber: {
+    type: String,
+    required: true,
+  },
+  residencyExpiryDate: {
+    type: Date,
+    required: true,
   },
 });
 

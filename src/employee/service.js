@@ -100,8 +100,12 @@ exports.getEmployeeById = async (id) => {
 exports.updateEmployee = async (
   id,
   employeeName = null,
+  employeeID = null,
   status = null,
-  branchID = null
+  branchID = null,
+  nationality = null,
+  idNumber = null,
+  residencyExpiryDate = null
 ) => {
   let employee = await Employee.findById(id).populate("branchID").lean();
   if (!employee) {
@@ -111,9 +115,16 @@ exports.updateEmployee = async (
   let update = {};
   if (employeeName) {
     update.employeeName = employeeName;
-    let duplicate = await Employee.findOne({ _id: { $ne: id }, employeeName });
+  }
+  if (employeeID) {
+    update.employeeID = employeeID;
+    let duplicate = await Employee.findOne({
+      _id: { $ne: id },
+      employeeID,
+      companyID: employee.companyID,
+    });
     if (duplicate) {
-      throw new BadRequestException("اسم الموظف موجود");
+      throw new BadRequestException("رقم الموظف موجود");
     }
   }
   if (status) {
@@ -121,6 +132,25 @@ exports.updateEmployee = async (
   }
   if (branchID) {
     update.branchID = branchID;
+  }
+  if (nationality) {
+    update.nationality = nationality;
+  }
+  if (idNumber) {
+    update.idNumber = idNumber;
+  }
+  if (residencyExpiryDate) {
+    // Check if residency expiry date is in the future
+    const expiryDate = new Date(residencyExpiryDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (expiryDate <= today) {
+      throw new BadRequestException(
+        "تاريخ انتهاء الإقامة يجب أن يكون في المستقبل"
+      );
+    }
+    update.residencyExpiryDate = residencyExpiryDate;
   }
 
   employee = await Employee.findByIdAndUpdate(id, update, {
@@ -148,10 +178,21 @@ exports.deleteEmployee = async (id) => {
   return "تم حذف الموظف بنجاح";
 };
 
-exports.createEmployee = async (employeeName, branchID, companyID) => {
-  let employeeID = getId();
+exports.createEmployee = async (
+  employeeName,
+  employeeID,
+  branchID,
+  companyID,
+  nationality,
+  idNumber,
+  residencyExpiryDate
+) => {
   if (!employeeName) {
     throw new BadRequestException("الرجاء كتابةاسم الموظف");
+  }
+
+  if (!employeeID) {
+    throw new BadRequestException("الرجاء كتابةرقم الموظف");
   }
 
   if (!companyID) {
@@ -162,17 +203,47 @@ exports.createEmployee = async (employeeName, branchID, companyID) => {
     throw new BadRequestException("الرجاء اختيار الفرع");
   }
 
+  if (!nationality) {
+    throw new BadRequestException("الرجاء كتابةالجنسية");
+  }
+
+  if (!idNumber) {
+    throw new BadRequestException("الرجاء كتابةرقم الهوية/الإقامة");
+  }
+
+  if (!residencyExpiryDate) {
+    throw new BadRequestException("الرجاء كتابةتاريخ انتهاء الإقامة");
+  }
+
+  // Check if residency expiry date is in the future
+  const expiryDate = new Date(residencyExpiryDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (expiryDate <= today) {
+    throw new BadRequestException(
+      "تاريخ انتهاء الإقامة يجب أن يكون في المستقبل"
+    );
+  }
+
   const employee = await Employee.findOne({
-    employeeName,
-    branchID,
+    employeeID,
     companyID,
   });
 
   if (employee) {
-    throw new BadRequestException("يوجد موظف بنفس الاسم");
+    throw new BadRequestException("يوجد موظف بنفس الرقم");
   }
 
-  await Employee.create({ employeeID, employeeName, branchID, companyID });
+  await Employee.create({
+    employeeID,
+    employeeName,
+    branchID,
+    companyID,
+    nationality,
+    idNumber,
+    residencyExpiryDate,
+  });
   return;
 };
 

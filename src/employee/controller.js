@@ -115,8 +115,12 @@ exports.updateEmployee = async (req, res) => {
   try {
     const id = req.params.id;
     const employeeName = req.body.employeeName;
+    const employeeID = req.body.employeeID;
     const status = req.body.status;
     const branchID = req.body.branchID;
+    const nationality = req.body.nationality;
+    const idNumber = req.body.idNumber;
+    const residencyExpiryDate = req.body.residencyExpiryDate;
 
     employee = await employeeService.getEmployeeById(id);
     if (employee.branchID) {
@@ -130,8 +134,12 @@ exports.updateEmployee = async (req, res) => {
     employee = await employeeService.updateEmployee(
       id,
       employeeName,
+      employeeID,
       status,
-      branchID
+      branchID,
+      nationality,
+      idNumber,
+      residencyExpiryDate
     );
 
     res.render("employee/editEmployee.hbs", {
@@ -164,7 +172,11 @@ exports.createEmployee = async (req, res) => {
   let companies = null;
   try {
     let employeeName = req.body.employeeName;
+    let employeeID = req.body.employeeID;
     let branchID = req.body.branchID;
+    let nationality = req.body.nationality;
+    let idNumber = req.body.idNumber;
+    let residencyExpiryDate = req.body.residencyExpiryDate;
 
     let companyID = req.body.companyID;
     if (!companyID) {
@@ -174,12 +186,15 @@ exports.createEmployee = async (req, res) => {
 
     let branches = await branchService.getAllBranches(req.user.companyID);
 
-    let duplicate = await employeeService.getEmployeeByName(employeeName);
-    if (duplicate) {
-      throw new BadRequestException("اسم الموظف موجود");
-    }
-
-    await employeeService.createEmployee(employeeName, branchID, companyID);
+    await employeeService.createEmployee(
+      employeeName,
+      employeeID,
+      branchID,
+      companyID,
+      nationality,
+      idNumber,
+      residencyExpiryDate
+    );
 
     res.render("employee/addEmployee.hbs", {
       successMessage: "أضيف الموظف بنجاح",
@@ -190,6 +205,10 @@ exports.createEmployee = async (req, res) => {
     res.render("employee/addEmployee.hbs", {
       errorMessage: error.message,
       employeeName: req.body.employeeName,
+      employeeID: req.body.employeeID,
+      nationality: req.body.nationality,
+      idNumber: req.body.idNumber,
+      residencyExpiryDate: req.body.residencyExpiryDate,
       companies,
     });
   }
