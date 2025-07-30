@@ -47,14 +47,14 @@ exports.getAllCustodies = async (req, res) => {
     const createdAt = new Date(custody.createdAt);
     const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000); // Minutes since creation
 
-    // Only AccountantManager can edit/delete after time limit, others have 5 hour limit
+    // Only AccountantManager can delete, others have 5 hour edit limit
     if (req.user.role === "AccountantManager") {
       custody.canEdit = true;
       custody.canDelete = true;
     } else {
-      // For non-managers: 5 hour limit (300 minutes)
+      // For non-managers: 5 hour edit limit, no delete access
       custody.canEdit = minutesSinceCreation <= 300;
-      custody.canDelete = minutesSinceCreation <= 300;
+      custody.canDelete = false;
     }
 
     return custody;
@@ -246,7 +246,7 @@ exports.deleteCustody = async (req, res) => {
     const currentDate = new Date();
     const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000);
 
-    if (minutesSinceCreation > 300 && req.user.role !== "AccountantManager") {
+    if (req.user.role !== "AccountantManager") {
       throw new UnauthorizedException(" ليس لديك الصلاحية لحذف بيانات العهدة");
     }
 

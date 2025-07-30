@@ -46,10 +46,6 @@ router
 
 router.route("/:id").get(auth, isSuperAdmin, companyController.viewCompany);
 
-router
-  .route("/:id")
-  .delete(auth, isSuperAdmin, companyController.deleteCompany);
-
 router.post("/:id/hide", auth, isSuperAdmin, companyController.hideCompany);
 router.post("/:id/unhide", auth, isSuperAdmin, companyController.unhideCompany);
 

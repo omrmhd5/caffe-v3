@@ -70,17 +70,6 @@ exports.createCompany = async (
   return "أضيفت بنجاح";
 };
 
-exports.deleteCompany = async (id) => {
-  const company = await Company.findById(id);
-
-  if (!company) {
-    throw new NotFoundException("الشركة غير موجودة");
-  }
-
-  await Company.findByIdAndDelete(id);
-  return;
-};
-
 exports.updateCompany = async (
   id,
   companyName,

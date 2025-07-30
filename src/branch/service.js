@@ -78,16 +78,6 @@ exports.getBranchById = async (id) => {
   return branch;
 };
 
-exports.deleteBranch = async (id) => {
-  const branch = await Branch.findById(id);
-  if (!branch) {
-    throw new NotFoundException("الفرع غير موجود");
-  }
-
-  await Branch.findByIdAndDelete(id);
-  return;
-};
-
 exports.createBranch = async (branchName, companyID) => {
   if (!branchName) {
     throw new BadRequestException("الرجاء كتابةاسم الفرع");

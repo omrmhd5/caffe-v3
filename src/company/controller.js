@@ -72,18 +72,6 @@ exports.getCompanyById = async (req, res) => {
   res.render("user/viewUsers.hbs", { companies });
 };
 
-exports.deleteCompany = async (req, res) => {
-  try {
-    const id = req.params.id;
-    await companyService.deleteCompany(id);
-
-    res.send({ message: "حذفت الشركة بنجاح" });
-  } catch (error) {
-    console.log(error, error.status, error.message);
-    res.status(error.status).send({ errorMessage: error.message });
-  }
-};
-
 exports.addCompany = async (req, res) => {
   res.render("company/addCompany.hbs");
 };

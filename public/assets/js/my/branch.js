@@ -21,64 +21,6 @@
 //   }
 // }
 
-function deleteBranch(id) {
-  swal({
-    title: "هل انت متأكد من حذف الفرع",
-    text: "سيتم حذف جميع البيانات المتعلقة بهذا الفرع",
-    type: "warning",
-    buttons: {
-      confirm: {
-        text: "نعم ",
-        className: "btn btn-danger",
-      },
-      cancel: {
-        text: "لا",
-        visible: true,
-        className: "btn btn-success",
-      },
-    },
-  }).then((Delete) => {
-    if (Delete) {
-      $.ajax({
-        url: `branches/${id}`,
-        type: "DELETE",
-        success: (data, status, xhr) => {
-          swal({
-            title: "حذف الفرع بنجاح",
-            type: "success",
-            buttons: {
-              confirm: {
-                className: "btn btn-success",
-              },
-            },
-          }).then((OK) => {
-            if (OK) {
-              $(window).scrollTop(0);
-              location.reload();
-            }
-          });
-        },
-        error: (jqXhr, textStatus, errorMessage) => {
-          swal("حدث خطأ", jqXhr.responseJSON.errorMessage, {
-            icon: "error",
-            buttons: {
-              confirm: {
-                className: "btn btn-danger",
-              },
-            },
-          }).then((OK) => {
-            if (OK) {
-              swal.close();
-            }
-          });
-        },
-      });
-    } else {
-      swal.close();
-    }
-  });
-}
-
 function toggleBranchHidden(id, checked) {
   const url = checked ? `/branches/${id}/unhide` : `/branches/${id}/hide`;
   $.ajax({

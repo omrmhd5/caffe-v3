@@ -32,63 +32,6 @@ const showNotification = function (state, message) {
   });
 };
 
-function deleteCompany(id) {
-  swal({
-    title: "هل انت متأكد من حذف الشركة",
-    text: "سيتم حذف جميع البيانات المتعلقة بهذا الشركة",
-    type: "warning",
-    buttons: {
-      confirm: {
-        text: "نعم ",
-        className: "btn btn-danger",
-      },
-      cancel: {
-        text: "لا ",
-        visible: true,
-        className: "btn btn-success",
-      },
-    },
-  }).then((Delete) => {
-    if (Delete) {
-      $.ajax({
-        url: `companies/${id}`,
-        type: "DELETE",
-        success: (data, status, xhr) => {
-          swal({
-            title: "حذفت الشركة بنجاح",
-            type: "success",
-            buttons: {
-              confirm: {
-                className: "btn btn-success",
-              },
-            },
-          }).then((OK) => {
-            if (OK) {
-              location.reload();
-            }
-          });
-        },
-        error: (jqXhr, textStatus, errorMessage) => {
-          swal("حدث خطأ", jqXhr.responseJSON.errorMessage, {
-            icon: "error",
-            buttons: {
-              confirm: {
-                className: "btn btn-danger",
-              },
-            },
-          }).then((OK) => {
-            if (OK) {
-              swal.close();
-            }
-          });
-        },
-      });
-    } else {
-      swal.close();
-    }
-  });
-}
-
 function showImage(src) {
   // Get the image and insert it inside the modal - use its "alt" text as a caption
   let modalImg = document.getElementById("img01");

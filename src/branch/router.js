@@ -10,8 +10,6 @@ router
   .get(auth, isSuperAdmin, branchController.addBranch)
   .post(auth, isSuperAdmin, branchController.createBranch);
 
-router.route("/:id").delete(auth, isSuperAdmin, branchController.deleteBranch);
-
 router
   .route("/:id/edit")
   .get(auth, isSuperAdmin, branchController.showEdit)

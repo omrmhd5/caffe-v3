@@ -80,18 +80,6 @@ exports.createBranch = async (req, res) => {
   }
 };
 
-exports.deleteBranch = async (req, res) => {
-  try {
-    const id = req.params.id;
-    await branchService.deleteBranch(id);
-
-    res.send({ message: "حذف الفرع بنجاح" });
-  } catch (error) {
-    console.log(error, error.status, error.message);
-    res.status(error.status).send({ errorMessage: error.message });
-  }
-};
-
 exports.showEdit = async (req, res) => {
   const id = req.params.id;
   const branch = await branchService.getBranchById(id);

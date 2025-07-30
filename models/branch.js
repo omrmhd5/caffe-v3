@@ -66,37 +66,6 @@ branchSchema.virtual("sales", {
   foreignField: "branchID",
 });
 
-branchSchema.pre("remove", async function (next) {
-  const cashiers = await Cashier.find({ branchID: this._id });
-  cashiers.forEach(async (cashier) => {
-    const user = await User.findOne({ _id: cashier.cashierID });
-    await user.remove();
-  });
-  cashiers.forEach(async (cashier) => {
-    await cashier.remove();
-  });
-
-  const items = await Item.find({ branchID: this._id });
-
-  items.forEach(async (item) => {
-    await item.remove();
-  });
-
-  const stores = await Store.find({ branchID: this._id });
-
-  stores.forEach(async (store) => {
-    await store.remove();
-  });
-
-  const sales = await Sales.find({ branchID: this._id });
-
-  sales.forEach(async (sale) => {
-    await sale.remove();
-  });
-
-  next();
-});
-
 const Branch = mongoose.model("Branch", branchSchema);
 
 module.exports = Branch;

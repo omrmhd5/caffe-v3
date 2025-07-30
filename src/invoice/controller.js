@@ -98,14 +98,14 @@ exports.getAllInvoices = async (req, res) => {
     const createdAt = new Date(invoice.createdAt);
     const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000); // Minutes since creation
 
-    // Only AccountantManager can edit/delete after time limit, others have 5 hour limit
+    // Only AccountantManager can delete, others have 5 hour edit limit
     if (req.user.role === "AccountantManager") {
       invoice.canEdit = true;
       invoice.canDelete = true;
     } else {
-      // For non-managers: 5 hour limit (300 minutes)
+      // For non-managers: 5 hour edit limit, no delete access
       invoice.canEdit = minutesSinceCreation <= 300;
-      invoice.canDelete = minutesSinceCreation <= 300;
+      invoice.canDelete = false;
     }
 
     return invoice;
@@ -341,7 +341,7 @@ exports.deleteInvoice = async (req, res) => {
     const currentDate = new Date();
     const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000);
 
-    if (minutesSinceCreation > 300 && req.user.role !== "AccountantManager") {
+    if (req.user.role !== "AccountantManager") {
       throw new UnauthorizedException(
         " ليس لديك الصلاحية لحذف بيانات الفاتورة"
       );
