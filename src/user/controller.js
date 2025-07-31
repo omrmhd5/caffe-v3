@@ -312,10 +312,11 @@ exports.loginUser = async (req, res) => {
 
     res.clearCookie("auth_token");
     res.cookie("auth_token", user.token, {
-      maxAge: 1000 * 60 * 5, // 5 minutes
+      maxAge: 1000 * 60 * 5,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax", // Changed from "strict" to "lax" for better compatibility
+      path: "/",
     });
 
     res.redirect("/");

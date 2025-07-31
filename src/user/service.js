@@ -294,7 +294,7 @@ exports.loginUser = async (username, password) => {
     }
   }
 
-  user.token = await generateAuthToken(user);
+  user.token = await exports.generateAuthToken(user);
   await user.save();
 
   delete user.password;
@@ -364,7 +364,7 @@ exports.resetPasswordRequest = async (email) => {
     );
   }
 
-  const token = await generateAuthToken(user);
+  const token = await exports.generateAuthToken(user);
   user.token = token;
   await user.save();
   let baseUrl = process.env.BASE_URL;
@@ -403,7 +403,7 @@ exports.resetPassword = async (email, token, newPassword) => {
   return "تمت استعادة  كلمة المرور بنجاح";
 };
 
-const generateAuthToken = async function (user) {
+exports.generateAuthToken = async function (user) {
   const token = jwt.sign(
     { _id: user._id.toString() },
     "ASDSADKSADKSKLASNKLAS45",

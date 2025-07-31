@@ -6,6 +6,22 @@ const {
   UnauthorizedException,
 } = require("../common/errors/exceptions");
 
+// Helper function to check if token is about to expire (within 30 seconds)
+const isTokenExpiringSoon = (token) => {
+  try {
+    const decoded = jwt.decode(token);
+    if (!decoded || !decoded.exp) return true;
+
+    const now = Math.floor(Date.now() / 1000);
+    const timeUntilExpiry = decoded.exp - now;
+
+    // Refresh if token expires within 30 seconds
+    return timeUntilExpiry <= 30;
+  } catch (error) {
+    return true;
+  }
+};
+
 const auth = async (req, res, next) => {
   try {
     const token = req.cookies["auth_token"];
@@ -62,7 +78,31 @@ const auth = async (req, res, next) => {
       }
     }
 
-    req.token = token;
+    // Only refresh token if it's about to expire (sliding session)
+    if (isTokenExpiringSoon(token)) {
+      try {
+        // Generate new token for sliding session
+        const newToken = await userService.generateAuthToken(user);
+        user.token = newToken;
+        await user.save();
+
+        // Set new cookie with refreshed token
+        res.cookie("auth_token", newToken, {
+          maxAge: 1000 * 60 * 5,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+        });
+
+        req.token = newToken;
+      } catch (refreshError) {
+        req.token = token;
+      }
+    } else {
+      req.token = token;
+    }
+
     req.user = user;
     next();
   } catch (e) {
