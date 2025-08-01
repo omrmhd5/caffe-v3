@@ -98,14 +98,14 @@ exports.getAllInvoices = async (req, res) => {
     const createdAt = new Date(invoice.createdAt);
     const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000); // Minutes since creation
 
-    // Only AccountantManager can delete, others have 5 hour edit limit
+    // Only AccountantManager has full access, others have 5 hour limit for both edit and delete
     if (req.user.role === "AccountantManager") {
       invoice.canEdit = true;
       invoice.canDelete = true;
     } else {
-      // For non-managers: 5 hour edit limit, no delete access
+      // For non-managers: 5 hour limit for both edit and delete
       invoice.canEdit = minutesSinceCreation <= 300;
-      invoice.canDelete = false;
+      invoice.canDelete = minutesSinceCreation <= 300; // Same 5-hour deadline as edit
     }
 
     return invoice;
@@ -252,11 +252,13 @@ exports.showInvoice = async (req, res) => {
   const currentDate = new Date();
   const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000);
 
-  // Only AccountantManager can edit after time limit, others have 5 hour limit
+  // Only AccountantManager has full access, others have 5 hour limit for both edit and delete
   if (req.user.role === "AccountantManager") {
     invoice.canEdit = true;
+    invoice.canDelete = true;
   } else {
     invoice.canEdit = minutesSinceCreation <= 300;
+    invoice.canDelete = minutesSinceCreation <= 300; // Same 5-hour deadline as edit
   }
 
   res.render("invoice/showInvoice.hbs", { invoice });
@@ -341,7 +343,8 @@ exports.deleteInvoice = async (req, res) => {
     const currentDate = new Date();
     const minutesSinceCreation = parseInt((currentDate - createdAt) / 60000);
 
-    if (req.user.role !== "AccountantManager") {
+    // Only AccountantManager has full access, others have 5 hour limit for delete
+    if (req.user.role !== "AccountantManager" && minutesSinceCreation > 300) {
       throw new UnauthorizedException(
         " ليس لديك الصلاحية لحذف بيانات الفاتورة"
       );

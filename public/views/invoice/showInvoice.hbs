@@ -151,6 +151,11 @@
                 <h6 class="select"> تعديل الفاتورة </h6>
               </a>
               {{/if}}
+              {{#if invoice.canDelete}}
+              <button type="button" onclick="deleteInvoice('{{invoice._id}}')" class="btn btn-danger">
+                <h6 class="select"> حذف الفاتورة </h6>
+              </button>
+              {{/if}}
             </div>
           </form>
         </div>
@@ -160,5 +165,31 @@
 </div>
 
 {{> footer}}
+
+<script>
+function deleteInvoice(id) {
+  if (confirm('هل أنت متأكد من حذف هذه الفاتورة؟')) {
+    fetch(`/invoice/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.message) {
+        alert(data.message);
+        window.location.href = '/invoice';
+      } else if (data.errorMessage) {
+        alert(data.errorMessage);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('حدث خطأ أثناء حذف الفاتورة');
+    });
+  }
+}
+</script>
 
 {{> footer/invoiceFooter}}
