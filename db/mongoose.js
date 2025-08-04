@@ -6,14 +6,14 @@ const DB_NAME = process.env.DB_NAME || "cafe-api";
 const DB_USER = process.env.DB_USER;
 const DB_PASS = process.env.DB_PASS;
 
-// let connectionString = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`;
-// if (DB_USER && DB_PASS) {
-//   connectionString = `mongodb://${encodeURIComponent(
-//     DB_USER
-//   )}:${encodeURIComponent(DB_PASS)}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
-// }
+let connectionString = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+if (DB_USER && DB_PASS) {
+  connectionString = `mongodb://${encodeURIComponent(
+    DB_USER
+  )}:${encodeURIComponent(DB_PASS)}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+}
 
-let connectionString = process.env.MONGO_URI;
+// let connectionString = process.env.MONGO_URI;
 
 mongoose
   .connect(connectionString)
