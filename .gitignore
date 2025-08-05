@@ -1,7 +1,7 @@
 node_modules
 config
 public/uploads/*
-db/mongoose.js
+# db/mongoose.js
 test.js
 ./test.js
 .env
