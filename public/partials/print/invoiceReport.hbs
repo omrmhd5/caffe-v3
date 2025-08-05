@@ -1,30 +1,15 @@
 <style>
   .table { border-collapse: collapse; color: black; width: 100%; table-layout:
-  fixed; } th p { color: black; margin: 0; font-size: 12px; } .table td, .table
-  th { height: auto !important; padding: .3rem !important; text-align: center;
-  vertical-align: middle; word-wrap: break-word; overflow-wrap: break-word;
-  max-width: 0; } /* Set specific column widths */ .table th:nth-child(1),
-  .table td:nth-child(1) { width: 10%; } /* التاريخ */ .table th:nth-child(2),
-  .table td:nth-child(2) { width: 12%; } /* رقم الفاتورة */ .table
-  th:nth-child(3), .table td:nth-child(3) { width: 10%; } /* المبلغ */ .table
-  th:nth-child(4), .table td:nth-child(4) { width: 10%; } /* قيمة الضريبة */
-  .table th:nth-child(5), .table td:nth-child(5) { width: 12%; } /* الرقم
-  الضريبي للمورد */ .table th:nth-child(6), .table td:nth-child(6) { width: 15%;
-  } /* اسم المورد */ .table th:nth-child(7), .table td:nth-child(7) { width:
-  20%; } /* الوصف */ .table th:nth-child(8), .table td:nth-child(8) { width:
-  11%; } /* المجموع المستلم */ /* Special handling for description column */
-  .table td:nth-child(7) { text-align: right; white-space: normal; line-height:
-  1.2; font-size: 11px; } #page-title { border: 1px solid black; display: flex;
-  justify-content: center; align-items: center; padding: auto; color: black;
-  height: 75px; width: 680px; margin: 50px auto; } .tail-border { border: 1px
-  solid black; display: flex; justify-content: center; align-items: center;
-  color: black; height: 60px; width: 320px; margin: 50px auto; } .table-bordered
-  td, .table-bordered th { text-align: center; border-color: black !important; }
-  .print-font { font-size: 20px; } .print-border { border: 1px solid black; } /*
-  Ensure totals section stays on page */ .totals-section { page-break-inside:
-  avoid; margin-top: 20px; } /* Force page break before totals if needed */
-  @media print { .totals-section { page-break-before: auto; page-break-inside:
-  avoid; } }
+  fixed; } th p { color: black; } .table td, .table th { height: 75% !important;
+  padding: .2rem !important; text-align: center; word-wrap: break-word;
+  overflow-wrap: break-word; white-space: normal; vertical-align: top; }
+  #page-title { border: 1px solid black; display: flex; justify-content: center;
+  align-items: center; padding: auto; color: black; height: 75px; width: 680px;
+  margin: 50px auto; } .tail-border { border: 1px solid black; display: flex;
+  justify-content: center; align-items: center; color: black; height: 60px;
+  width: 320px; margin: 50px auto; } .table-bordered td, .table-bordered th {
+  text-align: center; border-color: black !important; } .print-font { font-size:
+  24px; } .print-border { border: 1px solid black; }
 </style>
 
 <div
@@ -94,7 +79,7 @@
     </tbody>
   </table>
 
-  <div class="row mt-2 totals-section">
+  <div class="row mt-2">
     <div class="col-md-4">
       <center class="print-border">
         <h3 class="print-font">إجمالي الفواتير</h3>
