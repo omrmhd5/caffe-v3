@@ -82,43 +82,9 @@ const sendTaxRatioData = () => {
 };
 
 taxButton.addEventListener("click", (e) => {
-  // Check if mada ratio has changed
-  const currentMadaRatio = madaRatio.value;
-  const originalMadaRatio = $(madaRatio).data("original-value");
-
-  if (
-    originalMadaRatio !== undefined &&
-    parseFloat(currentMadaRatio) !== parseFloat(originalMadaRatio)
-  ) {
-    // Show confirmation dialog for mada ratio change
-    swal({
-      title: "تغيير نسبة مدى",
-      text: "هل أنت متأكد أنك تريد تغيير نسبة مدى لهذا الفرع؟ سيؤثر ذلك على هذا الشهر وكل الشهور القادمة.",
-      icon: "warning",
-      buttons: {
-        confirm: {
-          text: "نعم",
-          className: "btn btn-success",
-        },
-        cancel: {
-          text: "لا",
-          visible: true,
-          className: "btn btn-danger",
-        },
-      },
-    }).then((confirmed) => {
-      if (confirmed) {
-        sendTaxRatioData();
-      } else {
-        // Revert mada ratio to original value
-        madaRatio.value = originalMadaRatio;
-        calculateMadaTaxes();
-      }
-    });
-  } else {
-    // No mada ratio change, proceed normally
-    sendTaxRatioData();
-  }
+  // Simply save the data without confirmation dialog
+  // Individual field changes will have their own dialogs
+  sendTaxRatioData();
 });
 
 const sendData = (button) => {
@@ -194,17 +160,175 @@ $(document).on("change", "#mada-ratio", function () {
     $(this).data("original-value", originalMadaRatio);
   }
 
-  // Update the original value to the new value
-  $(this).data("original-value", newMadaRatio);
-
-  // Recalculate taxes
-  calculateMadaTaxes();
+  // Show confirmation dialog for mada ratio change
+  swal({
+    title: "تغيير نسبة مدى",
+    text: "هل أنت متأكد أنك تريد تغيير نسبة مدى لهذا الفرع؟ سيؤثر ذلك على هذا الشهر وكل الشهور القادمة.",
+    icon: "warning",
+    buttons: {
+      confirm: {
+        text: "نعم",
+        className: "btn btn-success",
+      },
+      cancel: {
+        text: "لا",
+        visible: true,
+        className: "btn btn-danger",
+      },
+    },
+  }).then((confirmed) => {
+    if (confirmed) {
+      // Update the original value to the new value
+      $(this).data("original-value", newMadaRatio);
+      // Recalculate taxes
+      calculateMadaTaxes();
+    } else {
+      // Revert to original value
+      $(this).val(originalMadaRatio);
+      calculateMadaTaxes();
+    }
+  });
 });
 
-// Store original mada ratio values when page loads
+// Store original values when page loads
 $(document).ready(function () {
   $("#mada-ratio").each(function () {
     $(this).data("original-value", $(this).val());
+  });
+  $("#visa-ratio").each(function () {
+    $(this).data("original-value", $(this).val());
+  });
+  $("#mada-tax").each(function () {
+    $(this).data("original-value", $(this).val());
+  });
+  $("#visa-tax").each(function () {
+    $(this).data("original-value", $(this).val());
+  });
+});
+
+// Visa ratio change handler
+$(document).on("change", "#visa-ratio", function () {
+  const newVisaRatio = $(this).val();
+  const originalVisaRatio = $(this).data("original-value") || newVisaRatio;
+
+  if (!newVisaRatio || isNaN(newVisaRatio)) return;
+
+  // Store original value if not already stored
+  if (!$(this).data("original-value")) {
+    $(this).data("original-value", originalVisaRatio);
+  }
+
+  // Show confirmation dialog for visa ratio change
+  swal({
+    title: "تغيير نسبة البنك للفيزا",
+    text: "هل أنت متأكد أنك تريد تغيير نسبة البنك للفيزا لهذا الفرع؟ سيؤثر ذلك على هذا الشهر وكل الشهور القادمة.",
+    icon: "warning",
+    buttons: {
+      confirm: {
+        text: "نعم",
+        className: "btn btn-success",
+      },
+      cancel: {
+        text: "لا",
+        visible: true,
+        className: "btn btn-danger",
+      },
+    },
+  }).then((confirmed) => {
+    if (confirmed) {
+      // Update the original value to the new value
+      $(this).data("original-value", newVisaRatio);
+      // Recalculate taxes
+      calculateVisaTaxes();
+    } else {
+      // Revert to original value
+      $(this).val(originalVisaRatio);
+      calculateVisaTaxes();
+    }
+  });
+});
+
+// Mada tax change handler
+$(document).on("change", "#mada-tax", function () {
+  const newMadaTax = $(this).val();
+  const originalMadaTax = $(this).data("original-value") || newMadaTax;
+
+  if (!newMadaTax || isNaN(newMadaTax)) return;
+
+  // Store original value if not already stored
+  if (!$(this).data("original-value")) {
+    $(this).data("original-value", originalMadaTax);
+  }
+
+  // Show confirmation dialog for mada tax change
+  swal({
+    title: "تغيير قيمة الضريبة (%) للمدى",
+    text: "هل أنت متأكد أنك تريد تغيير قيمة الضريبة (%) للمدى لهذا الفرع؟ سيؤثر ذلك على هذا الشهر وكل الشهور القادمة.",
+    icon: "warning",
+    buttons: {
+      confirm: {
+        text: "نعم",
+        className: "btn btn-success",
+      },
+      cancel: {
+        text: "لا",
+        visible: true,
+        className: "btn btn-danger",
+      },
+    },
+  }).then((confirmed) => {
+    if (confirmed) {
+      // Update the original value to the new value
+      $(this).data("original-value", newMadaTax);
+      // Recalculate taxes
+      calculateMadaTaxes();
+    } else {
+      // Revert to original value
+      $(this).val(originalMadaTax);
+      calculateMadaTaxes();
+    }
+  });
+});
+
+// Visa tax change handler
+$(document).on("change", "#visa-tax", function () {
+  const newVisaTax = $(this).val();
+  const originalVisaTax = $(this).data("original-value") || newVisaTax;
+
+  if (!newVisaTax || isNaN(newVisaTax)) return;
+
+  // Store original value if not already stored
+  if (!$(this).data("original-value")) {
+    $(this).data("original-value", originalVisaTax);
+  }
+
+  // Show confirmation dialog for visa tax change
+  swal({
+    title: "تغيير قيمة الضريبة (%) للفيزا",
+    text: "هل أنت متأكد أنك تريد تغيير قيمة الضريبة (%) للفيزا لهذا الفرع؟ سيؤثر ذلك على هذا الشهر وكل الشهور القادمة.",
+    icon: "warning",
+    buttons: {
+      confirm: {
+        text: "نعم",
+        className: "btn btn-success",
+      },
+      cancel: {
+        text: "لا",
+        visible: true,
+        className: "btn btn-danger",
+      },
+    },
+  }).then((confirmed) => {
+    if (confirmed) {
+      // Update the original value to the new value
+      $(this).data("original-value", newVisaTax);
+      // Recalculate taxes
+      calculateVisaTaxes();
+    } else {
+      // Revert to original value
+      $(this).val(originalVisaTax);
+      calculateVisaTaxes();
+    }
   });
 });
 
@@ -490,17 +614,8 @@ madaRatio.addEventListener("change", function (e) {
   });
 });
 
-visaRatio.addEventListener("change", (e) => {
-  calculateVisaTaxes();
-});
-
-madaTax.addEventListener("change", (e) => {
-  calculateMadaTaxes();
-});
-
-visaTax.addEventListener("change", (e) => {
-  calculateVisaTaxes();
-});
+// These event listeners are now handled by the jQuery change handlers above
+// which include confirmation dialogs
 
 // Live sum for Paid Amount
 $(document).on("input", ".paid-field", function () {

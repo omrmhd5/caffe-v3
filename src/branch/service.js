@@ -22,12 +22,69 @@ async function getRentForMonth(branch, date) {
 
 // Helper to get mada ratio for a branch for a specific date
 async function getMadaRatioForMonth(branch, date) {
-  if (!branch.madaRatioHistory || branch.madaRatioHistory.length === 0)
+  if (
+    !branch.historyValues?.madaRatio ||
+    branch.historyValues.madaRatio.length === 0
+  )
     return 0;
   const d = new Date(date);
   // Find the most recent mada ratio entry before or at the given date
   let best = null;
-  for (const entry of branch.madaRatioHistory) {
+  for (const entry of branch.historyValues.madaRatio) {
+    if (entry.fromDate <= d && (!best || entry.fromDate > best.fromDate)) {
+      best = entry;
+    }
+  }
+  return best ? best.value : 0;
+}
+
+// Helper to get visa ratio for a branch for a specific date
+async function getVisaRatioForMonth(branch, date) {
+  if (
+    !branch.historyValues?.visaRatio ||
+    branch.historyValues.visaRatio.length === 0
+  )
+    return 0;
+  const d = new Date(date);
+  // Find the most recent visa ratio entry before or at the given date
+  let best = null;
+  for (const entry of branch.historyValues.visaRatio) {
+    if (entry.fromDate <= d && (!best || entry.fromDate > best.fromDate)) {
+      best = entry;
+    }
+  }
+  return best ? best.value : 0;
+}
+
+// Helper to get mada tax for a branch for a specific date
+async function getMadaTaxForMonth(branch, date) {
+  if (
+    !branch.historyValues?.madaTax ||
+    branch.historyValues.madaTax.length === 0
+  )
+    return 0;
+  const d = new Date(date);
+  // Find the most recent mada tax entry before or at the given date
+  let best = null;
+  for (const entry of branch.historyValues.madaTax) {
+    if (entry.fromDate <= d && (!best || entry.fromDate > best.fromDate)) {
+      best = entry;
+    }
+  }
+  return best ? best.value : 0;
+}
+
+// Helper to get visa tax for a branch for a specific date
+async function getVisaTaxForMonth(branch, date) {
+  if (
+    !branch.historyValues?.visaTax ||
+    branch.historyValues.visaTax.length === 0
+  )
+    return 0;
+  const d = new Date(date);
+  // Find the most recent visa tax entry before or at the given date
+  let best = null;
+  for (const entry of branch.historyValues.visaTax) {
     if (entry.fromDate <= d && (!best || entry.fromDate > best.fromDate)) {
       best = entry;
     }
@@ -169,11 +226,83 @@ exports.updateRentHistory = async (id, value, fromDate) => {
 exports.updateMadaRatioHistory = async (id, value, fromDate) => {
   const branch = await Branch.findById(id);
   if (!branch) throw new NotFoundException("الفرع غير موجود");
+  // Initialize historyValues if it doesn't exist
+  if (!branch.historyValues) {
+    branch.historyValues = {
+      madaRatio: [],
+      visaRatio: [],
+      madaTax: [],
+      visaTax: [],
+    };
+  }
   // Remove all future mada ratio history entries from this date forward
-  branch.madaRatioHistory = branch.madaRatioHistory.filter(
+  branch.historyValues.madaRatio = branch.historyValues.madaRatio.filter(
     (entry) => new Date(entry.fromDate) < new Date(fromDate)
   );
-  branch.madaRatioHistory.push({ value, fromDate });
+  branch.historyValues.madaRatio.push({ value, fromDate });
+  await branch.save();
+  return branch;
+};
+
+exports.updateVisaRatioHistory = async (id, value, fromDate) => {
+  const branch = await Branch.findById(id);
+  if (!branch) throw new NotFoundException("الفرع غير موجود");
+  // Initialize historyValues if it doesn't exist
+  if (!branch.historyValues) {
+    branch.historyValues = {
+      madaRatio: [],
+      visaRatio: [],
+      madaTax: [],
+      visaTax: [],
+    };
+  }
+  // Remove all future visa ratio history entries from this date forward
+  branch.historyValues.visaRatio = branch.historyValues.visaRatio.filter(
+    (entry) => new Date(entry.fromDate) < new Date(fromDate)
+  );
+  branch.historyValues.visaRatio.push({ value, fromDate });
+  await branch.save();
+  return branch;
+};
+
+exports.updateMadaTaxHistory = async (id, value, fromDate) => {
+  const branch = await Branch.findById(id);
+  if (!branch) throw new NotFoundException("الفرع غير موجود");
+  // Initialize historyValues if it doesn't exist
+  if (!branch.historyValues) {
+    branch.historyValues = {
+      madaRatio: [],
+      visaRatio: [],
+      madaTax: [],
+      visaTax: [],
+    };
+  }
+  // Remove all future mada tax history entries from this date forward
+  branch.historyValues.madaTax = branch.historyValues.madaTax.filter(
+    (entry) => new Date(entry.fromDate) < new Date(fromDate)
+  );
+  branch.historyValues.madaTax.push({ value, fromDate });
+  await branch.save();
+  return branch;
+};
+
+exports.updateVisaTaxHistory = async (id, value, fromDate) => {
+  const branch = await Branch.findById(id);
+  if (!branch) throw new NotFoundException("الفرع غير موجود");
+  // Initialize historyValues if it doesn't exist
+  if (!branch.historyValues) {
+    branch.historyValues = {
+      madaRatio: [],
+      visaRatio: [],
+      madaTax: [],
+      visaTax: [],
+    };
+  }
+  // Remove all future visa tax history entries from this date forward
+  branch.historyValues.visaTax = branch.historyValues.visaTax.filter(
+    (entry) => new Date(entry.fromDate) < new Date(fromDate)
+  );
+  branch.historyValues.visaTax.push({ value, fromDate });
   await branch.save();
   return branch;
 };

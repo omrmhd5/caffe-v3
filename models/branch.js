@@ -28,12 +28,32 @@ const branchSchema = new mongoose.Schema({
       fromDate: { type: Date, required: true },
     },
   ],
-  madaRatioHistory: [
-    {
-      value: { type: Number, required: true },
-      fromDate: { type: Date, required: true },
-    },
-  ],
+  historyValues: {
+    madaRatio: [
+      {
+        value: { type: Number, required: true },
+        fromDate: { type: Date, required: true },
+      },
+    ],
+    visaRatio: [
+      {
+        value: { type: Number, required: true },
+        fromDate: { type: Date, required: true },
+      },
+    ],
+    madaTax: [
+      {
+        value: { type: Number, required: true },
+        fromDate: { type: Date, required: true },
+      },
+    ],
+    visaTax: [
+      {
+        value: { type: Number, required: true },
+        fromDate: { type: Date, required: true },
+      },
+    ],
+  },
   // custodies: [
   //   {
   //     type: mongoose.Schema.Types.ObjectId,
