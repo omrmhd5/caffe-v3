@@ -66,7 +66,9 @@ const invoiceSchema = new mongoose.Schema(
   }
 );
 
-invoiceSchema.index({description: 'text'});
+invoiceSchema.index({ description: "text" });
+// Add unique compound index to prevent duplicate serial numbers within the same branch
+invoiceSchema.index({ branchID: 1, serialNumber: 1 }, { unique: true });
 
 const Invoice = mongoose.model("Invoice", invoiceSchema);
 

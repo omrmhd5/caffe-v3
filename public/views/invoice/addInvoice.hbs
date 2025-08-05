@@ -23,7 +23,7 @@
           </div>
         </div>
         <div class="card-body px-0" dir="rtl">
-          <form action="/invoice/add" method="POST" enctype="multipart/form-data" class="col-md-8 col-12 mx-auto">
+          <form action="/invoice/add" method="POST" enctype="multipart/form-data" class="col-md-8 col-12 mx-auto" id="invoiceForm">
             <div class="row form-group">
               
               <div class="col">
@@ -172,7 +172,7 @@
               </div>
             </div>
             <div class=" Center row">
-              <button type="submit" class=" btnclass mx-auto mx-md-2">
+              <button type="submit" class=" btnclass mx-auto mx-md-2" id="submitBtn">
                 <h6 class="select"> أضف الفاتورة </h6>
               </button>
               <a href="/invoice" class="btnclass signature px-3 btn-round">
@@ -208,6 +208,28 @@
   if (window.history.replaceState) {
     window.history.replaceState(null, null, window.location.href);
   }
+
+  // Form submission protection to prevent double-clicking
+  let isSubmitting = false;
+  
+  document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+    if (isSubmitting) {
+      e.preventDefault();
+      return false;
+    }
+    
+    isSubmitting = true;
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<h6 class="select">جاري الإضافة...</h6>';
+    
+    // Re-enable after 5 seconds in case of error
+    setTimeout(() => {
+      isSubmitting = false;
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<h6 class="select">أضف الفاتورة</h6>';
+    }, 5000);
+  });
 </script>
 
 {{> footer/invoiceFooter}}
