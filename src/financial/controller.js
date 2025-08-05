@@ -87,19 +87,16 @@ exports.updateFinancials = async (req, res) => {
 exports.createFinancials = async (req, res) => {
   let data = JSON.parse(req.body.data);
   let notes = JSON.parse(req.body.notes);
-  let rentNotes = JSON.parse(req.body.rentNotes);
+  let rentDates = JSON.parse(req.body.rentDates);
   let date = req.body.date;
 
   let partnersCount = req.body.partnersCount;
   await partnerService.update(date, partnersCount);
   await noteService.addBulk(date, notes, req.user.companyID._id);
 
-  for (let rentNote of rentNotes) {
-    await financialService.updateRentNote(
-      rentNote.branchID,
-      rentNote.note,
-      date
-    );
+  // Update rent dates in branch metadata
+  for (let rentDate of rentDates) {
+    await branchService.updateRentDate(rentDate.branchID, rentDate.rentDate);
   }
 
   for (let financial of data) {

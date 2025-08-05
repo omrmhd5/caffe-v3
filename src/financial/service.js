@@ -378,8 +378,8 @@ exports.showAdd = async (date, user) => {
     financial.branchname = branch.branchname;
     financial.branchID = branch._id;
 
-    // Set rent comment directly from comment field
-    financial.rentComment = financial.comment || "";
+    // Set rent date from branch metadata
+    financial.rentComment = branch.rentDate || "";
 
     financial.bankRatio = taxValue ? taxValue.taxRatioTotal : 0;
     totalBankRatio += financial.bankRatio;

@@ -307,6 +307,14 @@ exports.updateVisaTaxHistory = async (id, value, fromDate) => {
   return branch;
 };
 
+exports.updateRentDate = async (id, rentDate) => {
+  const branch = await Branch.findById(id);
+  if (!branch) throw new NotFoundException("الفرع غير موجود");
+  branch.rentDate = rentDate || "";
+  await branch.save();
+  return branch;
+};
+
 exports.isBranchEditable = async (id, date) => {
   const branch = await Branch.findById(id);
   if (!branch) throw new NotFoundException("الفرع غير موجود");

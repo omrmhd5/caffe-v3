@@ -54,6 +54,10 @@ const branchSchema = new mongoose.Schema({
       },
     ],
   },
+  rentDate: {
+    type: String,
+    default: "",
+  },
   // custodies: [
   //   {
   //     type: mongoose.Schema.Types.ObjectId,

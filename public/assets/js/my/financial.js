@@ -283,18 +283,17 @@ const sendData = async () => {
     });
   }
 
-  let rentNotesElements = document.getElementsByClassName("rent-note-input");
+  let rentDatesElements = document.getElementsByClassName("rent-note-input");
   let rentBranchIDs = document.getElementsByClassName("rent-branch-id");
 
-  let rentNotes = [];
-  for (let i = 0; i < rentNotesElements.length; i++) {
-    if (!rentNotesElements[i].value) {
-      rentNotesElements[i].value = "";
+  let rentDates = [];
+  for (let i = 0; i < rentDatesElements.length; i++) {
+    if (!rentDatesElements[i].value) {
+      rentDatesElements[i].value = "";
     }
-    rentNotes.push({
+    rentDates.push({
       branchID: rentBranchIDs[i].innerHTML,
-      note: rentNotesElements[i].value,
-      date,
+      rentDate: rentDatesElements[i].value,
     });
   }
 
@@ -308,7 +307,7 @@ const sendData = async () => {
         partnersCount,
         date,
         notes: JSON.stringify(notes),
-        rentNotes: JSON.stringify(rentNotes),
+        rentDates: JSON.stringify(rentDates),
       });
     })
     .catch(function () {
