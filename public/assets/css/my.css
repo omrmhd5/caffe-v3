@@ -1,38 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Cairo&display=swap");
 :root {
   --colorNavbar: #023047;
   --colorHover2: #ffb703;
   --colorButi1: #ebedf2;
-  --bgColor: rgba(0,0,0,.03);
+  --bgColor: rgba(0, 0, 0, 0.03);
 }
 @media print {
-  body {overflow: visible !important;}
+  body {
+    overflow: visible !important;
+  }
 }
 /* @font-face {
   font-family: 'cairo', 'Sakkal Majalla';
   src: url('./majalla.ttf');
 } */
-td {text-align: center;}
-th {text-align: center;}
-.text-left {text-align: left;}
-.text-right {text-align: right;}
-.text-center {text-align: center;}
+td {
+  text-align: center;
+}
+th {
+  text-align: center;
+}
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}
+.text-center {
+  text-align: center;
+}
 
-html, body {
-  font-family: 'Cairo', sans-serif !important;
+html,
+body {
+  font-family: "Cairo", sans-serif !important;
   max-width: 100%;
   overflow-x: hidden;
   background-color: var(--bgColor);
   color: #fff;
 }
 
-.navbar_color {background-color: var(--colorNavbar);}
+.navbar_color {
+  background-color: var(--colorNavbar);
+}
 
 .navbar .navbar-nav .nav-item .nav-link {
   font-size: 14px;
   display: flex;
   justify-content: center;
-  color: #F5F5F5;
+  color: #f5f5f5;
   border: 1.3px solid;
   border-radius: 10px;
   margin: 5px;
@@ -42,14 +57,14 @@ html, body {
 .navbar .navbar-nav .nav-item .nav-link:hover {
   background-color: #f6f6f6;
   color: #023047;
-  transition: all .7s ease
+  transition: all 0.7s ease;
 }
 
-@media(max-width:767px) {
+@media (max-width: 767px) {
   .navbar .navbar-nav .nav-item .nav-link:hover {
     background-color: inherit;
     color: #fff;
-    transition: all .7s ease
+    transition: all 0.7s ease;
   }
 }
 
@@ -59,7 +74,9 @@ html, body {
   height: 2rem;
 }
 
-.dropdown-toggle::after {content: none;}
+.dropdown-toggle::after {
+  content: none;
+}
 
 .custom-file-label::after {
   left: 0;
@@ -75,18 +92,20 @@ html, body {
   width: 100%;
 }
 
-.logoImg {width: 10%;}
+.logoImg {
+  width: 10%;
+}
 
-@media(max-width:767px) {
+@media (max-width: 767px) {
   .logoImg {
-    visibility: hidden
+    visibility: hidden;
   }
   .navLogOut .nav-link {
     border: none !important;
   }
   .navLogo {
     margin-top: -70px;
-  }  
+  }
   .select {
     margin: 0;
     font-size: 20px;
@@ -98,7 +117,7 @@ html, body {
     display: grid;
   }
   .width-edit {
-    width: 15rem
+    width: 15rem;
   }
   .navbar-expand .navbar-nav .dropdown-menu {
     position: initial !important;
@@ -112,15 +131,15 @@ html, body {
     top: 80vh !important;
     left: 50vw !important;
   }
-  .show+.navLogOut {
+  .show + .navLogOut {
     right: 4rem;
     width: auto;
     margin-top: inherit;
     position: relative;
   }
 }
-@media(min-width:767px)and(max-width:1025px){
-  .navLogOut{
+@media (min-width: 767px) and(max-width:1025px) {
+  .navLogOut {
     width: 100% !important;
   }
 }
@@ -191,7 +210,9 @@ html, body {
   padding: 10px;
 }
 
-input {text-align: center;}
+input {
+  text-align: center;
+}
 
 .btnclass {
   padding: 5px 10px;
@@ -206,20 +227,23 @@ input {text-align: center;}
   margin: 10px;
   text-decoration: none;
   cursor: pointer;
-  transition: all ease .5s;
+  transition: all ease 0.5s;
 }
-
 
 .btnclass:hover {
   background-color: #023047d3;
-  transition: all .7s ease;
+  transition: all 0.7s ease;
 }
-h6 {text-decoration: none;}
+h6 {
+  text-decoration: none;
+}
 .select {
   margin-bottom: 0;
   font-size: 20px;
 }
-h6.select {cursor: pointer;}
+h6.select {
+  cursor: pointer;
+}
 
 .disabled {
   opacity: 0.6;
@@ -240,7 +264,9 @@ h6.select {cursor: pointer;}
   border: 1px solid;
   border: none;
 }
-.ptable {text-align: center;}
+.ptable {
+  text-align: center;
+}
 
 .totalBtn {
   border-radius: 10px;
@@ -275,7 +301,8 @@ a {
   font-size: 100px;
   text-align: center;
 }
-.dropdown-item:focus, .dropdown-item:hover {
+.dropdown-item:focus,
+.dropdown-item:hover {
   color: #fff;
   text-decoration: none;
   background-color: #023047;
@@ -285,7 +312,9 @@ a {
   outline: none;
   border: none;
 }
-.width-edit {width: 23rem}
+.width-edit {
+  width: 23rem;
+}
 
 .note {
   line-height: 0;
@@ -300,35 +329,56 @@ a {
   border: none;
 }
 
-.signature { width: auto !important;}
-.cursor {cursor: pointer;}
-.width8rem {min-width: 8rem !important;}
-.width6rem {width: 6rem !important;}
-input[type=checkbox], input[type=radio] {height: 40px;}
+.signature {
+  width: auto !important;
+}
+.cursor {
+  cursor: pointer;
+}
+.width8rem {
+  min-width: 8rem !important;
+}
+.width6rem {
+  width: 6rem !important;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  height: 40px;
+}
 .navbar-toggler {
   border: none;
   outline: none;
 }
-.navbar-toggler-icon {color: #fff;}
-.hoverOption:focus, .hoverOption:hover {background-color: var(--colorNavbar) !important;}
-.card .card-header, .card-light .card-header{
-  color:var(--colorNavbar) !important;
+.navbar-toggler-icon {
+  color: #fff;
 }
-.form-group label, .form-check label {
-  margin-bottom: .5rem;
+.hoverOption:focus,
+.hoverOption:hover {
+  background-color: var(--colorNavbar) !important;
+}
+.card .card-header,
+.card-light .card-header {
+  color: var(--colorNavbar) !important;
+}
+.form-group label,
+.form-check label {
+  margin-bottom: 0.5rem;
   color: #495057;
   /* font-weight: 600; */
   font-size: 1rem;
-  white-space: nowrap; }
-.swal-modal{
-height: auto;
-width:235px;
-border-radius: 15px;
-background-color: var(--colorNavbar);
+  white-space: nowrap;
+}
+.swal-modal {
+  height: auto;
+  width: 235px;
+  border-radius: 15px;
+  background-color: var(--colorNavbar);
 }
 
-.swal-title,.swal-footer,.swal-text{
-  font-size:16px;
+.swal-title,
+.swal-footer,
+.swal-text {
+  font-size: 16px;
   color: #fff !important;
   text-align: center;
 }
@@ -338,6 +388,6 @@ background-color: var(--colorNavbar);
   background-color:#fff !important;
   color: var(--colorNavbar) !important;
 } */
-.d-income-tr{
+.d-income-tr {
   background-color: inherit !important;
 }

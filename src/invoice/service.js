@@ -197,13 +197,7 @@ exports.createInvoice = async (
     throw new BadRequestException("الرجاء إدخال اسم المورد ورقم الفاتورة");
   }
 
-  // Check if invoice with same serial number already exists in this branch
-  const existingInvoice = await Invoice.findOne({ branchID, serialNumber });
-  if (existingInvoice) {
-    throw new BadRequestException(
-      `رقم القيد ${serialNumber} موجود مسبقاً في هذا الفرع`
-    );
-  }
+  // Removed duplicate serial number validation - allowing duplicates
 
   // if ((!taxValue || taxValue < 0) && (supplierName || invoiceNumber || supplierTaxNumber)) {
   //   throw new BadRequestException(" الرجاء حذف اسم ورقم المورد ورقم الفاتورة أو إضافة قيمة الضريبة");
@@ -287,17 +281,7 @@ exports.updateInvoice = async (
   }
 
   if (serialNumber) {
-    // Check if the new serial number already exists in the same branch (excluding current invoice)
-    const existingInvoice = await Invoice.findOne({
-      branchID: invoice.branchID._id,
-      serialNumber: serialNumber,
-      _id: { $ne: id }, // Exclude current invoice from check
-    });
-    if (existingInvoice) {
-      throw new BadRequestException(
-        `رقم القيد ${serialNumber} موجود مسبقاً في هذا الفرع`
-      );
-    }
+    // Removed duplicate serial number validation - allowing duplicates
     update.serialNumber = serialNumber;
   }
 
