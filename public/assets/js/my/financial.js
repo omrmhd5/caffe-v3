@@ -370,7 +370,7 @@ const validateFinancialInput = (
     income = numeral(income).value().toFixed(2);
   }
 
-  if (!rent || isNaN(rent)) {
+  if (rent === undefined || rent === null || rent === "" || isNaN(rent)) {
     rent = "0";
   } else {
     rent = parseFloat(rent).toFixed(2);
@@ -436,7 +436,7 @@ const calculateRentColumntTotal = () => {
 
   $("tr .rent").each(function (index, value) {
     let currentValue = parseFloat($(this).val());
-    if (!currentValue || isNaN(currentValue)) {
+    if (isNaN(currentValue)) {
       currentValue = 0;
     } else {
       currentValue = currentValue;
@@ -454,7 +454,7 @@ const calculateBankRatioColumntTotal = () => {
 
   $("tr .bank-ratio").each(function (index, value) {
     let currentValue = parseFloat($(this).val());
-    if (!currentValue || isNaN(currentValue)) {
+    if (isNaN(currentValue)) {
       currentValue = 0;
     } else {
       currentValue = currentValue;
@@ -472,7 +472,7 @@ const calculateSaudizationSalaryColumntTotal = () => {
 
   $("tr .saudization-salary").each(function (index, value) {
     let currentValue = parseFloat($(this).val());
-    if (!currentValue || isNaN(currentValue)) {
+    if (isNaN(currentValue)) {
       currentValue = 0;
     } else {
       currentValue = currentValue;
@@ -490,7 +490,7 @@ const calculateBillsColumntTotal = () => {
 
   $("tr .bills").each(function (index, value) {
     let currentValue = parseFloat($(this).val());
-    if (!currentValue || isNaN(currentValue)) {
+    if (isNaN(currentValue)) {
       currentValue = 0;
     } else {
       currentValue = currentValue;
@@ -508,7 +508,7 @@ const calculateBills1ColumntTotal = () => {
 
   $("tr .bills1").each(function (index, value) {
     let currentValue = parseFloat($(this).val());
-    if (!currentValue || isNaN(currentValue)) {
+    if (isNaN(currentValue)) {
       currentValue = 0;
     } else {
       currentValue = currentValue;
@@ -526,7 +526,7 @@ const calculateBills2ColumntTotal = () => {
 
   $("tr .bills2").each(function (index, value) {
     let currentValue = parseFloat($(this).val());
-    if (!currentValue || isNaN(currentValue)) {
+    if (isNaN(currentValue)) {
       currentValue = 0;
     } else {
       currentValue = currentValue;
@@ -544,7 +544,7 @@ const calculateTotalIncomeColumntTotal = () => {
 
   $("tr .net-income").each(function (index, value) {
     let currentValue = $(this).val();
-    if (!currentValue) {
+    if (currentValue === undefined || currentValue === null || currentValue === "") {
       currentValue = 0;
     } else {
       currentValue = numeral(currentValue).value();
@@ -626,7 +626,7 @@ $(document).on("change", ".rent", function () {
   const originalRent = $(this).data("original-value") || newRent;
   const date = $("#query-date").val();
 
-  if (!branchID || !newRent || isNaN(newRent)) return;
+  if (!branchID || newRent === undefined || newRent === null || newRent === "" || isNaN(newRent)) return;
 
   // Store original value if not already stored
   if (!$(this).data("original-value")) {
@@ -709,7 +709,7 @@ function recalculateAllNetIncomeRows() {
     let bills2Value = $(".bills2", row).val();
 
     // Use the same validation as validateFinancialInput
-    const validate = (v) => (!v || isNaN(v) ? 0 : parseFloat(v));
+    const validate = (v) => (v === undefined || v === null || v === "" || isNaN(v) ? 0 : parseFloat(v));
     let income = validate(incomeValue);
     let rent = validate(rentValue);
     let expenses = validate(expensesValue);
@@ -801,7 +801,7 @@ const calculateTotalSalariesColumntTotal = () => {
   let totalSalaries = 0;
   $("tr .salaries").each(function (index, value) {
     let currentValue = $(this).val();
-    if (!currentValue) {
+    if (currentValue === undefined || currentValue === null || currentValue === "") {
       currentValue = 0;
     } else {
       currentValue = numeral(currentValue).value();

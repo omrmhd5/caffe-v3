@@ -101,7 +101,11 @@ exports.createFinancials = async (req, res) => {
 
   for (let financial of data) {
     // Update branch rent history if rent is provided
-    if (financial.rent && parseFloat(financial.rent) > 0) {
+    if (
+      financial.rent !== undefined &&
+      financial.rent !== null &&
+      !isNaN(parseFloat(financial.rent))
+    ) {
       await branchService.updateRentHistory(
         financial.branchID,
         parseFloat(financial.rent),
