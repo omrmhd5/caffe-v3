@@ -26,6 +26,7 @@ const dailyIncomeRoutes = require("./src/dailyIncome/router");
 const indexRoutes = require("./src/routes/index");
 const taxValueRoutes = require("./src/taxValue/router");
 const paymentValueRouter = require("./src/paymentValue/router");
+const backgroundRoutes = require("./src/background/router");
 
 const cookieParser = require("cookie-parser");
 
@@ -131,6 +132,14 @@ hbs.registerHelper("sum", function () {
   return total;
 });
 
+hbs.registerHelper("formatFileSize", function (bytes) {
+  if (!bytes || bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+});
+
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "./public")));
 app.set("view engine", "hbs");
@@ -157,6 +166,7 @@ app.use("/financial", financialRoutes);
 app.use("/dailyIncome", dailyIncomeRoutes);
 app.use("/taxValue", taxValueRoutes);
 app.use("/paymentValue", paymentValueRouter);
+app.use("/background", backgroundRoutes);
 
 app.use("/", indexRoutes);
 

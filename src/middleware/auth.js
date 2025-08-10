@@ -6,7 +6,7 @@ const {
   UnauthorizedException,
 } = require("../common/errors/exceptions");
 
-// Helper function to check if token is about to expire (within 120 seconds)
+// Helper function to check if token is about to expire (within 5 minutes)
 const isTokenExpiringSoon = (token) => {
   try {
     const decoded = jwt.decode(token);
@@ -15,8 +15,8 @@ const isTokenExpiringSoon = (token) => {
     const now = Math.floor(Date.now() / 1000);
     const timeUntilExpiry = decoded.exp - now;
 
-    // Refresh if token expires within 120 seconds
-    return timeUntilExpiry <= 120;
+    // Refresh if token expires within 5 minutes (300 seconds)
+    return timeUntilExpiry <= 300;
   } catch (error) {
     return true;
   }

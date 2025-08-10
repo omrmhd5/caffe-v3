@@ -1,0 +1,439 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<link rel="stylesheet" href="/assets/css/my.css">
+<style>
+  .background-change-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  }
+
+  .current-background {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 2px dashed #ddd;
+    border-radius: 10px;
+  }
+
+  .current-background img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  .upload-section {
+    text-align: center;
+    padding: 30px;
+    border: 2px dashed #007bff;
+    border-radius: 10px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+  }
+
+  .upload-section:hover {
+    border-color: #0056b3;
+    background: #e9ecef;
+  }
+
+  .file-input-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  .file-input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .upload-btn {
+    display: inline-block;
+    padding: 15px 30px;
+    background: #007bff;
+    color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .upload-btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+  }
+
+  .file-info {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .change-btn {
+    margin-top: 20px;
+    padding: 12px 30px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: none;
+  }
+
+  .change-btn:hover {
+    background: #218838;
+    transform: translateY(-1px);
+  }
+
+  .change-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .alert {
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 6px;
+    display: none;
+  }
+
+  .alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+
+  .loading {
+    display: none;
+    text-align: center;
+    margin: 20px 0;
+  }
+
+  .spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .background-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+
+  .background-info h5 {
+    margin-bottom: 10px;
+    color: #495057;
+  }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    padding: 5px 0;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .info-label {
+    font-weight: bold;
+    color: #6c757d;
+  }
+
+  .info-value {
+    color: #495057;
+  }
+
+  .back-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+  }
+
+  .back-btn:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+  }
+
+  .back-btn i {
+    margin-left: 8px;
+  }
+</style>
+
+<div dir="auto">
+  <div class="col-md-12">
+    <div class="headerPage">
+      <div class="Title">
+        <h2 style="text-align: center; color:white;">
+          تغيير خلفية النظام
+        </h2>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-body">
+        <!-- Back Button -->
+        <div class="d-print-none mb-3">
+          <button class="back-btn" onclick="goBack()">
+            <i class="fas fa-arrow-right"></i>
+            رجوع
+          </button>
+        </div>
+
+        <div class="background-change-container" dir="rtl">
+          <div class="text-center mb-4">
+            <h3 class="text-primary">اختر صورة جديدة لخلفية النظام</h3>
+            <p class="text-muted">يمكنك رفع صورة جديدة لتغيير خلفية النظام</p>
+          </div>
+
+          <!-- Current Background Display -->
+          <div class="current-background">
+            <h5 class="mb-3">الخلفية الحالية</h5>
+            {{#if backgroundInfo.exists}}
+              <img src="{{backgroundInfo.path}}?v={{backgroundInfo.modified}}" alt="Current Background" id="current-bg">
+              <div class="background-info mt-3">
+                <h5>معلومات الخلفية</h5>
+                <div class="info-item">
+                  <span class="info-label">اسم الملف:</span>
+                  <span class="info-value">{{backgroundInfo.filename}}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">الحجم:</span>
+                  <span class="info-value">{{formatFileSize backgroundInfo.size}}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">آخر تعديل:</span>
+                  <span class="info-value">{{formatDate backgroundInfo.modified}}</span>
+                </div>
+              </div>
+            {{else}}
+              <div class="text-muted">
+                <i class="fas fa-image fa-3x mb-3"></i>
+                <p>لا توجد خلفية محددة حالياً</p>
+              </div>
+            {{/if}}
+          </div>
+
+          <!-- Upload Section -->
+          <div class="upload-section">
+            <h5 class="mb-3">اختر صورة جديدة</h5>
+            <div class="file-input-wrapper">
+              <input type="file" id="backgroundFile" class="file-input" accept="image/*">
+              <label for="backgroundFile" class="upload-btn">
+                <i class="fas fa-upload mr-2"></i>
+                اختر صورة
+              </label>
+            </div>
+            
+            <div class="file-info" id="fileInfo" style="display: none;">
+              <p><strong>الملف المختار:</strong> <span id="fileName"></span></p>
+              <p><strong>الحجم:</strong> <span id="fileSize"></span></p>
+              <p><strong>النوع:</strong> <span id="fileType"></span></p>
+            </div>
+
+            <button class="change-btn" id="changeBtn" onclick="changeBackground()">
+              <i class="fas fa-save mr-2"></i>
+              تغيير الخلفية
+            </button>
+          </div>
+
+          <!-- Alerts -->
+          <div class="alert alert-success" id="successAlert"></div>
+          <div class="alert alert-danger" id="errorAlert"></div>
+
+          <!-- Loading -->
+          <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p class="mt-2">جاري تغيير الخلفية...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedFile = null;
+
+// File input change handler
+document.getElementById('backgroundFile').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    selectedFile = file;
+    showFileInfo(file);
+    document.getElementById('changeBtn').style.display = 'inline-block';
+  } else {
+    selectedFile = null;
+    hideFileInfo();
+    document.getElementById('changeBtn').style.display = 'none';
+  }
+});
+
+// Show file information
+function showFileInfo(file) {
+  const fileInfo = document.getElementById('fileInfo');
+  const fileName = document.getElementById('fileName');
+  const fileSize = document.getElementById('fileSize');
+  const fileType = document.getElementById('fileType');
+
+  fileName.textContent = file.name;
+  fileSize.textContent = formatFileSize(file.size);
+  fileType.textContent = file.type;
+
+  fileInfo.style.display = 'block';
+}
+
+// Hide file information
+function hideFileInfo() {
+  document.getElementById('fileInfo').style.display = 'none';
+}
+
+// Format file size
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Change background function
+async function changeBackground() {
+  if (!selectedFile) {
+    showError('الرجاء اختيار ملف أولاً');
+    return;
+  }
+
+  // Show loading
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('changeBtn').disabled = true;
+
+  // Create FormData
+  const formData = new FormData();
+  formData.append('background', selectedFile);
+
+  try {
+    const response = await fetch('/background/change', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showSuccess(result.message);
+      
+      // Refresh the page after 2 seconds to show new background
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+    } else {
+      showError(result.message);
+    }
+  } catch (error) {
+    showError('حدث خطأ أثناء تغيير الخلفية');
+    console.error('Error:', error);
+  } finally {
+    // Hide loading
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('changeBtn').disabled = false;
+  }
+}
+
+// Show success message
+function showSuccess(message) {
+  const alert = document.getElementById('successAlert');
+  alert.textContent = message;
+  alert.style.display = 'block';
+  
+  setTimeout(() => {
+    alert.style.display = 'none';
+  }, 5000);
+}
+
+// Show error message
+function showError(message) {
+  const alert = document.getElementById('errorAlert');
+  alert.textContent = message;
+  alert.style.display = 'block';
+  
+  setTimeout(() => {
+    alert.style.display = 'none';
+  }, 5000);
+}
+
+// Go back function
+function goBack() {
+  window.history.back();
+}
+
+// Handle drag and drop
+const uploadSection = document.querySelector('.upload-section');
+
+uploadSection.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  uploadSection.style.borderColor = '#28a745';
+  uploadSection.style.background = '#e8f5e8';
+});
+
+uploadSection.addEventListener('dragleave', function(e) {
+  e.preventDefault();
+  uploadSection.style.borderColor = '#007bff';
+  uploadSection.style.background = '#f8f9fa';
+});
+
+uploadSection.addEventListener('drop', function(e) {
+  e.preventDefault();
+  uploadSection.style.borderColor = '#007bff';
+  uploadSection.style.background = '#f8f9fa';
+  
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    const file = files[0];
+    if (file.type.startsWith('image/')) {
+      document.getElementById('backgroundFile').files = files;
+      selectedFile = file;
+      showFileInfo(file);
+      document.getElementById('changeBtn').style.display = 'inline-block';
+    } else {
+      showError('الرجاء اختيار ملف صورة صحيح');
+    }
+  }
+});
+</script>
+
+{{> footer}}
