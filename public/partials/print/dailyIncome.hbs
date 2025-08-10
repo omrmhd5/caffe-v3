@@ -43,17 +43,52 @@
     text-align: center;
     border-color: black !important;
   }
+
+  /* Print-specific styles for repeating header on each page */
+  @media print {
+    .print-header {
+      display: table-header-group;
+    }
+    
+    .print-content {
+      display: table-row-group;
+    }
+    
+    /* Ensure proper page breaks */
+    .page-break {
+      page-break-before: always;
+    }
+    
+    /* Force table headers to repeat on each page */
+    thead {
+      display: table-header-group;
+    }
+    
+    tbody {
+      display: table-row-group;
+    }
+  }
 </style>
 
 <div class="card-body d-none d-print-block" style="padding-right: 0; padding-left: 0;" dir="rtl">
-  <div id="page-title" class="headerPage">
-    <h2>
-      يوميات {{branch.branchname}} لشهر {{month}}
-    </h2>
-  </div>
-
-  <div>
-    <table id="daily-income-printed-table" class="table table-bordered">
+  <!-- Main table structure to enable header repetition -->
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead class="print-header">
+      <tr>
+        <td>
+          <div id="page-title" class="headerPage">
+            <h2>
+              يوميات {{branch.branchname}} لشهر {{month}}
+            </h2>
+          </div>
+        </td>
+      </tr>
+    </thead>
+    
+    <tbody class="print-content">
+      <tr>
+        <td>
+          <table id="daily-income-printed-table" class="table table-bordered">
       <thead>
         <tr>
           <th width="10%"> التاريخ</th>
@@ -97,6 +132,20 @@
         </tr>
       </tbody>
     </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Page break to ensure title appears on page 2 -->
+    <div class="page-break"></div>
+
+    <!-- Second title for page 2 -->
+    <div id="page-title" class="headerPage" style="margin-top: 20px;">
+      <h2>
+        يوميات {{branch.branchname}} لشهر {{month}}
+      </h2>
+    </div>
 
     <!-- Daily Income Notes Section -->
     {{#if notes}}
@@ -337,5 +386,9 @@
 
     <!-- Paid/Received and Grand Total Table -->
     
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
