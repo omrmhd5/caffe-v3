@@ -1,48 +1,15 @@
 <style>
-  .table {
-    border-collapse: collapse;
-    color: black;
-  }
-
-  th p {
-    color: black;
-  }
-
-  .table td,
-  .table th {
-    height: 75% !important;
-    padding: .2rem !important;
-    text-align: center;
-  }
-
-  #page-title {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: auto;
-    color: black;
-    height: 75px;
-    width: 680px;
-    margin: 50px auto;
-  }
-
-  .tail-border {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: black;
-    height: 60px;
-    width: 320px;
-    margin: 50px auto;
-  }
-
-  .table-bordered td,
-  .table-bordered th {
-    text-align: center;
-    border-color: black !important;
-  }
+  .table { border-collapse: collapse; color: black; } th p { color: black; }
+  .table td, .table th { height: 75% !important; padding: .2rem !important;
+  text-align: center; } #page-title { border: 1px solid black; display: flex;
+  justify-content: center; align-items: center; padding: auto; color: black;
+  height: 75px; width: 680px; margin: 50px auto; } .tail-border { border: 1px
+  solid black; display: flex; justify-content: center; align-items: center;
+  color: black; height: 60px; width: 320px; margin: 50px auto; } .table-bordered
+  td, .table-bordered th { text-align: center; border-color: black !important; }
+  /* Page numbering - only using @page rule */ @media print { @page {
+  @bottom-center { content: counter(page); font-size: 18px; color: black;
+  margin-bottom: 20px; font-weight: bold; } } }
 </style>
 
 <div class="d-none d-print-block" dir="rtl" style="border: 1px solid white;">
@@ -50,9 +17,10 @@
     <h2>
       تقرير المخزن
       {{#if branch}}
-      فرع {{branch.branchname}}
+        فرع
+        {{branch.branchname}}
       {{/if}}
-      بتاريخ 
+      بتاريخ
       {{today}}
     </h2>
   </div>
@@ -81,31 +49,32 @@
                   <p> العدد الحالي </p>
                 </th>
                 <th scope="col">
-                   <p >العدد الحالي الفعلي</p> </th>
-                <th scope="col">
-                   <p > العجز</p> 
+                  <p>العدد الحالي الفعلي</p>
                 </th>
                 <th scope="col">
-                   <p > سعر الصنف</p> 
+                  <p> العجز</p>
                 </th>
                 <th scope="col">
-                   <p > قيمة العجز</p>
+                  <p> سعر الصنف</p>
+                </th>
+                <th scope="col">
+                  <p> قيمة العجز</p>
                 </th>
               </tr>
             </thead>
             <tbody>
               {{#each printedData}}
-              <tr>
-                <th scope="row">{{incremented @index}}</th>
-                <td>{{itemID.itemName}}</td>
-                <td>{{boughtquantity}}</td>
-                <td>{{soldquantity}}</td>
-                <td>{{currentquantity}}</td>
-                <td>{{realcurrentquantity}}</td>
-                <td>{{shortage}}</td>
-                <td>{{itemID.price}}</td>
-                <td>{{multiply itemID.price  shortage}}</td>
-              </tr>
+                <tr>
+                  <th scope="row">{{incremented @index}}</th>
+                  <td>{{itemID.itemName}}</td>
+                  <td>{{boughtquantity}}</td>
+                  <td>{{soldquantity}}</td>
+                  <td>{{currentquantity}}</td>
+                  <td>{{realcurrentquantity}}</td>
+                  <td>{{shortage}}</td>
+                  <td>{{itemID.price}}</td>
+                  <td>{{multiply itemID.price shortage}}</td>
+                </tr>
               {{/each}}
             </tbody>
           </table>
@@ -114,6 +83,5 @@
     </div>
   </div>
 </div>
-
 
 <!-- End Of Printed Part -->

@@ -67,6 +67,17 @@
     tbody {
       display: table-row-group;
     }
+    
+    /* Page numbering - only using @page rule */
+    @page {
+      @bottom-center {
+        content: counter(page);
+        font-size: 18px;
+        color: black;
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+    }
   }
 </style>
 

@@ -1,52 +1,15 @@
 <style>
-  .table {
-    border-collapse: collapse;
-    color: black;
-  }
-
-  th p {
-    color: black;
-  }
-
-  .table td,
-  .table th {
-    height: 75% !important;
-    padding: .2rem !important;
-    text-align: center;
-  }
-
-  #page-title {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: auto;
-    color: black;
-    height: 75px;
-    width: 680px;
-    margin: 50px auto;
-  }
-
-  .tail-border {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: black;
-    height: 60px;
-    width: 320px;
-    margin: 50px auto;
-  }
-
-  .table-bordered td,
-  .table-bordered th {
-    text-align: center;
-    border-color: black !important;
-  }
-
-  .print-border {
-    border: 1px solid black;
-  }
+  .table { border-collapse: collapse; color: black; } th p { color: black; }
+  .table td, .table th { height: 75% !important; padding: .2rem !important;
+  text-align: center; } #page-title { border: 1px solid black; display: flex;
+  justify-content: center; align-items: center; padding: auto; color: black;
+  height: 75px; width: 680px; margin: 50px auto; } .tail-border { border: 1px
+  solid black; display: flex; justify-content: center; align-items: center;
+  color: black; height: 60px; width: 320px; margin: 50px auto; } .table-bordered
+  td, .table-bordered th { text-align: center; border-color: black !important; }
+  .print-border { border: 1px solid black; } /* Page numbering - only using
+  @page rule */ @media print { @page { @bottom-center { content: counter(page);
+  font-size: 18px; color: black; margin-bottom: 20px; font-weight: bold; } } }
 </style>
 
 <div class="d-none d-print-block" dir="rtl" style="border: 1px solid white;">
@@ -54,10 +17,13 @@
     <h2 style="text-align: center;">
       المبيعات
       {{#if branch}}
-      فرع {{branch.branchname}}
-      <br>
-      من {{fromDate}}
-      إلى {{toDate}}
+        فرع
+        {{branch.branchname}}
+        <br />
+        من
+        {{fromDate}}
+        إلى
+        {{toDate}}
       {{/if}}
     </h2>
   </div>
@@ -79,13 +45,13 @@
             </thead>
             <tbody>
               {{#each printedData}}
-              <tr>
-                <th scope="row">{{incremented @index}}</th>
-                <td>{{itemID.itemName}}</td>
-                <td>{{price}}</td>
-                <td>{{checkOrZeror boughtquantity}}</td>
-                <td><strong class="total-price">{{totalprice}}</strong></td>
-              </tr>
+                <tr>
+                  <th scope="row">{{incremented @index}}</th>
+                  <td>{{itemID.itemName}}</td>
+                  <td>{{price}}</td>
+                  <td>{{checkOrZeror boughtquantity}}</td>
+                  <td><strong class="total-price">{{totalprice}}</strong></td>
+                </tr>
               {{/each}}
               <tr>
                 <td><strong>المجموع</strong></td>

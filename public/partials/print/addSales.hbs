@@ -1,56 +1,30 @@
 <style>
-  .table {
-    border-collapse: collapse;
-    color: black;
-  }
-
-  th p {
-    color: black;
-  }
-
-  .table td,
-  .table th {
-    padding: .2rem !important;
-    text-align: center;
-  }
-
-  #page-title {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: auto;
-    color: black;
-    height: 75px;
-    width: 680px;
-    margin: 50px auto;
-  }
-
-  .tail-border {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: black;
-    height: 60px;
-    width: 320px;
-    margin: 50px auto;
-  }
-
-  .table-bordered td,
-  .table-bordered th {
-    text-align: center;
-    border-color: black !important;
-  }
+  .table { border-collapse: collapse; color: black; } th p { color: black; }
+  .table td, .table th { padding: .2rem !important; text-align: center; }
+  #page-title { border: 1px solid black; display: flex; justify-content: center;
+  align-items: center; padding: auto; color: black; height: 75px; width: 680px;
+  margin: 50px auto; } .tail-border { border: 1px solid black; display: flex;
+  justify-content: center; align-items: center; color: black; height: 60px;
+  width: 320px; margin: 50px auto; } .table-bordered td, .table-bordered th {
+  text-align: center; border-color: black !important; } /* Page numbering - only
+  using @page rule */ @media print { @page { @bottom-center { content:
+  counter(page); font-size: 18px; color: black; margin-bottom: 20px;
+  font-weight: bold; } } }
 </style>
 
-<div class="container d-none d-print-block" dir="auto" style="border: 1px solid white;">
+<div
+  class="container d-none d-print-block"
+  dir="auto"
+  style="border: 1px solid white;"
+>
   <div class="col-md-12">
     <div id="page-title" class="headerPage">
       <h2>
-        يوم {{formatDate date }}
+        يوم
+        {{formatDate date}}
         {{#if branch}}
-        فرع {{branch.branchname}}
+          فرع
+          {{branch.branchname}}
         {{/if}}
       </h2>
     </div>
@@ -66,8 +40,8 @@
               <th style="width: 20%;">
                 <p> العدد المباع </p>
               </th>
-               <th style="width: 20%;">
-                <p>  سعر الصنف </p>
+              <th style="width: 20%;">
+                <p> سعر الصنف </p>
               </th>
               <th style="width: 15%;">
                 <p> المبلغ </p>
@@ -76,14 +50,22 @@
           </thead>
           <tbody>
             {{#each items}}
-            <tr>
-              <td hidden><input type="text" class="itemID" value="{{_id}}"></td>
-              <td hidden><input type="text" class="price" value="{{price}}"></td>
-              <td> {{itemName}} </td>
-              <td>{{boughtquantity}} </td>
-              <td>{{price}} </td>
-              <td> {{multiply boughtquantity price}} </td>
-            </tr>
+              <tr>
+                <td hidden><input
+                    type="text"
+                    class="itemID"
+                    value="{{_id}}"
+                  /></td>
+                <td hidden><input
+                    type="text"
+                    class="price"
+                    value="{{price}}"
+                  /></td>
+                <td> {{itemName}} </td>
+                <td>{{boughtquantity}} </td>
+                <td>{{price}} </td>
+                <td> {{multiply boughtquantity price}} </td>
+              </tr>
             {{/each}}
           </tbody>
         </table>
@@ -92,8 +74,10 @@
 
     <div>
       <center class="tail-border">
-        <input type="text" value="{{dayTotal}}" id="dayTotalValue" hidden>
-        <h3> إجمالي اليوم : <strong id="sales-total">{{ dayTotal }} ريال</strong></h3>
+        <input type="text" value="{{dayTotal}}" id="dayTotalValue" hidden />
+        <h3>
+          إجمالي اليوم :
+          <strong id="sales-total">{{dayTotal}} ريال</strong></h3>
       </center>
     </div>
   </div>

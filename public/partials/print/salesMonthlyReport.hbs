@@ -1,50 +1,23 @@
 <style>
-  .table {
-    border-collapse: collapse;
-    color: black;
-  }
-
-  th p {
-    color: black;
-  }
-
-  .table td,
-  .table th {
-    padding: .2rem !important;
-    text-align: center;
-  }
-
-  #page-title {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: auto;
-    color: black;
-    height: 75px;
-    width: 680px;
-    margin: 50px auto;
-  }
-
-  .tail-border {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: black;
-    height: 60px;
-    width: 320px;
-    margin: 50px auto;
-  }
-
-  .table-bordered td,
-  .table-bordered th {
-    text-align: center;
-    border-color: black !important;
-  }
+  .table { border-collapse: collapse; color: black; } th p { color: black; }
+  .table td, .table th { padding: .2rem !important; text-align: center; }
+  #page-title { border: 1px solid black; display: flex; justify-content: center;
+  align-items: center; padding: auto; color: black; height: 75px; width: 680px;
+  margin: 50px auto; } .tail-border { border: 1px solid black; display: flex;
+  justify-content: center; align-items: center; color: black; height: 60px;
+  width: 320px; margin: 50px auto; } .table-bordered td, .table-bordered th {
+  text-align: center; border-color: black !important; } /* Page numbering - only
+  using @page rule */ @media print { @page { @bottom-center { content:
+  counter(page); font-size: 18px; color: black; margin-bottom: 20px;
+  font-weight: bold; } } }
 </style>
 
-<div class="card-body d-none d-print-block" id="report" dir="rtl" style="border: 1px solid white;">
+<div
+  class="card-body d-none d-print-block"
+  id="report"
+  dir="rtl"
+  style="border: 1px solid white;"
+>
   <div id="page-title">
     <h2>
       تقرير شهر
@@ -55,38 +28,38 @@
   </div>
 
   <center>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th scope="col">
-              <p> # </p>
-            </th>
-            <th scope="col">
-              <p>التاريخ </p>
-            </th>
-            <th scope="col">
-              <p> اجمالي الدخل </p>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each sales}}
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">
+            <p> # </p>
+          </th>
+          <th scope="col">
+            <p>التاريخ </p>
+          </th>
+          <th scope="col">
+            <p> اجمالي الدخل </p>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each sales}}
           <tr>
             <td scope="row">{{incremented @index}}</td>
             <td>{{formatDate date}}</td>
             <td>{{totalPrice}}</td>
           </tr>
-          {{/each}}
-        </tbody>
-      </table>
+        {{/each}}
+      </tbody>
+    </table>
 
-      <center class="tail-border">
-        {{#if total}}
+    <center class="tail-border">
+      {{#if total}}
         <h3>إجمالي المبيعات <strong id="salary-total">{{total}}</strong></h3>
-        {{/if}}
-        {{#ifEquals total 0}}
+      {{/if}}
+      {{#ifEquals total 0}}
         <h3> إجمالي المبيعات <strong>0.00</strong></h3>
-        {{/ifEquals}}
-      </center>
+      {{/ifEquals}}
+    </center>
   </center>
 </div>

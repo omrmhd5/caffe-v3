@@ -1,48 +1,15 @@
 <style>
-  .table {
-    border-collapse: collapse;
-    color: black;
-  }
-
-  th p {
-    color: black;
-  }
-
-  .table td,
-  .table th {
-    height: 75% !important;
-    padding: .2rem !important;
-    text-align: center;
-  }
-
-  #page-title {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: auto;
-    color: black;
-    height: 75px;
-    width: 680px;
-    margin: 50px auto;
-  }
-
-  .tail-border {
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: black;
-    height: 60px;
-    width: 320px;
-    margin: 50px auto;
-  }
-
-  .table-bordered td,
-  .table-bordered th {
-    text-align: center;
-    border-color: black !important;
-  }
+  .table { border-collapse: collapse; color: black; } th p { color: black; }
+  .table td, .table th { height: 75% !important; padding: .2rem !important;
+  text-align: center; } #page-title { border: 1px solid black; display: flex;
+  justify-content: center; align-items: center; padding: auto; color: black;
+  height: 75px; width: 680px; margin: 50px auto; } .tail-border { border: 1px
+  solid black; display: flex; justify-content: center; align-items: center;
+  color: black; height: 60px; width: 320px; margin: 50px auto; } .table-bordered
+  td, .table-bordered th { text-align: center; border-color: black !important; }
+  /* Page numbering - only using @page rule */ @media print { @page {
+  @bottom-center { content: counter(page); font-size: 18px; color: black;
+  margin-bottom: 20px; font-weight: bold; } } }
 </style>
 
 <div class="container d-none d-print-block" dir="rtl">
@@ -50,7 +17,8 @@
     <h2>
       تقرير المبيعات
       {{#if branch}}
-      فرع {{branch.branchname}}
+        فرع
+        {{branch.branchname}}
       {{/if}}
     </h2>
   </div>
@@ -75,25 +43,29 @@
       </thead>
       <tbody>
         {{#each sales}}
-        <tr>
-          <th scope="row">{{incremented @index}}</th>
-          <td>{{itemName}}</td>
-          <td>{{boughtquantity}}</td>
-          <td>{{totalprice}}</td>
-        </tr>
+          <tr>
+            <th scope="row">{{incremented @index}}</th>
+            <td>{{itemName}}</td>
+            <td>{{boughtquantity}}</td>
+            <td>{{totalprice}}</td>
+          </tr>
         {{/each}}
       </tbody>
     </table>
 
     {{#if total}}
-    <center class="tail-border">
-      <h3 style="font-size: 30px;"> إجمالي المبيعات <strong>{{ total }}</strong></h3>
-    </center>
+      <center class="tail-border">
+        <h3 style="font-size: 30px;">
+          إجمالي المبيعات
+          <strong>{{total}}</strong></h3>
+      </center>
     {{/if}}
     {{#ifEquals total 0}}
-    <center class="tail-border">
-      <h3 style="font-size: 30px;"> إجمالي المبيعات <strong> 0.00</strong></h3>
-    </center>
+      <center class="tail-border">
+        <h3 style="font-size: 30px;">
+          إجمالي المبيعات
+          <strong> 0.00</strong></h3>
+      </center>
     {{/ifEquals}}
   </div>
 </div>

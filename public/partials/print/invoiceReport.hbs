@@ -3,90 +3,112 @@
   dir="rtl"
   style="border: 1px solid white;"
 >
-  <div id="page-title">
-    <h2 style="text-align: center;">
-      تقرير الفواتير
-      {{!-- {{#if branch}} --}}
-      {{!-- فرع {{branch.branchname}} --}}
-      {{!-- {{/if}} --}}
-      <br />
-      من
-      {{fromDate}}
-      إلى
-      {{toDate}}
-    </h2>
-  </div>
-
-  <table class="table table-bordered" style="table-layout: auto;">
-    <thead>
+  <!-- Main table structure to enable header repetition -->
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead class="print-header">
       <tr>
-        <th scope="col">
-          <p> التاريخ </p>
-        </th>
-        <th scope="col">
-          <p> رقم الفاتورة </p>
-        </th>
-        <th scope="col">
-          <p> المبلغ </p>
-        </th>
-        <th scope="col">
-          <p> قيمة الضريبة </p>
-        </th>
-        <th scope="col">
-          <p> الرقم الضريبي للمورد </p>
-        </th>
-        <th scope="col">
-          <p> اسم المورد </p>
-        </th>
-        <th scope="col">
-          <p> الوصف </p>
-        </th>
-        <th scope="col">
-          <p> المجموع المستلم </p>
-        </th>
+        <td>
+          <div id="page-title">
+            <h2 style="text-align: center;">
+              تقرير الفواتير
+              {{!-- {{#if branch}} --}}
+              {{!-- فرع {{branch.branchname}} --}}
+              {{!-- {{/if}} --}}
+              <br />
+              من
+              {{fromDate}}
+              إلى
+              {{toDate}}
+            </h2>
+          </div>
+        </td>
       </tr>
     </thead>
-    <tbody>
-      {{#each invoices}}
-        {{#each this}}
-          <tr>
-            <td>{{formatDate key}}</td>
-            <td>{{invoiceNumber}}</td>
-            <td>{{amount}}</td>
-            <td>{{taxValue}}</td>
-            <td>{{supplierTaxNumber}}</td>
-            <td>{{supplierName}}</td>
-            <td
-              style="white-space: pre-wrap; word-wrap: break-word; max-width: 200px;"
-            >{{description}}</td>
-            <td>{{dayTotal}}</td>
-          </tr>
-        {{/each}}
-      {{/each}}
 
+    <tbody class="print-content">
+      <tr>
+        <td>
+          <table class="table table-bordered" style="table-layout: auto;">
+            <thead>
+              <tr>
+                <th scope="col">
+                  <p> التاريخ </p>
+                </th>
+                <th scope="col">
+                  <p> رقم الفاتورة </p>
+                </th>
+                <th scope="col">
+                  <p> المبلغ </p>
+                </th>
+                <th scope="col">
+                  <p> قيمة الضريبة </p>
+                </th>
+                <th scope="col">
+                  <p> الرقم الضريبي للمورد </p>
+                </th>
+                <th scope="col">
+                  <p> اسم المورد </p>
+                </th>
+                <th scope="col">
+                  <p> الوصف </p>
+                </th>
+                <th scope="col">
+                  <p> المجموع المستلم </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each invoices}}
+                {{#each this}}
+                  <tr>
+                    <td>{{formatDate key}}</td>
+                    <td>{{invoiceNumber}}</td>
+                    <td>{{amount}}</td>
+                    <td>{{taxValue}}</td>
+                    <td>{{supplierTaxNumber}}</td>
+                    <td>{{supplierName}}</td>
+                    <td
+                      style="white-space: pre-wrap; word-wrap: break-word; max-width: 200px;"
+                    >{{description}}</td>
+                    <td>{{dayTotal}}</td>
+                  </tr>
+                {{/each}}
+              {{/each}}
+
+            </tbody>
+          </table>
+
+          <div class="row mt-2">
+            <div class="col-md-4">
+              <center class="print-border">
+                <h3 class="print-font">إجمالي الفواتير</h3>
+                <p class="print-font"><strong>{{invoicesTotal}}</strong></p>
+              </center>
+            </div>
+
+            <div class="col-md-4">
+              <center class="print-border">
+                <h3 class="print-font">إجمالي الضريبة</h3>
+                <p class="print-font"><strong>{{taxTotal}}</strong></p>
+              </center>
+            </div>
+
+            <div class="col-md-4">
+              <center class="print-border">
+                <h3 class="print-font"> إجمالي المصروفات </h3>
+                <p class="print-font"><strong>{{total}}</strong></p>
+              </center>
+            </div>
+          </div>
+
+        </td>
+      </tr>
     </tbody>
   </table>
-
-  <div class="row mt-2">
-    <div class="col-md-4">
-      <center class="print-border">
-        <h3 class="print-font">إجمالي الفواتير</h3>
-        <p class="print-font"><strong>{{invoicesTotal}}</strong></p>
-      </center>
-    </div>
-
-    <div class="col-md-4">
-      <center class="print-border">
-        <h3 class="print-font">إجمالي الضريبة</h3>
-        <p class="print-font"><strong>{{taxTotal}}</strong></p>
-      </center>
-    </div>
-
-    <div class="col-md-4">
-      <center class="print-border">
-        <h3 class="print-font"> إجمالي المصروفات </h3>
-        <p class="print-font"><strong>{{total}}</strong></p>
-      </center>
-    </div>
-  </div>
 </div>
+
+<style>
+  @media print { /* Page numbering - only using @page rule */ @page {
+  @bottom-center { content: counter(page); font-size: 18px; color: black;
+  margin-bottom: 20px; font-weight: bold; } } }
+</style>
