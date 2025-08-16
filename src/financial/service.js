@@ -64,7 +64,10 @@ exports.report = async (date, user) => {
   // Update rent in financials to use rentHistory
   for (let f of financials) {
     if (f.branchID && f.branchID.rentHistory) {
-      f.rent = await getRentForMonth(f.branchID, date);
+      // If rent is 0, display what's in rentHistory, otherwise display the actual rent value
+      if (f.rent === 0 || f.rent === null || f.rent === undefined) {
+        f.rent = await getRentForMonth(f.branchID, date);
+      }
     }
 
     // Set rent comment directly from comment field
@@ -100,7 +103,10 @@ exports.getAllFinancials = async (date, branchID, user) => {
   // Update rent in financials to use rentHistory
   for (let f of financials) {
     if (f.branchID && f.branchID.rentHistory) {
-      f.rent = await getRentForMonth(f.branchID, find.date);
+      // If rent is 0, display what's in rentHistory, otherwise display the actual rent value
+      if (f.rent === 0 || f.rent === null || f.rent === undefined) {
+        f.rent = await getRentForMonth(f.branchID, find.date);
+      }
     }
   }
   return financials;
@@ -113,7 +119,10 @@ exports.getFinanceById = async (id) => {
   }
   // Update rent to use rentHistory
   if (item.branchID && item.branchID.rentHistory) {
-    item.rent = await getRentForMonth(item.branchID, item.date);
+    // If rent is 0, display what's in rentHistory, otherwise display the actual rent value
+    if (item.rent === 0 || item.rent === null || item.rent === undefined) {
+      item.rent = await getRentForMonth(item.branchID, item.date);
+    }
   }
   return item;
 };
@@ -140,7 +149,9 @@ exports.updateFinance = async (date, branchID, financial) => {
   if (
     branch &&
     branch.rentHistory &&
-    (!financial.rent || financial.rent === 0)
+    (financial.rent === 0 ||
+      financial.rent === null ||
+      financial.rent === undefined)
   ) {
     financial.rent = await getRentForMonth(branch, date);
   }
@@ -278,7 +289,14 @@ exports.getFinanceByBranchId = async (branchID, date) => {
   }
   // Update rent to use rentHistory
   if (branch && branch.rentHistory) {
-    financial.rent = rent;
+    // If rent is 0, display what's in rentHistory, otherwise display the actual rent value
+    if (
+      financial.rent === 0 ||
+      financial.rent === null ||
+      financial.rent === undefined
+    ) {
+      financial.rent = rent;
+    }
   }
   // Always use calculated salaries instead of stored value
   financial.salaries = calculatedSalaries;
