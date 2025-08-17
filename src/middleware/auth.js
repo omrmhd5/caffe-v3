@@ -90,8 +90,8 @@ const auth = async (req, res, next) => {
         res.cookie("auth_token", newToken, {
           maxAge: 1000 * 60 * 5,
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          secure: false, // Set to false for better mobile compatibility
+          sameSite: "lax", // Use "lax" which works better on mobile
           path: "/",
         });
 

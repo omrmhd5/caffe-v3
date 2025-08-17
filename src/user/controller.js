@@ -314,8 +314,8 @@ exports.loginUser = async (req, res) => {
     res.cookie("auth_token", user.token, {
       maxAge: 1000 * 60 * 5,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax", // Changed from "strict" to "lax" for better compatibility
+      secure: false, // Set to false for better mobile compatibility
+      sameSite: "lax", // Use "lax" which works better on mobile
       path: "/",
     });
 
