@@ -197,7 +197,7 @@ exports.updateFinance = async (date, branchID, financial) => {
     financial.bills,
     financial.bills1,
     financial.bills2,
-  ].some((v) => parseFloat(v) && parseFloat(v) !== 0);
+  ].some((v) => parseFloat(v) !== 0 || v === 0);
 
   if (hasData) {
     await Financial.findOneAndUpdate(
