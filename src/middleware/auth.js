@@ -1,26 +1,10 @@
-const jwt = require("jsonwebtoken");
 const userService = require("../user/service");
+const tokenUtils = require("../common/token");
 
 const {
   UnauthenticatedException,
   UnauthorizedException,
 } = require("../common/errors/exceptions");
-
-// Helper function to check if token is about to expire (within 5 minutes)
-const isTokenExpiringSoon = (token) => {
-  try {
-    const decoded = jwt.decode(token);
-    if (!decoded || !decoded.exp) return true;
-
-    const now = Math.floor(Date.now() / 1000);
-    const timeUntilExpiry = decoded.exp - now;
-
-    // Refresh if token expires within 5 minutes (300 seconds)
-    return timeUntilExpiry <= 300;
-  } catch (error) {
-    return true;
-  }
-};
 
 const auth = async (req, res, next) => {
   try {
@@ -30,7 +14,23 @@ const auth = async (req, res, next) => {
       return res.render("login.hbs");
     }
 
-    const decoded = jwt.verify(token, "ASDSADKSADKSKLASNKLAS45");
+    // First verify the token to check if it's valid
+    let decoded;
+    try {
+      decoded = tokenUtils.verifyAuthToken(token);
+    } catch (verifyError) {
+      if (verifyError.name === "TokenExpiredError") {
+        // Token is expired, clear cookie and redirect to login
+        res.clearCookie("auth_token");
+        return res.render("login.hbs", {
+          errorMessage: "انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى",
+        });
+      }
+      // Other verification errors, clear cookie and redirect to login
+      res.clearCookie("auth_token");
+      return res.render("login.hbs");
+    }
+
     const user = await userService.getUser({
       _id: decoded._id,
       token: token,
@@ -79,10 +79,10 @@ const auth = async (req, res, next) => {
     }
 
     // Only refresh token if it's about to expire (sliding session)
-    if (isTokenExpiringSoon(token)) {
+    if (tokenUtils.isTokenExpiringSoon(token)) {
       try {
-        // Generate new token for sliding session
-        const newToken = await userService.generateAuthToken(user);
+        // Generate new token for sliding session using centralized utility
+        const newToken = tokenUtils.generateAuthToken(user);
         user.token = newToken;
         await user.save();
 
@@ -97,6 +97,7 @@ const auth = async (req, res, next) => {
 
         req.token = newToken;
       } catch (refreshError) {
+        // If refresh fails, continue with current token
         req.token = token;
       }
     } else {

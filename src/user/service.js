@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
+const tokenUtils = require("../common/token");
 const User = require("../../models/user");
 const {
   NotFoundException,
@@ -294,7 +294,7 @@ exports.loginUser = async (username, password) => {
     }
   }
 
-  user.token = await exports.generateAuthToken(user);
+  user.token = await tokenUtils.generateAuthToken(user);
   await user.save();
 
   delete user.password;
@@ -364,7 +364,7 @@ exports.resetPasswordRequest = async (email) => {
     );
   }
 
-  const token = await exports.generateAuthToken(user);
+  const token = await tokenUtils.generateAuthToken(user);
   user.token = token;
   await user.save();
   let baseUrl = process.env.BASE_URL;
@@ -386,7 +386,7 @@ exports.resetPassword = async (email, token, newPassword) => {
     );
   }
 
-  const decoded = jwt.verify(token, "ASDSADKSADKSKLASNKLAS45");
+  const decoded = tokenUtils.verifyAuthToken(token);
   user = await User.findOne({
     _id: decoded._id,
     token: token,
@@ -401,14 +401,4 @@ exports.resetPassword = async (email, token, newPassword) => {
 
   await user.save();
   return "تمت استعادة  كلمة المرور بنجاح";
-};
-
-exports.generateAuthToken = async function (user) {
-  const token = jwt.sign(
-    { _id: user._id.toString() },
-    "ASDSADKSADKSKLASNKLAS45",
-    { expiresIn: "5m" }
-  );
-
-  return token;
 };
