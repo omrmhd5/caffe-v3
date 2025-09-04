@@ -184,22 +184,22 @@ exports.createSalary = async (
       date: normalizedDate,
     });
   } else {
-    if (netSalary !== 0) {
-      await Salary.create({
-        employeeID,
-        date: normalizedDate,
-        salary,
-        extraWork,
-        allowance,
-        amountIncrease,
-        daysIncrease,
-        amountDecrease,
-        daysDecrease,
-        netSalary: netSalary.toFixed(2),
-        branchID,
-        accounter: userID,
-      });
-    }
+    // Always create salary records, even if net salary is zero
+    // This allows tracking of employees with zero salaries
+    await Salary.create({
+      employeeID,
+      date: normalizedDate,
+      salary,
+      extraWork,
+      allowance,
+      amountIncrease,
+      daysIncrease,
+      amountDecrease,
+      daysDecrease,
+      netSalary: netSalary.toFixed(2),
+      branchID,
+      accounter: userID,
+    });
   }
 
   return;
@@ -274,14 +274,8 @@ exports.updateSalary = async (
 };
 
 exports.updateBulk = async (user, salaries) => {
-  let netSalaryTotal = 0;
-  for (let salary of salaries) {
-    netSalaryTotal += salary.netSalary;
-  }
-
-  if (netSalaryTotal === 0) {
-    return;
-  }
+  // Remove the early return for zero total - we should save all salary records
+  // even if they sum to zero, as individual employees might have zero salaries
 
   for (let salary of salaries) {
     const normalizedDate = toMonthStartDate(salary.date);

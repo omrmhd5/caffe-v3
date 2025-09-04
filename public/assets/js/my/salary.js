@@ -291,5 +291,6 @@ $("#add-salary-table").delegate("input", "keyup", "change", function (e) {
     totalSalaries += currentValue;
   });
 
-  document.getElementById("salary-total").innerHTML = totalSalaries;
+  document.getElementById("salary-total").innerHTML =
+    numeral(totalSalaries).format("0,0.00");
 });
