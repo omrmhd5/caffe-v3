@@ -64,8 +64,9 @@ exports.getAllSalaries = async (
       }
 
       if (
-        employee.branchID.toString() != branchID ||
-        employee.status != "working"
+        (employee.branchID.toString() != branchID ||
+          employee.status != "working") &&
+        userRole != "AccountantManager"
       ) {
         salary.disabled = "disabled";
       }
