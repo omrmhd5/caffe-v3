@@ -49,7 +49,7 @@ exports.getAllEmployeesWithPagination = async (
     .limit(PAGE_SIZE)
     .populate("branchID")
     .populate("companyID")
-    .sort("branchID")
+    .sort("employeeName")
     .lean();
 
   for (let employee of employees) {
