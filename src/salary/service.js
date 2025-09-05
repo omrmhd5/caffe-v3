@@ -71,9 +71,25 @@ exports.getAllSalaries = async (
         salary.disabled = "disabled";
       }
 
+      // Check if employee's current branch matches the salary record's branch
+      const branchMismatch =
+        employee.branchID.toString() !== branchID.toString();
+
+      // Determine status indicator color
+      let statusIndicator = null;
+      if (branchMismatch) {
+        statusIndicator = "blue";
+      } else if (employee.status === "holiday") {
+        statusIndicator = "yellow";
+      } else if (employee.status === "notWorking") {
+        statusIndicator = "red";
+      }
+
       results.push({
         ...salary,
         ...employee.toObject(),
+        branchMismatch: branchMismatch,
+        statusIndicator: statusIndicator,
       });
     }
   }

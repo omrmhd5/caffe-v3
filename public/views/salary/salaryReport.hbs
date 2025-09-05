@@ -66,6 +66,24 @@
         </form>
       </div>
       <div class="card-body p-0">
+        <!-- Legend for status indicators -->
+        <div class="alert mb-3" style="margin: 15px;">
+          <h6 class="mb-2 text-right"><strong>مؤشرات الحالة:</strong></h6>
+          <div class="row text-right">
+            <div class="col-md-4">
+              <span style="border: 3px solid #007bff; padding: 2px 8px; margin-left: 5px;">🔵</span>
+              <small>فرع مختلف عن الفرع الحالي</small>
+            </div>
+            <div class="col-md-4">
+              <span style="border: 3px solid #ffc107; padding: 2px 8px; margin-left: 5px;">🟡</span>
+              <small>موظف في إجازة</small>
+            </div>
+            <div class="col-md-4">
+              <span style="border: 3px solid #dc3545; padding: 2px 8px; margin-left: 5px;">🔴</span>
+              <small>موظف غير عامل</small>
+            </div>
+          </div>
+        </div>
         <div class="table-responsive">
           <table id="add-salary-table" class="table">
             <thead>
@@ -104,7 +122,7 @@
             </thead>
             <tbody>
               {{#each salaries}}
-              <tr>
+              <tr {{#ifEquals statusIndicator 'yellow'}}style="border: 2px solid #ffc107;"{{/ifEquals}}{{#ifEquals statusIndicator 'red'}}style="border: 2px solid #dc3545;"{{/ifEquals}}{{#ifEquals statusIndicator 'blue'}}style="border: 2px solid #007bff;"{{/ifEquals}}>
                 <td><input value="{{employeeName}}" type="text" class="form-control name" disabled></td>
                 <td hidden><input value="{{_id}}" type="text" class="form-control employee-id"></td>
                 <td hidden><input value="{{branchID}}" type="text" class="form-control branch-id"></td>
