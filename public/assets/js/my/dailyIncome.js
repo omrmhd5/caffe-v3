@@ -61,6 +61,10 @@ const sendTaxRatioData = () => {
   });
 
   // Send to paymentValue backend
+  // If AccountantManager is saving, set approved to true automatically
+  // If non-manager is saving, reset approved to false (timer starts)
+  const isManager = window.userIsManager === true;
+  const isAccountantManager = window.userRole === "AccountantManager";
   $.ajax({
     url: "/paymentValue",
     type: "POST",
@@ -70,6 +74,7 @@ const sendTaxRatioData = () => {
         date: date,
         paidValues: paidValues,
         receivedValues: receivedValues,
+        approved: isAccountantManager ? true : isManager ? undefined : false, // AccountantManager auto-approves
       }),
     },
     success: function (data) {
@@ -717,6 +722,26 @@ $(document).ready(function () {
           );
         });
       }
+
+      // Check if paid fields should be disabled
+      // If approved, disable only for non-managers (managers can still edit)
+      // If not approved and not manager, check timer (1 hour)
+      const isManager = window.userIsManager === true;
+
+      // If approved, disable only for non-managers
+      if (data && data.approved === true && !isManager) {
+        $(".paid-field").prop("disabled", true);
+      } else if (!isManager && data && data.createdAt) {
+        // Check timer for non-managers if not approved (1 hour = 3600 seconds)
+        const createdAt = new Date(data.createdAt);
+        const currentTime = new Date();
+        const hoursPassed = (currentTime - createdAt) / (1000 * 60 * 60); // Convert to hours
+
+        if (hoursPassed > 1) {
+          $(".paid-field").prop("disabled", true);
+        }
+      }
+
       updateGrandTotal();
     },
   });
@@ -729,7 +754,227 @@ $(document).ready(function () {
   if (saveNotesButton) {
     saveNotesButton.addEventListener("click", saveNotes);
   }
+
+  // Add event listeners for approve/reject buttons
+  let approveButton = document.getElementById("approve-paid-values");
+  if (approveButton) {
+    approveButton.addEventListener("click", function () {
+      approvePaidValues();
+    });
+  }
+
+  let rejectButton = document.getElementById("reject-paid-values");
+  if (rejectButton) {
+    rejectButton.addEventListener("click", function () {
+      rejectPaidValues();
+    });
+  }
+
+  // Add event listener for save paid values button (non-managers only)
+  let savePaidValuesButton = document.getElementById("save-paid-values-button");
+  if (savePaidValuesButton) {
+    savePaidValuesButton.addEventListener("click", function () {
+      savePaidValuesOnly();
+    });
+  }
 });
+
+// Function to approve paid values
+function approvePaidValues() {
+  swal({
+    title: "قبول القيم",
+    text: "هل أنت متأكد أنك تريد قبول قيم المبلغ المحول؟",
+    icon: "warning",
+    buttons: {
+      confirm: {
+        text: "نعم",
+        className: "btn btn-success",
+      },
+      cancel: {
+        text: "لا",
+        visible: true,
+        className: "btn btn-danger",
+      },
+    },
+  }).then((confirmed) => {
+    if (confirmed) {
+      let date = $("#month").val();
+      let branchID = $("#branchID").val();
+
+      $.ajax({
+        url: "/paymentValue/approve",
+        type: "POST",
+        data: {
+          branchID: branchID,
+          date: date,
+        },
+        success: function (data) {
+          swal({
+            title: data.message,
+            type: "success",
+            buttons: {
+              confirm: {
+                className: "btn btn-success",
+              },
+            },
+          }).then(() => {
+            location.reload();
+          });
+        },
+        error: function (jqXhr) {
+          swal(
+            "حدث خطأ",
+            jqXhr.responseJSON?.errorMessage || "فشل في قبول القيم",
+            {
+              icon: "error",
+              buttons: {
+                confirm: {
+                  className: "btn btn-danger",
+                },
+              },
+            }
+          );
+        },
+      });
+    }
+  });
+}
+
+// Function to reject paid values
+function rejectPaidValues() {
+  swal({
+    title: "رفض القيم",
+    text: "هل أنت متأكد أنك تريد رفض قيم المبلغ المحول وإعادة تعيينها إلى الصفر؟",
+    icon: "warning",
+    buttons: {
+      confirm: {
+        text: "نعم",
+        className: "btn btn-danger",
+      },
+      cancel: {
+        text: "لا",
+        visible: true,
+        className: "btn btn-secondary",
+      },
+    },
+  }).then((confirmed) => {
+    if (confirmed) {
+      let date = $("#month").val();
+      let branchID = $("#branchID").val();
+
+      $.ajax({
+        url: "/paymentValue/reject",
+        type: "POST",
+        data: {
+          branchID: branchID,
+          date: date,
+        },
+        success: function (data) {
+          swal({
+            title: data.message,
+            type: "success",
+            buttons: {
+              confirm: {
+                className: "btn btn-success",
+              },
+            },
+          }).then(() => {
+            location.reload();
+          });
+        },
+        error: function (jqXhr) {
+          swal(
+            "حدث خطأ",
+            jqXhr.responseJSON?.errorMessage || "فشل في رفض القيم",
+            {
+              icon: "error",
+              buttons: {
+                confirm: {
+                  className: "btn btn-danger",
+                },
+              },
+            }
+          );
+        },
+      });
+    }
+  });
+}
+
+// Function to save only paid values (for non-managers when حفظ النسبة is disabled)
+function savePaidValuesOnly() {
+  let date = $("#month").val();
+  let branchID = $("#branchID").val();
+
+  // Collect paid and received values
+  const paidValues = [];
+  $(".paid-field").each(function () {
+    let val = parseFloat($(this).val());
+    paidValues.push(isNaN(val) ? 0 : val);
+  });
+
+  // Ensure we have exactly 10 paid values
+  while (paidValues.length < 10) {
+    paidValues.push(0);
+  }
+
+  const receivedValues = [];
+  $(".received-field").each(function () {
+    let val = parseFloat($(this).val());
+    receivedValues.push(isNaN(val) ? 0 : val);
+  });
+
+  // Ensure we have exactly 10 received values
+  while (receivedValues.length < 10) {
+    receivedValues.push(0);
+  }
+
+  // Only save paid values
+  // If AccountantManager is saving, set approved to true automatically
+  // Otherwise, reset approved to false (timer starts)
+  const isAccountantManager = window.userRole === "AccountantManager";
+  $.ajax({
+    url: "/paymentValue",
+    type: "POST",
+    data: {
+      paymentValue: JSON.stringify({
+        branchID: branchID,
+        date: date,
+        paidValues: paidValues,
+        receivedValues: receivedValues,
+        approved: isAccountantManager ? true : false, // AccountantManager auto-approves
+      }),
+    },
+    success: function (data) {
+      swal({
+        title: "تم الحفظ",
+        text: "تم حفظ المبلغ المحول بنجاح",
+        type: "success",
+        buttons: {
+          confirm: {
+            className: "btn btn-success",
+          },
+        },
+      }).then(() => {
+        location.reload();
+      });
+    },
+    error: function (jqXhr) {
+      swal(
+        "حدث خطأ",
+        jqXhr.responseJSON?.errorMessage || "فشل في حفظ المبلغ المحول",
+        {
+          icon: "error",
+          buttons: {
+            confirm: {
+              className: "btn btn-danger",
+            },
+          },
+        }
+      );
+    },
+  });
+}
 
 // Function to scroll to the last edited non-zero row
 function scrollToLastEditedNonZeroRow() {

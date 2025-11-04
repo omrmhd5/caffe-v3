@@ -63,6 +63,33 @@ exports.report = async (req, res) => {
     month
   );
 
+  // Check if paid fields should be disabled
+  // If approved, disable only for non-managers (managers can still edit)
+  // If not approved and not manager, check timer (1 hour)
+  let disablePaidFields = "";
+  const isManager =
+    req.user.role === "Manager" || req.user.role === "AccountantManager";
+
+  // If approved, disable only for non-managers
+  if (paymentValue && paymentValue.approved === true && !isManager) {
+    disablePaidFields = "disabled";
+  } else if (!isManager && paymentValue && paymentValue.createdAt) {
+    // Check timer for non-managers if not approved (1 hour = 3600 seconds)
+    const createdAt = new Date(paymentValue.createdAt);
+    const currentTime = new Date();
+    const hoursPassed = (currentTime - createdAt) / (1000 * 60 * 60); // Convert to hours
+
+    if (hoursPassed > 1) {
+      disablePaidFields = "disabled";
+    }
+  }
+
+  // Check if there are any non-zero paid values (for showing approve/reject buttons)
+  let hasNonZeroPaidValues = false;
+  if (paymentValue && paymentValue.paidValues) {
+    hasNonZeroPaidValues = paymentValue.paidValues.some((val) => val > 0);
+  }
+
   // Get notes for the current month and branch
   const notes = await notesService.getNotes(branchID, month, req.user);
 
@@ -86,6 +113,8 @@ exports.report = async (req, res) => {
     userRole: req.user.role,
     isManager:
       req.user.role === "Manager" || req.user.role === "AccountantManager",
+    disablePaidFields,
+    hasNonZeroPaidValues,
     notes,
   });
 };

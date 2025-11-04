@@ -34,7 +34,15 @@ exports.addPaymentValue = async (paymentValue) => {
     date: normalizedDate,
     paidValues: paidValues,
     receivedValues: receivedValues,
+    // Respect the approved value passed in (AccountantManager sets it to true)
+    approved: paymentValue.approved !== undefined ? paymentValue.approved : false,
   };
+
+  // If non-manager is saving (approved is false or undefined), reset createdAt to restart timer
+  // If approved is true (AccountantManager), don't reset createdAt
+  if (paymentValue.approved === false || paymentValue.approved === undefined) {
+    paymentValueToSave.createdAt = new Date();
+  }
 
   await PaymentValue.updateOne(
     {
@@ -42,7 +50,7 @@ exports.addPaymentValue = async (paymentValue) => {
       date: normalizedDate,
     },
     paymentValueToSave,
-    { upsert: true }
+    { upsert: true, setDefaultsOnInsert: true }
   );
 };
 
@@ -73,4 +81,33 @@ exports.getPaymentValue = async (branchID, date) => {
   }
 
   return result;
+};
+
+exports.approvePaymentValue = async (branchID, date) => {
+  const normalizedDate = toMonthStartDate(date);
+  await PaymentValue.updateOne(
+    {
+      branchID,
+      date: normalizedDate,
+    },
+    { approved: true },
+    { upsert: false }
+  );
+};
+
+exports.rejectPaymentValue = async (branchID, date) => {
+  const normalizedDate = toMonthStartDate(date);
+  await PaymentValue.updateOne(
+    {
+      branchID,
+      date: normalizedDate,
+    },
+    {
+      paidValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      receivedValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      approved: false,
+      createdAt: new Date(), // Reset timer so non-managers can edit until timer expires
+    },
+    { upsert: false }
+  );
 };

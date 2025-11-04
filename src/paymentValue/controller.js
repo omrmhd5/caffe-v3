@@ -21,3 +21,25 @@ exports.getPaymentValue = async (req, res) => {
     res.status(error.status || 500).send({ errorMessage: error.message });
   }
 };
+
+exports.approvePaymentValue = async (req, res) => {
+  try {
+    const { branchID, date } = req.body;
+    await paymentValueService.approvePaymentValue(branchID, date);
+    res.send({ message: "تم قبول القيم بنجاح" });
+  } catch (error) {
+    console.log(error, error.status, error.message);
+    res.status(error.status || 500).send({ errorMessage: error.message });
+  }
+};
+
+exports.rejectPaymentValue = async (req, res) => {
+  try {
+    const { branchID, date } = req.body;
+    await paymentValueService.rejectPaymentValue(branchID, date);
+    res.send({ message: "تم رفض القيم وإعادة تعيينها" });
+  } catch (error) {
+    console.log(error, error.status, error.message);
+    res.status(error.status || 500).send({ errorMessage: error.message });
+  }
+};
