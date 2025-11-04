@@ -69,18 +69,20 @@
                 <p class="select"> حالة الضمان </p>
                 <div class="">
                   <select id="warrantyStatus" name="warrantyStatus" class="form-control">
-                    {{#each statuses}}
+                    {{#each warrantyStatuses}}
                     <option value="{{value}}" {{selected}}>{{name}}</option>
                     {{/each}}
                   </select>
                 </div>
               </label>
               <label for="role" class="col-form-label col-md-4 col-12">
-                <p class="select"> الرقم التسلسلي </p>
+                <p class="select"> نوع الفاتورة </p>
                 <div class="">
-                  <div class="input-group">
-                    <input type="text" class="form-control" name="registrationNumber" value={{registrationNumber}}>
-                  </div>
+                  <select id="taxStatus" name="taxStatus" class="form-control">
+                    {{#each taxStatuses}}
+                    <option value="{{value}}" {{selected}}>{{name}}</option>
+                    {{/each}}
+                  </select>
                 </div>
               </label>
               <label for="role" class="col-form-label col-4">
@@ -192,17 +194,17 @@
         <ul class="pagination mt-2">
           {{#paginate pagination type="previous"}}
           <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link"
-              href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&description={{../description}}&p={{n}}">السابق</a>
+              href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&description={{../description}}&warrantyStatus={{../warrantyStatus}}&taxStatus={{../taxStatus}}&p={{n}}">السابق</a>
           </li>
           {{/paginate}}
           {{#paginate pagination type="middle" limit="3"}}
           <li {{#if active}} class="active page-item" {{/if}}><a class="page-link"
-              href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&description={{../description}}&p={{n}}">{{n}}</a>
+              href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&description={{../description}}&warrantyStatus={{../warrantyStatus}}&taxStatus={{../taxStatus}}&p={{n}}">{{n}}</a>
           </li>
           {{/paginate}}
           {{#paginate pagination type="next"}}
           <li {{#if disabled}} class="disabled page-item" {{/if}}><a class="page-link"
-              href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&description={{../description}}&p={{n}}">التالي</a>
+              href="?branchID={{../branchID}}&fromDate={{../fromDate}}&toDate={{../toDate}}&description={{../description}}&warrantyStatus={{../warrantyStatus}}&taxStatus={{../taxStatus}}&p={{n}}">التالي</a>
           </li>
           {{/paginate}}
         </ul>

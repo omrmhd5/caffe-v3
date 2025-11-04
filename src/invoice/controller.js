@@ -15,7 +15,7 @@ exports.getAllInvoices = async (req, res) => {
   let branchID = null;
   let fromDate = null;
   let toDate = null;
-  let serialNumber = null;
+  let taxStatus = 0;
   let page = 1;
   let invoices = null;
   let warrantyStatus = 0;
@@ -52,16 +52,24 @@ exports.getAllInvoices = async (req, res) => {
     });
   }
 
+  if (req.query.taxStatus) {
+    taxStatus = req.query.taxStatus;
+    taxStatuses = taxStatuses.map((status) => {
+      if (status.value === taxStatus) {
+        status.selected = "selected";
+      } else {
+        delete status.selected;
+      }
+      return status;
+    });
+  }
+
   if (req.query.fromDate) {
     fromDate = req.query.fromDate;
   }
 
   if (req.query.toDate) {
     toDate = req.query.toDate;
-  }
-
-  if (req.query.serialNumber) {
-    serialNumber = req.query.serialNumber;
   }
 
   if (req.query.description) {
@@ -75,12 +83,8 @@ exports.getAllInvoices = async (req, res) => {
       warrantyStatus,
       page,
       fromDate,
-      toDate
-    );
-  } else if (serialNumber) {
-    invoices = await invoiceService.getInvoiceBySerialNumber(
-      branchID,
-      serialNumber
+      toDate,
+      taxStatus
     );
   } else {
     invoices = await invoiceService.getAllInvoicesWithPagination(
@@ -88,7 +92,8 @@ exports.getAllInvoices = async (req, res) => {
       fromDate,
       toDate,
       warrantyStatus,
-      page
+      page,
+      taxStatus
     );
   }
 
@@ -116,20 +121,23 @@ exports.getAllInvoices = async (req, res) => {
     fromDate,
     toDate,
     warrantyStatus,
-    description
+    description,
+    taxStatus
   );
   count < PAGE_SIZE ? (count = 1) : (count = count);
 
   res.render("invoice/viewInvoices.hbs", {
     branches,
     invoices,
-    fromDate: serialNumber ? null : fromDate,
-    toDate: serialNumber ? null : toDate,
-    serialNumber,
+    fromDate,
+    toDate,
     branchID,
     branch,
     branchedRole: req.user.branchedRole,
-    statuses: warrantyStatuses,
+    warrantyStatuses: warrantyStatuses,
+    taxStatuses: taxStatuses,
+    warrantyStatus,
+    taxStatus,
     description,
     pagination: {
       page,

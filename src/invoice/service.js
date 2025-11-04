@@ -22,7 +22,8 @@ exports.getAllInvoicesWithPagination = (
   fromDate,
   toDate,
   warrantyStatus,
-  page
+  page,
+  taxStatus = 0
 ) => {
   let find = {};
 
@@ -30,6 +31,22 @@ exports.getAllInvoicesWithPagination = (
     find.warranty = true;
   } else if (warrantyStatus == 2) {
     find.warranty = false;
+  }
+
+  if (taxStatus == 1) {
+    find.$and = [
+      { supplierTaxNumber: { $exists: true } },
+      { supplierTaxNumber: { $ne: null } },
+      { supplierTaxNumber: { $ne: "" } },
+      { supplierTaxNumber: { $ne: " " } },
+    ];
+  } else if (taxStatus == 2) {
+    find.$or = [
+      { supplierTaxNumber: { $exists: false } },
+      { supplierTaxNumber: { $eq: null } },
+      { supplierTaxNumber: { $eq: "" } },
+      { supplierTaxNumber: { $eq: " " } },
+    ];
   }
 
   if (!branchID) {
@@ -59,7 +76,8 @@ exports.getCount = (
   fromDate,
   toDate,
   warrantyStatus,
-  description
+  description,
+  taxStatus = 0
 ) => {
   let find = {};
 
@@ -75,6 +93,22 @@ exports.getCount = (
     find.warranty = true;
   } else if (warrantyStatus == 2) {
     find.warranty = false;
+  }
+
+  if (taxStatus == 1) {
+    find.$and = [
+      { supplierTaxNumber: { $exists: true } },
+      { supplierTaxNumber: { $ne: null } },
+      { supplierTaxNumber: { $ne: "" } },
+      { supplierTaxNumber: { $ne: " " } },
+    ];
+  } else if (taxStatus == 2) {
+    find.$or = [
+      { supplierTaxNumber: { $exists: false } },
+      { supplierTaxNumber: { $eq: null } },
+      { supplierTaxNumber: { $eq: "" } },
+      { supplierTaxNumber: { $eq: " " } },
+    ];
   }
 
   find.branchID = branchID;
@@ -104,7 +138,8 @@ exports.getInvoiceByDescription = async (
   warrantyStatus,
   page,
   fromDate,
-  toDate
+  toDate,
+  taxStatus = 0
 ) => {
   let find = {};
 
@@ -116,6 +151,22 @@ exports.getInvoiceByDescription = async (
     find.warranty = true;
   } else if (warrantyStatus == 2) {
     find.warranty = false;
+  }
+
+  if (taxStatus == 1) {
+    find.$and = [
+      { supplierTaxNumber: { $exists: true } },
+      { supplierTaxNumber: { $ne: null } },
+      { supplierTaxNumber: { $ne: "" } },
+      { supplierTaxNumber: { $ne: " " } },
+    ];
+  } else if (taxStatus == 2) {
+    find.$or = [
+      { supplierTaxNumber: { $exists: false } },
+      { supplierTaxNumber: { $eq: null } },
+      { supplierTaxNumber: { $eq: "" } },
+      { supplierTaxNumber: { $eq: " " } },
+    ];
   }
 
   if (fromDate && toDate) {
