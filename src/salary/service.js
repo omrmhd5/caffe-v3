@@ -52,12 +52,12 @@ exports.getAllSalaries = async (
       // Only check time if salary has createdAt (means it exists in DB)
       // and it's not all zeros
       if (!isAllZero && salary.createdAt && userRole != "AccountantManager") {
-        // Calculate seconds since this specific row was saved to DB
+        // Calculate hours since this specific row was saved to DB
         const salaryDate = new Date(salary.createdAt);
-        const seconds = Math.abs(currentDate - salaryDate) / 1000;
+        const hours = Math.abs(currentDate - salaryDate) / 36e5;
 
-        // Disable if 30 seconds have passed since this row was saved
-        if (seconds > 30) {
+        // Disable if 24 hours have passed since this row was saved
+        if (hours > 24) {
           salary.disabled = "disabled";
         } else {
           salary.disabled = "";
