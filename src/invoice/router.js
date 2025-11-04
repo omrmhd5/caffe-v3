@@ -18,6 +18,7 @@ router
 
 router.route("/report").get(auth, invoiceController.report);
 router.route("/excel-report").get(auth, invoiceController.excelReport);
+router.route("/pdf-export").get(auth, invoiceController.pdfExport);
 
 router
   .route("/:id")

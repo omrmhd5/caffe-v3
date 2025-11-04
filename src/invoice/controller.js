@@ -1,4 +1,7 @@
 const excelJS = require("exceljs");
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
+const path = require("path");
 
 const {
   NotFoundException,
@@ -583,5 +586,228 @@ exports.excelReport = async (req, response) => {
     return workbook.xlsx.write(response).then(function () {
       response.status(200).end();
     });
+  }
+};
+
+exports.pdfExport = async (req, res) => {
+  try {
+    let branchID = null;
+    let branch = null;
+    let fromDate = null;
+    let toDate = null;
+    let taxStatus = 0;
+    let warrantyStatus = 0;
+    let description = null;
+
+    if (req.user.branchedRole) {
+      branchID = req.user.branchID;
+    } else {
+      branchID = req.query.branchID;
+    }
+
+    if (!branchID) {
+      return res.status(400).send({ errorMessage: "الرجاء اختيار الفرع" });
+    }
+
+    branch = await branchService.getBranchById(branchID);
+
+    if (req.query.fromDate) {
+      fromDate = req.query.fromDate;
+    }
+
+    if (req.query.toDate) {
+      toDate = req.query.toDate;
+    }
+
+    if (req.query.warrantyStatus) {
+      warrantyStatus = req.query.warrantyStatus;
+    }
+
+    if (req.query.taxStatus) {
+      taxStatus = req.query.taxStatus;
+    }
+
+    if (req.query.description) {
+      description = req.query.description;
+    }
+
+    // Get all invoices for export
+    const invoices = await invoiceService.getAllInvoicesForExport(
+      branchID,
+      fromDate,
+      toDate,
+      warrantyStatus,
+      taxStatus,
+      description
+    );
+
+    // Get status labels
+    const warrantyStatusLabel =
+      warrantyStatuses.find((s) => s.value == warrantyStatus)?.name || "الكل";
+    const taxStatusLabel =
+      taxStatuses.find((s) => s.value == taxStatus)?.name || "الكل";
+
+    // Create PDF document
+    const doc = new PDFDocument({
+      size: "A4",
+      margin: 50,
+    });
+
+    // Register Arabic font
+    const arabicFontPath = path.join(
+      __dirname,
+      "../../public/assets/css/majalla.ttf"
+    );
+    let arabicFont = "Helvetica"; // Default fallback
+
+    if (fs.existsSync(arabicFontPath)) {
+      try {
+        doc.registerFont("Arabic", arabicFontPath);
+        arabicFont = "Arabic";
+      } catch (error) {
+        console.error("Error registering Arabic font:", error);
+      }
+    }
+
+    // Set response headers
+    res.setHeader("Content-Type", "application/pdf");
+
+    // Generate filename: invoice-branch-dateFrom-DateTo
+    // All in Arabic except dates (English)
+    const branchNameForFile = (branch?.branchname || "غير-محدد").replace(
+      /\s+/g,
+      "-"
+    );
+    const fromDateForFile = fromDate || "غير-محدد";
+    const toDateForFile = toDate || "غير-محدد";
+    const filename = `فواتير-${branchNameForFile}-${fromDateForFile}-${toDateForFile}.pdf`;
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${encodeURIComponent(filename)}`
+    );
+
+    // Pipe PDF to response
+    doc.pipe(res);
+
+    // Helper function to reverse Arabic word order (last word becomes first)
+    const reverseArabicWords = (text) => {
+      if (!text) return "";
+      return text.split(" ").reverse().join(" ");
+    };
+
+    // First page - Summary information (all in Arabic, right-aligned, same line)
+    // For RTL text, we need to put value first, then label for proper display
+    const pageWidth = doc.page.width;
+    const margin = 50;
+    let currentY = 50;
+
+    // فواتير فرع: [Branch name] - Reverse word order and put value first
+    doc.font(arabicFont).fontSize(20);
+    const reversedBranchName = reverseArabicWords(branch?.branchname || "");
+    const branchText = `${reversedBranchName} فرع: فواتير`;
+    doc.text(branchText, margin, currentY, {
+      width: pageWidth - 2 * margin,
+      align: "right",
+    });
+    currentY += 40;
+
+    // من تاريخ: [From date] - Dates don't need reversal
+    const fromDateText = `${fromDate || "غير محدد"} تاريخ: من`;
+    doc.text(fromDateText, margin, currentY, {
+      width: pageWidth - 2 * margin,
+      align: "right",
+    });
+    currentY += 40;
+
+    // الى: [To date] - Dates don't need reversal
+    const toDateText = `${toDate || "غير محدد"} الى:`;
+    doc.text(toDateText, margin, currentY, {
+      width: pageWidth - 2 * margin,
+      align: "right",
+    });
+    currentY += 40;
+
+    // نوع الفواتير: [Tax status] - Reverse word order
+    const reversedTaxStatus = reverseArabicWords(taxStatusLabel);
+    const taxStatusText = `${reversedTaxStatus} الفواتير: نوع`;
+    doc.text(taxStatusText, margin, currentY, {
+      width: pageWidth - 2 * margin,
+      align: "right",
+    });
+    currentY += 40;
+
+    // حالة الضمان: [Warranty status] - Reverse word order
+    const reversedWarrantyStatus = reverseArabicWords(warrantyStatusLabel);
+    const warrantyStatusText = `${reversedWarrantyStatus} الضمان: حالة`;
+    doc.text(warrantyStatusText, margin, currentY, {
+      width: pageWidth - 2 * margin,
+      align: "right",
+    });
+    currentY += 40;
+
+    // إجمالي الفواتير: [Total invoices count]
+    const totalInvoicesText = `${invoices.length} الفواتير: إجمالي`;
+    doc.text(totalInvoicesText, margin, currentY, {
+      width: pageWidth - 2 * margin,
+      align: "right",
+    });
+
+    // Add a new page for each invoice
+    for (const invoice of invoices) {
+      doc.addPage();
+
+      // Invoice Description (in Arabic, right-aligned)
+      // Reverse word order and put description first, then label
+      const invoicePageWidth = doc.page.width;
+      const invoiceMargin = 50;
+
+      if (invoice.description) {
+        // Reverse the description word order (last word becomes first)
+        const reversedDescription = reverseArabicWords(invoice.description);
+        const descriptionText = `${reversedDescription} الفاتورة: وصف`;
+        doc
+          .font(arabicFont)
+          .fontSize(18)
+          .text(descriptionText, invoiceMargin, 50, {
+            width: invoicePageWidth - 2 * invoiceMargin,
+            align: "right",
+          });
+      } else {
+        doc
+          .font(arabicFont)
+          .fontSize(18)
+          .text("لا يوجد وصف الفاتورة: وصف", invoiceMargin, 50, {
+            width: invoicePageWidth - 2 * invoiceMargin,
+            align: "right",
+          });
+      }
+
+      // Invoice photo
+      if (invoice.image) {
+        const imagePath = path.join(__dirname, "../../public", invoice.image);
+        try {
+          if (fs.existsSync(imagePath)) {
+            // Get image dimensions to fit on page
+            const imageWidth = 500;
+            const imageHeight = 600;
+            const yPosition = 150;
+
+            doc.image(imagePath, 50, yPosition, {
+              fit: [imageWidth, imageHeight],
+              align: "center",
+            });
+          }
+        } catch (error) {
+          console.error("Error loading image:", error);
+        }
+      }
+    }
+
+    // Finalize PDF
+    doc.end();
+  } catch (error) {
+    console.error("PDF Export Error:", error);
+    res.status(500).send({ errorMessage: "خطأ في تصدير PDF" });
   }
 };

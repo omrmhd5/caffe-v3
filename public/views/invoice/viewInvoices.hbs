@@ -99,6 +99,15 @@
             </div>
         </form>
       </div>
+      <div class="card-header px-0">
+        <div class="form-group row mx-3">
+          <div class="col-sm-12">
+            <button id="pdf-export-btn" class="btn btn-primary" style="margin: 10px 0;">
+              <i class="fa fa-file-pdf"></i> تصدير PDF
+            </button>
+          </div>
+        </div>
+      </div>
       <div class="table-responsive">
         <table id="add-row" class=" table table-striped">
           <thead>
@@ -280,6 +289,28 @@
       form.submit();
     }
   }
+
+  // PDF Export button handler
+  $('#pdf-export-btn').on('click', function() {
+    let branchID = $('#branchID').val();
+    let fromDate = $('#fromDate').val();
+    let toDate = $('#toDate').val();
+    let warrantyStatus = $('#warrantyStatus').val();
+    let taxStatus = $('#taxStatus').val();
+    let description = $('input[name="description"]').val();
+
+    // Build query parameters
+    let params = new URLSearchParams();
+    if (branchID) params.append('branchID', branchID);
+    if (fromDate) params.append('fromDate', fromDate);
+    if (toDate) params.append('toDate', toDate);
+    if (warrantyStatus) params.append('warrantyStatus', warrantyStatus);
+    if (taxStatus) params.append('taxStatus', taxStatus);
+    if (description) params.append('description', description);
+
+    // Open PDF export URL
+    window.location.href = '/invoice/pdf-export?' + params.toString();
+  });
 
 </script>
 {{> footer/invoiceFooter}}

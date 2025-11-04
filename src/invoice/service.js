@@ -391,6 +391,63 @@ exports.updateInvoice = async (
   return invoice;
 };
 
+exports.getAllInvoicesForExport = async (
+  branchID,
+  fromDate,
+  toDate,
+  warrantyStatus,
+  taxStatus = 0,
+  description = null
+) => {
+  let find = {};
+
+  if (warrantyStatus == 1) {
+    find.warranty = true;
+  } else if (warrantyStatus == 2) {
+    find.warranty = false;
+  }
+
+  if (taxStatus == 1) {
+    find.$and = [
+      { supplierTaxNumber: { $exists: true } },
+      { supplierTaxNumber: { $ne: null } },
+      { supplierTaxNumber: { $ne: "" } },
+      { supplierTaxNumber: { $ne: " " } },
+    ];
+  } else if (taxStatus == 2) {
+    find.$or = [
+      { supplierTaxNumber: { $exists: false } },
+      { supplierTaxNumber: { $eq: null } },
+      { supplierTaxNumber: { $eq: "" } },
+      { supplierTaxNumber: { $eq: " " } },
+    ];
+  }
+
+  if (!branchID) {
+    return [];
+  }
+
+  find.branchID = branchID;
+
+  if (fromDate && toDate) {
+    toDate = getToDate(toDate);
+
+    find.date = {
+      $gte: fromDate,
+      $lte: toDate,
+    };
+  }
+
+  if (description) {
+    find.$text = { $search: description };
+  }
+
+  return await Invoice.find(find)
+    .populate("branchID")
+    .sort({ date: 1 })
+    .lean();
+};
+
 exports.getReport = async (
   branchID = null,
   fromDate,
