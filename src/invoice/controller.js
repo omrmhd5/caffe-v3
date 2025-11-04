@@ -753,8 +753,81 @@ exports.pdfExport = async (req, res) => {
       align: "right",
     });
 
+    // Helper function to get month and year from date
+    const getMonthYear = (date) => {
+      if (!date) return null;
+      const d = new Date(date);
+      return {
+        month: d.getMonth(),
+        year: d.getFullYear(),
+      };
+    };
+
+    // Helper function to format month name in Arabic
+    const getMonthNameArabic = (monthIndex) => {
+      const months = [
+        "يناير",
+        "فبراير",
+        "مارس",
+        "أبريل",
+        "مايو",
+        "يونيو",
+        "يوليو",
+        "أغسطس",
+        "سبتمبر",
+        "أكتوبر",
+        "نوفمبر",
+        "ديسمبر",
+      ];
+      return months[monthIndex] || "";
+    };
+
     // Add a new page for each invoice
-    for (const invoice of invoices) {
+    let previousMonthYear = null;
+    for (let i = 0; i < invoices.length; i++) {
+      const invoice = invoices[i];
+      const invoiceDate = new Date(invoice.date);
+      const currentMonthYear = getMonthYear(invoiceDate);
+
+      // Check if month changed (and it's not the first invoice)
+      if (previousMonthYear !== null) {
+        if (
+          currentMonthYear.month !== previousMonthYear.month ||
+          currentMonthYear.year !== previousMonthYear.year
+        ) {
+          // Month changed - add page break with message
+          doc.addPage();
+
+          // Format the message: "the upcoming invoices are for the new month: [month] till [date]"
+          const monthNameArabic = getMonthNameArabic(currentMonthYear.month);
+          const year = currentMonthYear.year;
+          const monthDateText = `${monthNameArabic} ${year}`;
+          const tillDateText = toDate || "غير محدد";
+
+          // Construct the message for proper RTL display in PDFKit
+          // For RTL, we write in visual order (left to right): [date] حتى [month] الجديد الشهر للهي القادمة الفواتير
+          // This displays correctly as: "الفواتير القادمة هي للشهر الجديد [month] حتى [date]"
+          // Note: Don't reverse monthDateText as it contains numbers
+          const reversedArabicPart = reverseArabicWords(
+            "الفواتير القادمة هي للشهر الجديد"
+          );
+          const messageText = `${tillDateText} حتى ${monthDateText} ${reversedArabicPart}`;
+
+          // Center the text vertically, but align right for proper RTL display
+          const pageHeight = doc.page.height;
+          const centerY = pageHeight / 2;
+
+          doc
+            .font(arabicFont)
+            .fontSize(24)
+            .text(messageText, margin, centerY - 50, {
+              width: pageWidth - 2 * margin,
+              align: "right",
+            });
+        }
+      }
+
+      // Add page for invoice
       doc.addPage();
 
       // Invoice Description (in Arabic, right-aligned)
@@ -802,6 +875,9 @@ exports.pdfExport = async (req, res) => {
           console.error("Error loading image:", error);
         }
       }
+
+      // Update previous month for next iteration
+      previousMonthYear = currentMonthYear;
     }
 
     // Finalize PDF
