@@ -37,11 +37,35 @@ exports.getAllSalaries = async (
     }).lean();
 
     if (salary) {
-      const salaryDate = new Date(salary.createdAt);
-      const hours = parseInt(Math.abs(currentDate - salaryDate) / 36e5);
+      // Check if all salary values are zero (empty/unentered salary)
+      // Convert to numbers to handle string values properly
+      const isAllZero =
+        (parseFloat(salary.salary) || 0) === 0 &&
+        (parseFloat(salary.extraWork) || 0) === 0 &&
+        (parseFloat(salary.allowance) || 0) === 0 &&
+        (parseFloat(salary.amountDecrease) || 0) === 0 &&
+        (parseFloat(salary.amountIncrease) || 0) === 0 &&
+        (parseFloat(salary.daysDecrease) || 0) === 0 &&
+        (parseFloat(salary.daysIncrease) || 0) === 0 &&
+        (parseFloat(salary.netSalary) || 0) === 0;
 
-      salary.disabled =
-        hours > 48 && userRole != "AccountantManager" ? "disabled" : "";
+      // Only check time if salary has createdAt (means it exists in DB)
+      // and it's not all zeros
+      if (!isAllZero && salary.createdAt && userRole != "AccountantManager") {
+        // Calculate seconds since this specific row was saved to DB
+        const salaryDate = new Date(salary.createdAt);
+        const seconds = Math.abs(currentDate - salaryDate) / 1000;
+
+        // Disable if 30 seconds have passed since this row was saved
+        if (seconds > 30) {
+          salary.disabled = "disabled";
+        } else {
+          salary.disabled = "";
+        }
+      } else {
+        // Keep enabled if: all zeros, no createdAt (new row), or is AccountantManager
+        salary.disabled = "";
+      }
     }
 
     if (
@@ -293,7 +317,35 @@ exports.updateBulk = async (user, salaries) => {
   // Remove the early return for zero total - we should save all salary records
   // even if they sum to zero, as individual employees might have zero salaries
 
+  let hasValidSalaries = false;
+  let branchID = null;
+  let date = null;
+
   for (let salary of salaries) {
+    // Check if all salary values are zero - skip these rows
+    // Convert to numbers to handle string values properly
+    const isAllZero =
+      (parseFloat(salary.salary) || 0) === 0 &&
+      (parseFloat(salary.extraWork) || 0) === 0 &&
+      (parseFloat(salary.allowance) || 0) === 0 &&
+      (parseFloat(salary.amountDecrease) || 0) === 0 &&
+      (parseFloat(salary.amountIncrease) || 0) === 0 &&
+      (parseFloat(salary.daysDecrease) || 0) === 0 &&
+      (parseFloat(salary.daysIncrease) || 0) === 0 &&
+      (parseFloat(salary.netSalary) || 0) === 0;
+
+    // Skip all-zero rows - don't save them to database
+    if (isAllZero) {
+      continue;
+    }
+
+    // Store branchID and date from first valid salary for financial update
+    if (!branchID && salary.branchID) {
+      branchID = salary.branchID;
+      date = salary.date;
+      hasValidSalaries = true;
+    }
+
     const normalizedDate = toMonthStartDate(salary.date);
     await Salary.findOneAndUpdate(
       {
@@ -308,11 +360,14 @@ exports.updateBulk = async (user, salaries) => {
     );
   }
 
-  await financialService.updateSalariesAndNetIncome(
-    salaries[0].branchID,
-    toMonthStartDate(salaries[0].date),
-    user._id
-  );
+  // Only update financials if we have at least one valid salary
+  if (hasValidSalaries && branchID && date) {
+    await financialService.updateSalariesAndNetIncome(
+      branchID,
+      toMonthStartDate(date),
+      user._id
+    );
+  }
 
   return;
 };
