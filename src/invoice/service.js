@@ -442,10 +442,7 @@ exports.getAllInvoicesForExport = async (
     find.$text = { $search: description };
   }
 
-  return await Invoice.find(find)
-    .populate("branchID")
-    .sort({ date: 1 })
-    .lean();
+  return await Invoice.find(find).populate("branchID").sort({ date: 1 }).lean();
 };
 
 exports.getReport = async (
