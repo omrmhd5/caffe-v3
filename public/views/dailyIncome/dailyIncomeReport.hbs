@@ -117,7 +117,7 @@
 
 </style>
 
-<div class=" bg-white col-md-12 d-print-none p-0" dir="rtl" style="padding: 0px 28px;">
+<div class=" bg-white col-md-12 d-print-none p-0" dir="rtl" style="padding: 0px 28px;" data-user-role="{{expreq.user.role}}">
   <div class="headerPage">
     <div class="Title">
       <h2 style="text-align: center;">
@@ -645,7 +645,6 @@
 <script>
   // Pass user role information to JavaScript
   window.userIsManager = {{#if isManager}}true{{else}}false{{/if}};
-  window.userRole = "{{userRole}}";
   
   $('#month').datetimepicker({
     format: 'YYYY/MM',
