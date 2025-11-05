@@ -132,6 +132,18 @@ hbs.registerHelper("sum", function () {
   return total;
 });
 
+hbs.registerHelper("range", function (from, to) {
+  let result = [];
+  for (let i = from; i <= to; i++) {
+    result.push(i);
+  }
+  return result;
+});
+
+hbs.registerHelper("add", function (a, b) {
+  return a + b;
+});
+
 hbs.registerHelper("formatFileSize", function (bytes) {
   if (!bytes || bytes === 0) return "0 Bytes";
   const k = 1024;

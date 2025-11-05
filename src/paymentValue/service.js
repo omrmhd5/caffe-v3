@@ -29,17 +29,55 @@ exports.addPaymentValue = async (paymentValue) => {
     receivedValues.splice(10);
   }
 
+  // Get existing payment value to check for changes
+  const existingPaymentValue = await PaymentValue.findOne({
+    branchID: paymentValue.branchID,
+    date: normalizedDate,
+  });
+
+  // Initialize arrays for tracking
+  let lastSubmittedPaidValues = existingPaymentValue?.lastSubmittedPaidValues || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  let paidFieldStatuses = existingPaymentValue?.paidFieldStatuses || [null, null, null, null, null, null, null, null, null, null];
+
+  // Ensure arrays have exactly 10 elements
+  while (lastSubmittedPaidValues.length < 10) {
+    lastSubmittedPaidValues.push(0);
+  }
+  while (paidFieldStatuses.length < 10) {
+    paidFieldStatuses.push(null);
+  }
+  lastSubmittedPaidValues = lastSubmittedPaidValues.slice(0, 10);
+  paidFieldStatuses = paidFieldStatuses.slice(0, 10);
+
+  // Check which fields have changed compared to last submitted values
+  // If a field changed and is not already approved, set status to 'pending'
+  for (let i = 0; i < 10; i++) {
+    if (paidValues[i] !== lastSubmittedPaidValues[i]) {
+      // Field value changed compared to last submitted
+      if (paidFieldStatuses[i] !== 'approved') {
+        // Set to pending if not already approved (allows changes to pending/rejected fields)
+        // This includes rejected fields that are being resubmitted - they become pending
+        paidFieldStatuses[i] = 'pending';
+      }
+      // If approved, keep it as approved (don't change status)
+    }
+  }
+
+  // Update last submitted values to current values (these are the values being saved)
+  lastSubmittedPaidValues = [...paidValues];
+
   const paymentValueToSave = {
     ...paymentValue,
     date: normalizedDate,
     paidValues: paidValues,
     receivedValues: receivedValues,
+    lastSubmittedPaidValues: lastSubmittedPaidValues,
+    paidFieldStatuses: paidFieldStatuses,
     // Respect the approved value passed in (AccountantManager sets it to true)
     approved: paymentValue.approved !== undefined ? paymentValue.approved : false,
   };
 
-  // If non-manager is saving (approved is false or undefined), reset createdAt to restart timer
-  // If approved is true (AccountantManager), don't reset createdAt
+  // Update createdAt when saving (for tracking purposes)
   if (paymentValue.approved === false || paymentValue.approved === undefined) {
     paymentValueToSave.createdAt = new Date();
   }
@@ -78,11 +116,98 @@ exports.getPaymentValue = async (branchID, date) => {
         ...Array(10 - (result.receivedValues?.length || 0)).fill(0),
       ];
     }
+    // Ensure lastSubmittedPaidValues has 10 elements
+    if (!Array.isArray(result.lastSubmittedPaidValues) || result.lastSubmittedPaidValues.length < 10) {
+      result.lastSubmittedPaidValues = [
+        ...(result.lastSubmittedPaidValues || []),
+        ...Array(10 - (result.lastSubmittedPaidValues?.length || 0)).fill(0),
+      ];
+    }
+    // Ensure paidFieldStatuses has 10 elements
+    if (!Array.isArray(result.paidFieldStatuses) || result.paidFieldStatuses.length < 10) {
+      result.paidFieldStatuses = [
+        ...(result.paidFieldStatuses || []),
+        ...Array(10 - (result.paidFieldStatuses?.length || 0)).fill(null),
+      ];
+    }
   }
 
   return result;
 };
 
+// Approve a specific field (fieldIndex: 0-9)
+exports.approvePaymentField = async (branchID, date, fieldIndex) => {
+  const normalizedDate = toMonthStartDate(date);
+  const paymentValue = await PaymentValue.findOne({
+    branchID,
+    date: normalizedDate,
+  });
+
+  if (!paymentValue) {
+    throw new Error("Payment value not found");
+  }
+
+  const paidFieldStatuses = [...(paymentValue.paidFieldStatuses || [null, null, null, null, null, null, null, null, null, null])];
+  while (paidFieldStatuses.length < 10) {
+    paidFieldStatuses.push(null);
+  }
+  paidFieldStatuses[fieldIndex] = 'approved';
+
+  await PaymentValue.updateOne(
+    {
+      branchID,
+      date: normalizedDate,
+    },
+    { paidFieldStatuses: paidFieldStatuses },
+    { upsert: false }
+  );
+};
+
+// Reject a specific field (fieldIndex: 0-9)
+exports.rejectPaymentField = async (branchID, date, fieldIndex) => {
+  const normalizedDate = toMonthStartDate(date);
+  const paymentValue = await PaymentValue.findOne({
+    branchID,
+    date: normalizedDate,
+  });
+
+  if (!paymentValue) {
+    throw new Error("Payment value not found");
+  }
+
+  const paidFieldStatuses = [...(paymentValue.paidFieldStatuses || [null, null, null, null, null, null, null, null, null, null])];
+  const paidValues = [...(paymentValue.paidValues || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])];
+  const lastSubmittedPaidValues = [...(paymentValue.lastSubmittedPaidValues || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])];
+
+  while (paidFieldStatuses.length < 10) {
+    paidFieldStatuses.push(null);
+  }
+  while (paidValues.length < 10) {
+    paidValues.push(0);
+  }
+  while (lastSubmittedPaidValues.length < 10) {
+    lastSubmittedPaidValues.push(0);
+  }
+
+  // Reset the field value to 0 and set status to rejected
+  paidValues[fieldIndex] = 0;
+  paidFieldStatuses[fieldIndex] = 'rejected';
+  // Keep lastSubmittedPaidValues unchanged so we can compare when resubmitted
+
+  await PaymentValue.updateOne(
+    {
+      branchID,
+      date: normalizedDate,
+    },
+    {
+      paidValues: paidValues,
+      paidFieldStatuses: paidFieldStatuses,
+    },
+    { upsert: false }
+  );
+};
+
+// Legacy methods for backward compatibility (approve/reject all)
 exports.approvePaymentValue = async (branchID, date) => {
   const normalizedDate = toMonthStartDate(date);
   await PaymentValue.updateOne(
@@ -106,7 +231,7 @@ exports.rejectPaymentValue = async (branchID, date) => {
       paidValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       receivedValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       approved: false,
-      createdAt: new Date(), // Reset timer so non-managers can edit until timer expires
+      createdAt: new Date(), // Reset createdAt when rejecting
     },
     { upsert: false }
   );

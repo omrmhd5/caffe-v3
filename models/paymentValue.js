@@ -19,6 +19,16 @@ const paymentValueSchema = new mongoose.Schema(
       type: [Number],
       default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
+    // Last submitted values to compare for changes
+    lastSubmittedPaidValues: {
+      type: [Number],
+      default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+    // Approval status per field: 'pending', 'approved', 'rejected', or null
+    paidFieldStatuses: {
+      type: [String],
+      default: [null, null, null, null, null, null, null, null, null, null],
+    },
     approved: {
       type: Boolean,
       default: false,

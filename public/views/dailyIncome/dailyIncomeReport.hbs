@@ -79,6 +79,42 @@
     background-color: #fff3cd !important;
   }
 
+  /* Status borders for paid fields */
+  .paid-field.status-approved {
+    border: 3px solid #28a745 !important;
+    border-radius: 4px;
+  }
+
+  .paid-field.status-rejected {
+    border: 3px solid #dc3545 !important;
+    border-radius: 4px;
+  }
+
+  .paid-field.status-pending {
+    border: 3px solid #ffc107 !important;
+    border-radius: 4px;
+  }
+
+  .paid-field-wrapper {
+    position: relative;
+  }
+
+  .field-action-buttons {
+    display: none;
+    margin-top: 5px;
+    gap: 5px;
+  }
+
+  .field-action-buttons.show {
+    display: flex;
+    justify-content: center;
+  }
+
+  .field-action-buttons button {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+
 </style>
 
 <div class=" bg-white col-md-12 d-print-none p-0" dir="rtl" style="padding: 0px 28px;">
@@ -311,23 +347,73 @@
         <tbody>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ محول 1" /></td>
-            <td><input type="number" class="form-control paid-field" value="0" {{disablePaidFields}}></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="0" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-0">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="0"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="0"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
           </tr>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ محول 2" /></td>
-            <td><input type="number" class="form-control paid-field" value="0" {{disablePaidFields}}></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="1" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-1">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="1"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="1"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
           </tr>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ محول 3" /></td>
-            <td><input type="number" class="form-control paid-field" value="0" {{disablePaidFields}}></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="2" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-2">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="2"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="2"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
           </tr>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ محول 4" /></td>
-            <td><input type="number" class="form-control paid-field" value="0" {{disablePaidFields}}></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="3" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-3">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="3"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="3"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
           </tr>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ محول 5" /></td>
-            <td><input type="number" class="form-control paid-field" value="0" {{disablePaidFields}}></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="4" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-4">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="4"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="4"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -336,23 +422,73 @@
         <tbody>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ محول 6" /></td>
-            <td><input type="number" class="form-control paid-field" value="0" {{disablePaidFields}}></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="5" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-5">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="5"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="5"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
           </tr>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ محول 7" /></td>
-            <td><input type="number" class="form-control paid-field" value="0" {{disablePaidFields}}></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="6" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-6">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="6"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="6"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
           </tr>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ محول 8" /></td>
-            <td><input type="number" class="form-control paid-field" value="0" {{disablePaidFields}}></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="7" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-7">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="7"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="7"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
           </tr>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ محول 9" /></td>
-            <td><input type="number" class="form-control paid-field" value="0" {{disablePaidFields}}></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="8" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-8">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="8"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="8"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
           </tr>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ محول 10" /></td>
-            <td><input type="number" class="form-control paid-field" value="0" {{disablePaidFields}}></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="9" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-9">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="9"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="9"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -407,36 +543,6 @@
         </tbody>
       </table>
     </div>
-    
-    <!-- Approve/Reject Buttons Row - Under All Tables -->
-    {{#if isManager}}
-    {{#if hasNonZeroPaidValues}}
-    {{#unless paymentValue.approved}}
-    <div class="row d-flex justify-content-center mt-2 w-100">
-      <div class="col-12 text-center">
-        <p class="mb-2" style="font-size: 12px; color: #666;">قبول أو رفض قيم المبلغ المحول المدخلة</p>
-        <div class="d-flex justify-content-center gap-2">
-          <button class="btn btn-success btn-sm" id="approve-paid-values" style="font-size: 12px; padding: 4px 12px;">
-            <i class="fa fa-check"></i> قبول
-          </button>
-          <button class="btn btn-danger btn-sm" id="reject-paid-values" style="font-size: 12px; padding: 4px 12px;">
-            <i class="fa fa-times"></i> رفض
-          </button>
-        </div>
-      </div>
-    </div>
-    {{/unless}}
-    {{#if paymentValue.approved}}
-    <div class="row d-flex justify-content-center mt-2 w-100">
-      <div class="col-12 text-center">
-        <div class="alert alert-success py-2 mb-0" style="font-size: 12px; padding: 4px 12px;">
-          <i class="fa fa-check-circle"></i> تم قبول القيم
-        </div>
-      </div>
-    </div>
-    {{/if}}
-    {{/if}}
-    {{/if}}
   </div>
   <!-- Summary Fields Row - All in one row -->
   <div class="row d-flex justify-content-center mt-3">
@@ -472,9 +578,7 @@
         <div class="col-md-6 text-center">
           <button class="btn btn-lg mb-2 btnclass" id="tax-button" {{disableSaveRatio}} {{#unless isManager}}disabled style="display:none"{{/unless}}> حفظ النسبة </button>
           {{#unless isManager}}
-          {{#if disableSaveRatio}}
           <button class="btn btn-lg mb-2 btnclass" id="save-paid-values-button"> حفظ المبلغ المحول </button>
-          {{/if}}
           {{/unless}}
         </div>
         <div class="col-md-6 text-center">

@@ -699,22 +699,142 @@ const saveNotes = (event) => {
   });
 };
 
+// Track last submitted values per field
+let lastSubmittedValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let fieldStatuses = [null, null, null, null, null, null, null, null, null, null];
+let isCurrentMonth = true;
+
+// Function to update field status and styling
+function updateFieldStatus(fieldIndex, status) {
+  const field = $(`.paid-field[data-field-index="${fieldIndex}"]`);
+  field.removeClass("status-approved status-rejected status-pending");
+  
+  if (status === 'approved') {
+    field.addClass("status-approved");
+    if (!window.userIsManager) {
+      field.prop("disabled", true);
+    }
+  } else if (status === 'rejected') {
+    field.addClass("status-rejected");
+    // Don't disable rejected fields - keep them editable
+    // When resubmitted, they will become pending (yellow)
+  } else if (status === 'pending') {
+    field.addClass("status-pending");
+    // Show approve/reject buttons for managers if pending
+    if (window.userIsManager) {
+      $(`#field-buttons-${fieldIndex}`).addClass("show");
+    }
+  } else {
+    field.removeClass("status-approved status-rejected status-pending");
+    if (window.userIsManager) {
+      $(`#field-buttons-${fieldIndex}`).removeClass("show");
+    }
+  }
+}
+
+// Function to check if field value changed
+function checkFieldChange(fieldIndex, currentValue) {
+  const lastSubmitted = lastSubmittedValues[fieldIndex] || 0;
+  
+  // Compare with tolerance for floating point
+  const hasChanged = Math.abs(currentValue - lastSubmitted) > 0.01;
+  
+  if (hasChanged && currentValue !== 0) {
+    // Field changed and has a non-zero value compared to last submitted
+    // If field was rejected, it will become pending when resubmitted
+    if (fieldStatuses[fieldIndex] === 'rejected') {
+      // When resubmitting after rejection, it should become pending (will be set on save)
+      // Show buttons for managers
+      if (window.userIsManager) {
+        $(`#field-buttons-${fieldIndex}`).addClass("show");
+      }
+    } else if (fieldStatuses[fieldIndex] === 'pending' || fieldStatuses[fieldIndex] === null) {
+      // Show buttons for pending or null fields that have changed
+      if (window.userIsManager) {
+        $(`#field-buttons-${fieldIndex}`).addClass("show");
+      }
+    }
+  } else {
+    // Field value matches last submitted or is 0 - hide buttons if status is not pending
+    if (fieldStatuses[fieldIndex] !== 'pending') {
+      $(`#field-buttons-${fieldIndex}`).removeClass("show");
+    }
+  }
+}
+
 $(document).ready(function () {
   let date = $("#month").val();
   let branchID = $("#branchID").val();
   if (!branchID) return; // Don't fetch if branchID is not selected
+  
+  // Check if current month
+  if (date) {
+    const normalizedMonth = date.replace(/\//g, "-");
+    const selectedDate = new Date(normalizedMonth + "-01");
+    const currentDate = new Date();
+    const selectedMonth = selectedDate.getMonth();
+    const selectedYear = selectedDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    isCurrentMonth = (selectedYear === currentYear && selectedMonth === currentMonth);
+  }
+  
   $.ajax({
     url: "/paymentValue",
     type: "GET",
     data: { branchID: branchID, date: date },
     success: function (data) {
+      // Store last submitted values and statuses
+      if (data && data.lastSubmittedPaidValues && Array.isArray(data.lastSubmittedPaidValues)) {
+        lastSubmittedValues = [...data.lastSubmittedPaidValues];
+        while (lastSubmittedValues.length < 10) {
+          lastSubmittedValues.push(0);
+        }
+        lastSubmittedValues = lastSubmittedValues.slice(0, 10);
+      }
+      
+      if (data && data.paidFieldStatuses && Array.isArray(data.paidFieldStatuses)) {
+        fieldStatuses = [...data.paidFieldStatuses];
+        while (fieldStatuses.length < 10) {
+          fieldStatuses.push(null);
+        }
+        fieldStatuses = fieldStatuses.slice(0, 10);
+      }
+      
       if (data && data.paidValues && Array.isArray(data.paidValues)) {
         $(".paid-field").each(function (i) {
-          $(this).val(
-            data.paidValues[i] !== undefined ? data.paidValues[i] : 0
-          );
+          const fieldIndex = parseInt($(this).attr("data-field-index"));
+          const value = data.paidValues[fieldIndex] !== undefined ? data.paidValues[fieldIndex] : 0;
+          $(this).val(value);
+          
+          // For non-managers: Disable ALL fields if month doesn't match (highest priority)
+          if (!window.userIsManager && !isCurrentMonth) {
+            $(this).prop("disabled", true);
+            return; // Skip the rest of the logic for non-current months
+          }
+          
+          // Apply status styling
+          if (fieldStatuses[fieldIndex]) {
+            updateFieldStatus(fieldIndex, fieldStatuses[fieldIndex]);
+          } else {
+            // Check if field has changed compared to last submitted (for showing buttons)
+            const lastSubmitted = lastSubmittedValues[fieldIndex] || 0;
+            const hasChanged = Math.abs(value - lastSubmitted) > 0.01;
+            
+            if (hasChanged && window.userIsManager) {
+              // Show buttons for changed fields
+              $(`#field-buttons-${fieldIndex}`).addClass("show");
+            }
+          }
+          
+          // For non-managers in current month: disable approved fields only
+          if (!window.userIsManager && fieldStatuses[fieldIndex] === 'approved') {
+            $(this).prop("disabled", true);
+          }
+          // Rejected fields remain editable - they show red border until resubmitted
         });
       }
+      
       if (data && data.receivedValues && Array.isArray(data.receivedValues)) {
         $(".received-field").each(function (i) {
           $(this).val(
@@ -723,27 +843,24 @@ $(document).ready(function () {
         });
       }
 
-      // Check if paid fields should be disabled
-      // If approved, disable only for non-managers (managers can still edit)
-      // If not approved and not manager, check timer (1 hour)
-      const isManager = window.userIsManager === true;
-
-      // If approved, disable only for non-managers
-      if (data && data.approved === true && !isManager) {
-        $(".paid-field").prop("disabled", true);
-      } else if (!isManager && data && data.createdAt) {
-        // Check timer for non-managers if not approved (1 hour = 3600 seconds)
-        const createdAt = new Date(data.createdAt);
-        const currentTime = new Date();
-        const hoursPassed = (currentTime - createdAt) / (1000 * 60 * 60); // Convert to hours
-
-        if (hoursPassed > 1) {
-          $(".paid-field").prop("disabled", true);
-        }
-      }
-
       updateGrandTotal();
     },
+  });
+  
+  // Track field changes for showing approve/reject buttons
+  $(document).on("input change", ".paid-field", function() {
+    // For non-managers: prevent changes if not current month
+    if (!window.userIsManager && !isCurrentMonth) {
+      $(this).prop("disabled", true);
+      return;
+    }
+    
+    if (!window.userIsManager) return; // Only managers can trigger approve/reject buttons
+    
+    const fieldIndex = parseInt($(this).attr("data-field-index"));
+    const currentValue = parseFloat($(this).val()) || 0;
+    
+    checkFieldChange(fieldIndex, currentValue);
   });
 
   // Scroll to last edited non-zero row
@@ -755,20 +872,16 @@ $(document).ready(function () {
     saveNotesButton.addEventListener("click", saveNotes);
   }
 
-  // Add event listeners for approve/reject buttons
-  let approveButton = document.getElementById("approve-paid-values");
-  if (approveButton) {
-    approveButton.addEventListener("click", function () {
-      approvePaidValues();
-    });
-  }
-
-  let rejectButton = document.getElementById("reject-paid-values");
-  if (rejectButton) {
-    rejectButton.addEventListener("click", function () {
-      rejectPaidValues();
-    });
-  }
+  // Add event listeners for per-field approve/reject buttons
+  $(document).on("click", ".approve-field-btn", function() {
+    const fieldIndex = parseInt($(this).attr("data-field-index"));
+    approvePaymentField(fieldIndex);
+  });
+  
+  $(document).on("click", ".reject-field-btn", function() {
+    const fieldIndex = parseInt($(this).attr("data-field-index"));
+    rejectPaymentField(fieldIndex);
+  });
 
   // Add event listener for save paid values button (non-managers only)
   let savePaidValuesButton = document.getElementById("save-paid-values-button");
@@ -779,11 +892,11 @@ $(document).ready(function () {
   }
 });
 
-// Function to approve paid values
-function approvePaidValues() {
+// Function to approve a specific field
+function approvePaymentField(fieldIndex) {
   swal({
     title: "قبول القيم",
-    text: "هل أنت متأكد أنك تريد قبول قيم المبلغ المحول؟",
+    text: `هل أنت متأكد أنك تريد قبول مبلغ محول ${fieldIndex + 1}؟`,
     icon: "warning",
     buttons: {
       confirm: {
@@ -802,13 +915,18 @@ function approvePaidValues() {
       let branchID = $("#branchID").val();
 
       $.ajax({
-        url: "/paymentValue/approve",
+        url: "/paymentValue/approve-field",
         type: "POST",
         data: {
           branchID: branchID,
           date: date,
+          fieldIndex: fieldIndex,
         },
         success: function (data) {
+          fieldStatuses[fieldIndex] = 'approved';
+          updateFieldStatus(fieldIndex, 'approved');
+          $(`#field-buttons-${fieldIndex}`).removeClass("show");
+          
           swal({
             title: data.message,
             type: "success",
@@ -817,8 +935,6 @@ function approvePaidValues() {
                 className: "btn btn-success",
               },
             },
-          }).then(() => {
-            location.reload();
           });
         },
         error: function (jqXhr) {
@@ -840,11 +956,11 @@ function approvePaidValues() {
   });
 }
 
-// Function to reject paid values
-function rejectPaidValues() {
+// Function to reject a specific field
+function rejectPaymentField(fieldIndex) {
   swal({
     title: "رفض القيم",
-    text: "هل أنت متأكد أنك تريد رفض قيم المبلغ المحول وإعادة تعيينها إلى الصفر؟",
+    text: `هل أنت متأكد أنك تريد رفض مبلغ محول ${fieldIndex + 1}؟`,
     icon: "warning",
     buttons: {
       confirm: {
@@ -863,13 +979,21 @@ function rejectPaidValues() {
       let branchID = $("#branchID").val();
 
       $.ajax({
-        url: "/paymentValue/reject",
+        url: "/paymentValue/reject-field",
         type: "POST",
         data: {
           branchID: branchID,
           date: date,
+          fieldIndex: fieldIndex,
         },
         success: function (data) {
+          // Update field to 0 and show red border, keep it editable
+          const field = $(`.paid-field[data-field-index="${fieldIndex}"]`);
+          field.val(0);
+          fieldStatuses[fieldIndex] = 'rejected';
+          updateFieldStatus(fieldIndex, 'rejected');
+          $(`#field-buttons-${fieldIndex}`).removeClass("show");
+          
           swal({
             title: data.message,
             type: "success",
@@ -878,8 +1002,6 @@ function rejectPaidValues() {
                 className: "btn btn-success",
               },
             },
-          }).then(() => {
-            location.reload();
           });
         },
         error: function (jqXhr) {
@@ -945,20 +1067,24 @@ function savePaidValuesOnly() {
         approved: isAccountantManager ? true : false, // AccountantManager auto-approves
       }),
     },
-    success: function (data) {
-      swal({
-        title: "تم الحفظ",
-        text: "تم حفظ المبلغ المحول بنجاح",
-        type: "success",
-        buttons: {
-          confirm: {
-            className: "btn btn-success",
-          },
+        success: function (data) {
+          swal({
+            title: "تم الحفظ",
+            text: "تم حفظ المبلغ المحول بنجاح",
+            type: "success",
+            buttons: {
+              confirm: {
+                className: "btn btn-success",
+              },
+            },
+          }).then(() => {
+            // After saving, if not current month, disable all fields for non-managers
+            if (!window.userIsManager && !isCurrentMonth) {
+              $(".paid-field").prop("disabled", true);
+            }
+            location.reload();
+          });
         },
-      }).then(() => {
-        location.reload();
-      });
-    },
     error: function (jqXhr) {
       swal(
         "حدث خطأ",

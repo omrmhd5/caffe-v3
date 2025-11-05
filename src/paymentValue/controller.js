@@ -43,3 +43,25 @@ exports.rejectPaymentValue = async (req, res) => {
     res.status(error.status || 500).send({ errorMessage: error.message });
   }
 };
+
+exports.approvePaymentField = async (req, res) => {
+  try {
+    const { branchID, date, fieldIndex } = req.body;
+    await paymentValueService.approvePaymentField(branchID, date, parseInt(fieldIndex));
+    res.send({ message: `تم قبول مبلغ محول ${parseInt(fieldIndex) + 1} بنجاح` });
+  } catch (error) {
+    console.log(error, error.status, error.message);
+    res.status(error.status || 500).send({ errorMessage: error.message });
+  }
+};
+
+exports.rejectPaymentField = async (req, res) => {
+  try {
+    const { branchID, date, fieldIndex } = req.body;
+    await paymentValueService.rejectPaymentField(branchID, date, parseInt(fieldIndex));
+    res.send({ message: `تم رفض مبلغ محول ${parseInt(fieldIndex) + 1} وإعادة تعيينه` });
+  } catch (error) {
+    console.log(error, error.status, error.message);
+    res.status(error.status || 500).send({ errorMessage: error.message });
+  }
+};

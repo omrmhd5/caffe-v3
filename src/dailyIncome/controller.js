@@ -64,25 +64,27 @@ exports.report = async (req, res) => {
   );
 
   // Check if paid fields should be disabled
-  // If approved, disable only for non-managers (managers can still edit)
-  // If not approved and not manager, check timer (1 hour)
-  let disablePaidFields = "";
+  // For non-managers: disable individual fields based on status OR if selected month is not current month
   const isManager =
     req.user.role === "Manager" || req.user.role === "AccountantManager";
 
-  // If approved, disable only for non-managers
-  if (paymentValue && paymentValue.approved === true && !isManager) {
-    disablePaidFields = "disabled";
-  } else if (!isManager && paymentValue && paymentValue.createdAt) {
-    // Check timer for non-managers if not approved (1 hour = 3600 seconds)
-    const createdAt = new Date(paymentValue.createdAt);
-    const currentTime = new Date();
-    const hoursPassed = (currentTime - createdAt) / (1000 * 60 * 60); // Convert to hours
+  // Check if selected month is not the current month (disable all for non-managers)
+  let isCurrentMonth = true;
+  if (!isManager && month) {
+    const normalizedMonth = month.replace(/\//g, "-");
+    const selectedDate = new Date(normalizedMonth + "-01");
+    const currentDate = new Date();
+    const selectedMonth = selectedDate.getMonth();
+    const selectedYear = selectedDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
 
-    if (hoursPassed > 1) {
-      disablePaidFields = "disabled";
-    }
+    isCurrentMonth = (selectedYear === currentYear && selectedMonth === currentMonth);
   }
+
+  // Get field statuses for visual indicators
+  const paidFieldStatuses = paymentValue?.paidFieldStatuses || [null, null, null, null, null, null, null, null, null, null];
+  const lastSubmittedPaidValues = paymentValue?.lastSubmittedPaidValues || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   // Check if there are any non-zero paid values (for showing approve/reject buttons)
   let hasNonZeroPaidValues = false;
@@ -113,7 +115,9 @@ exports.report = async (req, res) => {
     userRole: req.user.role,
     isManager:
       req.user.role === "Manager" || req.user.role === "AccountantManager",
-    disablePaidFields,
+    isCurrentMonth,
+    paidFieldStatuses,
+    lastSubmittedPaidValues,
     hasNonZeroPaidValues,
     notes,
   });
