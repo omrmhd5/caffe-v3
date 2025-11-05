@@ -4,29 +4,29 @@ const { toMonthStartDate } = require("../common/date");
 exports.addPaymentValue = async (paymentValue) => {
   const normalizedDate = toMonthStartDate(paymentValue.date);
 
-  // Ensure arrays have exactly 10 elements
+  // Ensure arrays have exactly 15 elements for paid, 5 for received
   const paidValues = Array.isArray(paymentValue.paidValues)
     ? [...paymentValue.paidValues]
-    : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   const receivedValues = Array.isArray(paymentValue.receivedValues)
     ? [...paymentValue.receivedValues]
-    : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    : [0, 0, 0, 0, 0];
 
-  // Pad arrays to exactly 10 elements
-  while (paidValues.length < 10) {
+  // Pad arrays to exactly 15 elements for paid, 5 for received
+  while (paidValues.length < 15) {
     paidValues.push(0);
   }
-  while (receivedValues.length < 10) {
+  while (receivedValues.length < 5) {
     receivedValues.push(0);
   }
 
-  // Trim arrays if they have more than 10 elements
-  if (paidValues.length > 10) {
-    paidValues.splice(10);
+  // Trim arrays if they have more than required elements
+  if (paidValues.length > 15) {
+    paidValues.splice(15);
   }
-  if (receivedValues.length > 10) {
-    receivedValues.splice(10);
+  if (receivedValues.length > 5) {
+    receivedValues.splice(5);
   }
 
   // Get existing payment value to check for changes
@@ -36,22 +36,22 @@ exports.addPaymentValue = async (paymentValue) => {
   });
 
   // Initialize arrays for tracking
-  let lastSubmittedPaidValues = existingPaymentValue?.lastSubmittedPaidValues || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  let paidFieldStatuses = existingPaymentValue?.paidFieldStatuses || [null, null, null, null, null, null, null, null, null, null];
+  let lastSubmittedPaidValues = existingPaymentValue?.lastSubmittedPaidValues || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  let paidFieldStatuses = existingPaymentValue?.paidFieldStatuses || [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
 
-  // Ensure arrays have exactly 10 elements
-  while (lastSubmittedPaidValues.length < 10) {
+  // Ensure arrays have exactly 15 elements
+  while (lastSubmittedPaidValues.length < 15) {
     lastSubmittedPaidValues.push(0);
   }
-  while (paidFieldStatuses.length < 10) {
+  while (paidFieldStatuses.length < 15) {
     paidFieldStatuses.push(null);
   }
-  lastSubmittedPaidValues = lastSubmittedPaidValues.slice(0, 10);
-  paidFieldStatuses = paidFieldStatuses.slice(0, 10);
+  lastSubmittedPaidValues = lastSubmittedPaidValues.slice(0, 15);
+  paidFieldStatuses = paidFieldStatuses.slice(0, 15);
 
   // Check which fields have changed compared to last submitted values
   // If a field changed and is not already approved, set status to 'pending'
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 15; i++) {
     if (paidValues[i] !== lastSubmittedPaidValues[i]) {
       // Field value changed compared to last submitted
       if (paidFieldStatuses[i] !== 'approved') {
@@ -99,35 +99,35 @@ exports.getPaymentValue = async (branchID, date) => {
     date: normalizedDate,
   }).lean();
 
-  // Ensure the result has proper arrays with 10 elements
+  // Ensure the result has proper arrays with 15 elements for paid, 5 for received
   if (result) {
-    if (!Array.isArray(result.paidValues) || result.paidValues.length < 10) {
+    if (!Array.isArray(result.paidValues) || result.paidValues.length < 15) {
       result.paidValues = [
         ...(result.paidValues || []),
-        ...Array(10 - (result.paidValues?.length || 0)).fill(0),
+        ...Array(15 - (result.paidValues?.length || 0)).fill(0),
       ];
     }
     if (
       !Array.isArray(result.receivedValues) ||
-      result.receivedValues.length < 10
+      result.receivedValues.length < 5
     ) {
       result.receivedValues = [
         ...(result.receivedValues || []),
-        ...Array(10 - (result.receivedValues?.length || 0)).fill(0),
+        ...Array(5 - (result.receivedValues?.length || 0)).fill(0),
       ];
     }
-    // Ensure lastSubmittedPaidValues has 10 elements
-    if (!Array.isArray(result.lastSubmittedPaidValues) || result.lastSubmittedPaidValues.length < 10) {
+    // Ensure lastSubmittedPaidValues has 15 elements
+    if (!Array.isArray(result.lastSubmittedPaidValues) || result.lastSubmittedPaidValues.length < 15) {
       result.lastSubmittedPaidValues = [
         ...(result.lastSubmittedPaidValues || []),
-        ...Array(10 - (result.lastSubmittedPaidValues?.length || 0)).fill(0),
+        ...Array(15 - (result.lastSubmittedPaidValues?.length || 0)).fill(0),
       ];
     }
-    // Ensure paidFieldStatuses has 10 elements
-    if (!Array.isArray(result.paidFieldStatuses) || result.paidFieldStatuses.length < 10) {
+    // Ensure paidFieldStatuses has 15 elements
+    if (!Array.isArray(result.paidFieldStatuses) || result.paidFieldStatuses.length < 15) {
       result.paidFieldStatuses = [
         ...(result.paidFieldStatuses || []),
-        ...Array(10 - (result.paidFieldStatuses?.length || 0)).fill(null),
+        ...Array(15 - (result.paidFieldStatuses?.length || 0)).fill(null),
       ];
     }
   }
@@ -135,7 +135,7 @@ exports.getPaymentValue = async (branchID, date) => {
   return result;
 };
 
-// Approve a specific field (fieldIndex: 0-9)
+// Approve a specific field (fieldIndex: 0-14)
 exports.approvePaymentField = async (branchID, date, fieldIndex) => {
   const normalizedDate = toMonthStartDate(date);
   const paymentValue = await PaymentValue.findOne({
@@ -147,8 +147,8 @@ exports.approvePaymentField = async (branchID, date, fieldIndex) => {
     throw new Error("Payment value not found");
   }
 
-  const paidFieldStatuses = [...(paymentValue.paidFieldStatuses || [null, null, null, null, null, null, null, null, null, null])];
-  while (paidFieldStatuses.length < 10) {
+  const paidFieldStatuses = [...(paymentValue.paidFieldStatuses || [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null])];
+  while (paidFieldStatuses.length < 15) {
     paidFieldStatuses.push(null);
   }
   paidFieldStatuses[fieldIndex] = 'approved';
@@ -163,7 +163,7 @@ exports.approvePaymentField = async (branchID, date, fieldIndex) => {
   );
 };
 
-// Reject a specific field (fieldIndex: 0-9)
+// Reject a specific field (fieldIndex: 0-14)
 exports.rejectPaymentField = async (branchID, date, fieldIndex) => {
   const normalizedDate = toMonthStartDate(date);
   const paymentValue = await PaymentValue.findOne({
@@ -175,17 +175,17 @@ exports.rejectPaymentField = async (branchID, date, fieldIndex) => {
     throw new Error("Payment value not found");
   }
 
-  const paidFieldStatuses = [...(paymentValue.paidFieldStatuses || [null, null, null, null, null, null, null, null, null, null])];
-  const paidValues = [...(paymentValue.paidValues || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])];
-  const lastSubmittedPaidValues = [...(paymentValue.lastSubmittedPaidValues || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])];
+  const paidFieldStatuses = [...(paymentValue.paidFieldStatuses || [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null])];
+  const paidValues = [...(paymentValue.paidValues || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])];
+  const lastSubmittedPaidValues = [...(paymentValue.lastSubmittedPaidValues || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])];
 
-  while (paidFieldStatuses.length < 10) {
+  while (paidFieldStatuses.length < 15) {
     paidFieldStatuses.push(null);
   }
-  while (paidValues.length < 10) {
+  while (paidValues.length < 15) {
     paidValues.push(0);
   }
-  while (lastSubmittedPaidValues.length < 10) {
+  while (lastSubmittedPaidValues.length < 15) {
     lastSubmittedPaidValues.push(0);
   }
 
@@ -228,8 +228,8 @@ exports.rejectPaymentValue = async (branchID, date) => {
       date: normalizedDate,
     },
     {
-      paidValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      receivedValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      paidValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      receivedValues: [0, 0, 0, 0, 0],
       approved: false,
       createdAt: new Date(), // Reset createdAt when rejecting
     },

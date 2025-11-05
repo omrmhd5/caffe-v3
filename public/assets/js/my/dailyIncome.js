@@ -700,8 +700,8 @@ const saveNotes = (event) => {
 };
 
 // Track last submitted values per field
-let lastSubmittedValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-let fieldStatuses = [null, null, null, null, null, null, null, null, null, null];
+let lastSubmittedValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let fieldStatuses = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
 let isCurrentMonth = true;
 
 // Function to update field status and styling
@@ -787,18 +787,18 @@ $(document).ready(function () {
       // Store last submitted values and statuses
       if (data && data.lastSubmittedPaidValues && Array.isArray(data.lastSubmittedPaidValues)) {
         lastSubmittedValues = [...data.lastSubmittedPaidValues];
-        while (lastSubmittedValues.length < 10) {
+        while (lastSubmittedValues.length < 15) {
           lastSubmittedValues.push(0);
         }
-        lastSubmittedValues = lastSubmittedValues.slice(0, 10);
+        lastSubmittedValues = lastSubmittedValues.slice(0, 15);
       }
       
       if (data && data.paidFieldStatuses && Array.isArray(data.paidFieldStatuses)) {
         fieldStatuses = [...data.paidFieldStatuses];
-        while (fieldStatuses.length < 10) {
+        while (fieldStatuses.length < 15) {
           fieldStatuses.push(null);
         }
-        fieldStatuses = fieldStatuses.slice(0, 10);
+        fieldStatuses = fieldStatuses.slice(0, 15);
       }
       
       if (data && data.paidValues && Array.isArray(data.paidValues)) {
@@ -952,6 +952,52 @@ function approvePaymentField(fieldIndex) {
           );
         },
       });
+    } else {
+      // If "لا" (No) is clicked, immediately reject the field without confirmation
+      let date = $("#month").val();
+      let branchID = $("#branchID").val();
+
+      $.ajax({
+        url: "/paymentValue/reject-field",
+        type: "POST",
+        data: {
+          branchID: branchID,
+          date: date,
+          fieldIndex: fieldIndex,
+        },
+        success: function (data) {
+          // Update field to 0 and show red border, keep it editable
+          const field = $(`.paid-field[data-field-index="${fieldIndex}"]`);
+          field.val(0);
+          fieldStatuses[fieldIndex] = 'rejected';
+          updateFieldStatus(fieldIndex, 'rejected');
+          $(`#field-buttons-${fieldIndex}`).removeClass("show");
+          
+          swal({
+            title: data.message,
+            type: "success",
+            buttons: {
+              confirm: {
+                className: "btn btn-success",
+              },
+            },
+          });
+        },
+        error: function (jqXhr) {
+          swal(
+            "حدث خطأ",
+            jqXhr.responseJSON?.errorMessage || "فشل في رفض القيم",
+            {
+              icon: "error",
+              buttons: {
+                confirm: {
+                  className: "btn btn-danger",
+                },
+              },
+            }
+          );
+        },
+      });
     }
   });
 }
@@ -970,7 +1016,7 @@ function rejectPaymentField(fieldIndex) {
       cancel: {
         text: "لا",
         visible: true,
-        className: "btn btn-secondary",
+        className: "btn btn-light",
       },
     },
   }).then((confirmed) => {

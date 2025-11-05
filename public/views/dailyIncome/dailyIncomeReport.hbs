@@ -492,7 +492,82 @@
           </tr>
         </tbody>
       </table>
-      <!-- Received Amount Table 1: مبلغ مستلم 1-5 -->
+      <!-- Paid Amount Table 3: مبلغ محول 11-15 -->
+      <table class="col-md-3 col-6 inline-table mx-1" style="min-width:200px;max-width:240px;">
+        <tbody>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 11" /></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="10" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-10">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="10"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="10"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 12" /></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="11" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-11">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="11"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="11"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 13" /></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="12" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-12">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="12"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="12"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 14" /></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="13" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-13">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="13"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="13"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><input class="form-control tax-title" disabled value="مبلغ محول 15" /></td>
+            <td>
+              <div class="paid-field-wrapper">
+                <input type="number" class="form-control paid-field" data-field-index="14" value="0" {{#unless isManager}}{{#unless isCurrentMonth}}disabled{{/unless}}{{/unless}}>
+                {{#if isManager}}
+                <div class="field-action-buttons" id="field-buttons-14">
+                  <button class="btn btn-success btn-sm approve-field-btn" data-field-index="14"><i class="fa fa-check"></i> قبول</button>
+                  <button class="btn btn-danger btn-sm reject-field-btn" data-field-index="14"><i class="fa fa-times"></i> رفض</button>
+                </div>
+                {{/if}}
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Received Amount Table: مبلغ مستلم 1-5 -->
       <table class="col-md-3 col-6 inline-table mx-1" style="min-width:200px;max-width:240px;">
         <tbody>
           <tr>
@@ -513,31 +588,6 @@
           </tr>
           <tr>
             <td><input class="form-control tax-title" disabled value="مبلغ مستلم 5" /></td>
-            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- Received Amount Table 2: مبلغ مستلم 6-10 -->
-      <table class="col-md-3 col-6 inline-table mx-1" style="min-width:200px;max-width:240px;">
-        <tbody>
-          <tr>
-            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 6" /></td>
-            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
-          </tr>
-          <tr>
-            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 7" /></td>
-            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
-          </tr>
-          <tr>
-            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 8" /></td>
-            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
-          </tr>
-          <tr>
-            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 9" /></td>
-            <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
-          </tr>
-          <tr>
-            <td><input class="form-control tax-title" disabled value="مبلغ مستلم 10" /></td>
             <td><input type="number" class="form-control received-field" value="0" {{#unless isManager}}disabled{{/unless}}></td>
           </tr>
         </tbody>
