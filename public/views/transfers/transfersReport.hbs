@@ -1,0 +1,269 @@
+{{> header}}
+{{> navbar/navbar}}
+
+<style>
+  .table td {
+    height: 75% !important;
+    padding: .1rem !important;
+  }
+
+  .table th {
+    text-align: center;
+    padding: 0 5px !important;
+  }
+
+  input {
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+  .tax-title {
+    font-weight: bold;
+    color: black;
+  }
+  td .form-control {
+    font-size: 16px;
+    color: black;
+    padding: .6rem 0rem;
+  }
+
+  /* Sticky table headers */
+  .table-responsive {
+    max-height: 30vh;
+    overflow-y: auto;
+  }
+
+  #transfers-table {
+    position: relative;
+  }
+
+  #transfers-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: white;
+  }
+
+  #transfers-table thead th {
+    background: white;
+    border-bottom: 2px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  /* Ensure the sticky header works properly */
+  #transfers-table tbody tr:first-child td {
+    border-top: none;
+  }
+
+  /* Highlight effect for the last edited row */
+  .highlight-row {
+    background-color: #fff3cd !important;
+    border: 2px solid #ffc107 !important;
+    transition: all 0.3s ease;
+  }
+
+  .highlight-row td {
+    background-color: #fff3cd !important;
+  }
+
+</style>
+
+<div class=" bg-white col-md-12 d-print-none p-0" dir="rtl" style="padding: 0px 28px;" data-user-role="{{expreq.user.role}}">
+  <div class="headerPage">
+    <div class="Title">
+      <h2 style="text-align: center;">
+        ادارة التحويلات
+      </h2>
+    </div>
+  </div>
+  <div class="card d-print-none">
+    <div class="card-header ">
+      <form class="form-horizontal" action="/transfers" id="search-form" method="GET">
+        <div class="form-group row">
+          <label for="branchID" class="col-form-label pt-0">
+            <p class="select">الفرع</p>
+          </label>
+          <div class="col-sm-2">
+            {{#if branchedRole}}
+            <select id="branchID" name="branchID" class="form-control" disabled>
+              <option value="{{branch._id}}" selected> {{branch.branchname}} </option>
+            </select>
+            {{else}}
+            <select id="branchID" name="branchID" class="form-control" onchange="submitSearchForm()" required>
+              <option value="" selected disabled hidden> اختر الفرع </option>
+              {{#each branches}}
+              <option value="{{_id}}" {{selected}}>{{branchname}}</option>
+              {{/each}}
+            </select>
+            {{/if}}
+          </div>
+          <div class="col-sm-1">
+            <button class="btnclass width6rem p-0"> بحث </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body col-lg-12 p-0">
+      <div class="d-print-none mb-2" style="padding: 10px;">
+        <button class="btn btn-primary btn-lg" id="add-row-button">
+          <i class="fa fa-plus"></i> إضافة سجل جديد
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table id="transfers-table" class="table table-striped  col-lg-12 d-print-none">
+          <thead>
+            <tr>
+              <th>
+                <p class="tableheader px-4 px-xl-0 mb-0"> الفرع </p>
+              </th>
+              <th>
+                <p class="tableheader px-5 px-xl-0 mb-0"> الشركة </p>
+              </th>
+              <th>
+                <p class="tableheader mb-0"> الحجز المعني </p>
+              </th>
+              <th>
+                <p class="tableheader mb-0"> تاريخ الحجز </p>
+              </th>
+              <th>
+                <p class="tableheader mb-0"> مبلغ الحجز </p>
+              </th>
+              <th>
+                <p class="tableheader mb-0"> المبلغ المرسل في الموقع </p>
+              </th>
+              <th>
+                <p class="tableheader mb-0"> المبلغ المحول في القروب </p>
+              </th>
+              <th>
+                <p class="tableheader mb-0"> العمولة سند صرف </p>
+              </th>
+              <th>
+                <p class="tableheader mb-0"> رسوم البنك </p>
+              </th>
+              <th>
+                <p class="tableheader px-5 px-xl-0 mb-0"> رقم السند </p>
+              </th>
+              <th>
+                <p class="tableheader px-5 px-md-0 mb-0"> تم الاستلام </p>
+              </th>
+              <th>
+                <p class="tableheader px-5 px-md-0 mb-0"> ملاحظات </p>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#if data}}
+              {{#each data}}
+              <tr class="transfer-tr">
+                <td><input class="form-control branch-name" value="{{branchName}}" disabled></td>
+                <td>
+                  <select class="form-control company-name">
+                    <option value="">اختر الشركة</option>
+                    <option value="اقودا" {{#ifEquals companyName "اقودا"}}selected{{/ifEquals}}>اقودا</option>
+                    <option value="اكسبيديا" {{#ifEquals companyName "اكسبيديا"}}selected{{/ifEquals}}>اكسبيديا</option>
+                    <option value="TRIP" {{#ifEquals companyName "TRIP"}}selected{{/ifEquals}}>TRIP</option>
+                    <option value="بوكينق" {{#ifEquals companyName "بوكينق"}}selected{{/ifEquals}}>بوكينق</option>
+                    <option value="اخرى" {{#ifEquals companyName "اخرى"}}selected{{/ifEquals}}>اخرى</option>
+                    <option value="المطار" {{#ifEquals companyName "المطار"}}selected{{/ifEquals}}>المطار</option>
+                    <option value="المسافر" {{#ifEquals companyName "المسافر"}}selected{{/ifEquals}}>المسافر</option>
+                    <option value="اخرى 1" {{#ifEquals companyName "اخرى 1"}}selected{{/ifEquals}}>اخرى 1</option>
+                    <option value="اخرى 2" {{#ifEquals companyName "اخرى 2"}}selected{{/ifEquals}}>اخرى 2</option>
+                  </select>
+                </td>
+                <td><input class="form-control reservation-ref" value="{{reservationRef}}"></td>
+                <td><input type="date" class="form-control reservation-date" value="{{formatDate reservationDate}}"></td>
+                <td><input type="number" class="form-control reservation-amount" value="{{toFixed reservationAmount}}"></td>
+                <td><input type="number" class="form-control sent-amount" value="{{toFixed sentAmount}}"></td>
+                <td><input type="number" class="form-control transferred-amount" value="{{toFixed transferredAmount}}"></td>
+                <td><input type="number" class="form-control commission-voucher" value="{{toFixed commissionVoucher}}"></td>
+                <td><input type="number" class="form-control bank-fees" value="{{toFixed bankFees}}"></td>
+                <td><input class="form-control voucher-number" value="{{voucherNumber}}"></td>
+                <td><input type="checkbox" class="form-control received" {{#if received}}checked{{/if}}></td>
+                <td><input class="form-control notes" value="{{notes}}"></td>
+              </tr>
+              {{/each}}
+            {{else}}
+              <tr>
+                <td colspan="12" style="text-align: center; padding: 20px;">
+                  <p>لا توجد بيانات</p>
+                </td>
+              </tr>
+            {{/if}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer d-print-block mt-3">
+    <div class="totaldiv" style="width: 100%;">
+      <div class="row d-flex justify-content-center">
+        <div class="col-md-6 text-center">
+          <button class="btn btn-lg mb-2 btnclass" id="save-button"> حفظ </button>
+        </div>
+        <div class="col-md-6 text-center">
+          <button class="btnclass" id="print-button">اطبع</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{> footer}}
+
+<script>
+  function submitSearchForm() {
+    if ($('#branchID').val()) {
+      $('#search-form').submit();
+    }
+  }
+
+  // Add new row functionality
+  $('#add-row-button').on('click', function() {
+    const tbody = $('#transfers-table tbody');
+    
+    // Remove the "no data" row if it exists
+    tbody.find('tr:has(td[colspan])').remove();
+    
+    // Get the selected branch name from the dropdown
+    const branchSelect = $('#branchID');
+    const selectedBranchText = branchSelect.find('option:selected').text().trim();
+    
+    // Create new row with empty inputs
+    const newRow = `
+      <tr class="transfer-tr">
+        <td><input class="form-control branch-name" value="${selectedBranchText}" disabled></td>
+        <td>
+          <select class="form-control company-name">
+            <option value="">اختر الشركة</option>
+            <option value="اقودا">اقودا</option>
+            <option value="اكسبيديا">اكسبيديا</option>
+            <option value="TRIP">TRIP</option>
+            <option value="بوكينق">بوكينق</option>
+            <option value="اخرى">اخرى</option>
+            <option value="المطار">المطار</option>
+            <option value="المسافر">المسافر</option>
+            <option value="اخرى 1">اخرى 1</option>
+            <option value="اخرى 2">اخرى 2</option>
+          </select>
+        </td>
+        <td><input class="form-control reservation-ref" value=""></td>
+        <td><input type="date" class="form-control reservation-date" value=""></td>
+        <td><input type="number" class="form-control reservation-amount" value=""></td>
+        <td><input type="number" class="form-control sent-amount" value=""></td>
+        <td><input type="number" class="form-control transferred-amount" value=""></td>
+        <td><input type="number" class="form-control commission-voucher" value=""></td>
+        <td><input type="number" class="form-control bank-fees" value=""></td>
+        <td><input class="form-control voucher-number" value=""></td>
+        <td><input type="checkbox" class="form-control received"></td>
+        <td><input class="form-control notes" value=""></td>
+      </tr>
+    `;
+    
+    tbody.append(newRow);
+  });
+</script>
+
