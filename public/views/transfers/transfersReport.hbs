@@ -4,33 +4,47 @@
 <style>
   .table td {
     height: 75% !important;
-    padding: .1rem !important;
+    padding: .2rem !important;
+    text-align: center;
   }
 
   .table th {
+    padding: .3rem !important;
     text-align: center;
-    padding: 0 5px !important;
   }
 
   input {
     text-align: center;
-    margin: 0;
-    padding: 0;
   }
-  .tax-title {
-    font-weight: bold;
-    color: black;
+
+  /* Received dropdown styling */
+  .received-select {
+    text-align: center;
   }
-  td .form-control {
-    font-size: 16px;
-    color: black;
-    padding: .6rem 0rem;
+
+  .received-select option[value="نعم"] {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .received-select option[value="لا"] {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .received-select.received-yes {
+    background-color: #28a745 !important;
+    color: white !important;
+  }
+
+  .received-select.received-no {
+    background-color: #dc3545 !important;
+    color: white !important;
   }
 
   /* Sticky table headers */
   .table-responsive {
-    max-height: 30vh;
-    overflow-y: auto;
+    overflow-x: auto;
   }
 
   #transfers-table {
@@ -106,51 +120,51 @@
   </div>
 
   <div class="card">
-    <div class="card-body col-lg-12 p-0">
+    <div class="card-body" style="padding-right: 0; padding-left: 0;">
       <div class="d-print-none mb-2" style="padding: 10px;">
         <button class="btn btn-primary btn-lg" id="add-row-button">
           <i class="fa fa-plus"></i> إضافة سجل جديد
         </button>
       </div>
       <div class="table-responsive">
-        <table id="transfers-table" class="table table-striped  col-lg-12 d-print-none">
-          <thead>
+        <table id="transfers-table" class="table d-print-none">
+          <thead style="height: 5px;">
             <tr>
               <th>
-                <p class="tableheader px-4 px-xl-0 mb-0"> الفرع </p>
+                <p class="tableheader width8rem mb-0"> الفرع </p>
               </th>
               <th>
-                <p class="tableheader px-5 px-xl-0 mb-0"> الشركة </p>
+                <p class="tableheader width8rem mb-0"> الشركة </p>
               </th>
               <th>
-                <p class="tableheader mb-0"> الحجز المعني </p>
+                <p class="tableheader width8rem mb-0"> الحجز المعني </p>
+              </th>
+              <th style="min-width: 10rem;">
+                <p class="tableheader width8rem mb-0"> تاريخ الحجز </p>
               </th>
               <th>
-                <p class="tableheader mb-0"> تاريخ الحجز </p>
+                <p class="tableheader width8rem mb-0"> مبلغ الحجز </p>
               </th>
               <th>
-                <p class="tableheader mb-0"> مبلغ الحجز </p>
+                <p class="tableheader width8rem mb-0"> المبلغ المرسل في الموقع </p>
               </th>
               <th>
-                <p class="tableheader mb-0"> المبلغ المرسل في الموقع </p>
+                <p class="tableheader width8rem mb-0"> المبلغ المحول في القروب </p>
               </th>
               <th>
-                <p class="tableheader mb-0"> المبلغ المحول في القروب </p>
+                <p class="tableheader width8rem mb-0"> العمولة سند صرف </p>
               </th>
               <th>
-                <p class="tableheader mb-0"> العمولة سند صرف </p>
+                <p class="tableheader width8rem mb-0"> رسوم البنك </p>
               </th>
               <th>
-                <p class="tableheader mb-0"> رسوم البنك </p>
+                <p class="tableheader width8rem mb-0"> رقم السند </p>
               </th>
               <th>
-                <p class="tableheader px-5 px-xl-0 mb-0"> رقم السند </p>
+                <p class="tableheader width8rem mb-0"> تم الاستلام </p>
               </th>
               <th>
-                <p class="tableheader px-5 px-md-0 mb-0"> تم الاستلام </p>
-              </th>
-              <th>
-                <p class="tableheader px-5 px-md-0 mb-0"> ملاحظات </p>
+                <p class="tableheader width8rem mb-0"> ملاحظات </p>
               </th>
             </tr>
           </thead>
@@ -174,14 +188,19 @@
                   </select>
                 </td>
                 <td><input class="form-control reservation-ref" value="{{reservationRef}}"></td>
-                <td><input type="date" class="form-control reservation-date" value="{{formatDate reservationDate}}"></td>
+                <td><input type="text" class="form-control reservation-date" value="{{formatDate reservationDate}}" disabled></td>
                 <td><input type="number" class="form-control reservation-amount" value="{{toFixed reservationAmount}}"></td>
                 <td><input type="number" class="form-control sent-amount" value="{{toFixed sentAmount}}"></td>
                 <td><input type="number" class="form-control transferred-amount" value="{{toFixed transferredAmount}}"></td>
-                <td><input type="number" class="form-control commission-voucher" value="{{toFixed commissionVoucher}}"></td>
-                <td><input type="number" class="form-control bank-fees" value="{{toFixed bankFees}}"></td>
+                <td><input type="number" class="form-control commission-voucher" value="{{toFixed commissionVoucher}}" disabled></td>
+                <td><input type="number" class="form-control bank-fees" value="{{toFixed bankFees}}" disabled></td>
                 <td><input class="form-control voucher-number" value="{{voucherNumber}}"></td>
-                <td><input type="checkbox" class="form-control received" {{#if received}}checked{{/if}}></td>
+                <td>
+                  <select class="form-control received-select" {{#ifNotEquals expreq.user.role "AccountantManager"}}disabled{{/ifNotEquals}}>
+                    <option value="لا" {{#ifEquals received "لا"}}selected{{/ifEquals}} {{#unless received}}selected{{/unless}}>لا</option>
+                    <option value="نعم" {{#ifEquals received "نعم"}}selected{{/ifEquals}}>نعم</option>
+                  </select>
+                </td>
                 <td><input class="form-control notes" value="{{notes}}"></td>
               </tr>
               {{/each}}
@@ -251,19 +270,143 @@
           </select>
         </td>
         <td><input class="form-control reservation-ref" value=""></td>
-        <td><input type="date" class="form-control reservation-date" value=""></td>
+        <td><input type="text" class="form-control reservation-date" value="" disabled></td>
         <td><input type="number" class="form-control reservation-amount" value=""></td>
         <td><input type="number" class="form-control sent-amount" value=""></td>
         <td><input type="number" class="form-control transferred-amount" value=""></td>
-        <td><input type="number" class="form-control commission-voucher" value=""></td>
-        <td><input type="number" class="form-control bank-fees" value=""></td>
+        <td><input type="number" class="form-control commission-voucher" value="" disabled></td>
+        <td><input type="number" class="form-control bank-fees" value="" disabled></td>
         <td><input class="form-control voucher-number" value=""></td>
-        <td><input type="checkbox" class="form-control received"></td>
+        <td>
+          <select class="form-control received-select" disabled>
+            <option value="لا" selected>لا</option>
+            <option value="نعم">نعم</option>
+          </select>
+        </td>
         <td><input class="form-control notes" value=""></td>
       </tr>
     `;
     
     tbody.append(newRow);
+    
+    // Enable received dropdown only for AccountantManager
+    const userRole = $('[data-user-role]').attr('data-user-role');
+    const newRowReceived = tbody.find('tr:last .received-select');
+    if (userRole === 'AccountantManager') {
+      newRowReceived.prop('disabled', false);
+    }
+    
+    // Add change event listener to update background color for received dropdown
+    updateReceivedDropdowns();
+    
+    // Calculate initial values for the new row (will be calculated automatically when values are entered)
   });
+
+  // Function to update received dropdown styling
+  function updateReceivedDropdowns() {
+    $('.received-select').off('change').on('change', function() {
+      $(this).removeClass('received-yes received-no');
+      if ($(this).val() === 'نعم') {
+        $(this).addClass('received-yes');
+      } else if ($(this).val() === 'لا') {
+        $(this).addClass('received-no');
+      }
+    });
+    
+    // Set initial colors for existing dropdowns
+    $('.received-select').each(function() {
+      if ($(this).val() === 'نعم') {
+        $(this).addClass('received-yes');
+      } else if ($(this).val() === 'لا') {
+        $(this).addClass('received-no');
+      }
+    });
+  }
+
+  // Initialize on page load
+  $(document).ready(function() {
+    updateReceivedDropdowns();
+    initializeAutoDateFill();
+    initializeAutoCalculations();
+  });
+
+  // Function to auto-calculate commission voucher and bank fees
+  function initializeAutoCalculations() {
+    // Function to calculate values for a specific row
+    function calculateRowValues(row) {
+      const reservationAmount = parseFloat(row.find('.reservation-amount').val()) || 0;
+      const sentAmount = parseFloat(row.find('.sent-amount').val()) || 0;
+      const transferredAmount = parseFloat(row.find('.transferred-amount').val()) || 0;
+      
+      // العمولة سند صرف = مبلغ الحجز - المبلغ المحول في القروب
+      const commissionVoucher = reservationAmount - transferredAmount;
+      row.find('.commission-voucher').val(commissionVoucher.toFixed(2));
+      
+      // رسوم البنك = المبلغ المرسل في الموقع - المبلغ المحول في القروب
+      const bankFees = sentAmount - transferredAmount;
+      row.find('.bank-fees').val(bankFees.toFixed(2));
+    }
+    
+    // Handle changes to reservation amount, sent amount, or transferred amount
+    $(document).on('input change', '.reservation-amount, .sent-amount, .transferred-amount', function() {
+      const row = $(this).closest('tr');
+      calculateRowValues(row);
+    });
+    
+    // Calculate initial values for existing rows
+    $('.transfer-tr').each(function() {
+      calculateRowValues($(this));
+    });
+  }
+
+  // Function to auto-fill reservation date when both company and reservation ref are present
+  function initializeAutoDateFill() {
+    // Function to check and fill date for a specific row
+    function checkAndFillDate(row) {
+      const companySelect = row.find('.company-name');
+      const reservationRef = row.find('.reservation-ref');
+      const reservationDate = row.find('.reservation-date');
+      
+      const companyValue = companySelect.val();
+      const refValue = reservationRef.val().trim();
+      
+      // Only fill if both are present
+      if (companyValue && refValue) {
+        // Get today's date and current time in HH:mm:ss mm/dd/yyyy format (time before date)
+        const today = new Date();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const year = today.getFullYear();
+        const hours = String(today.getHours()).padStart(2, '0');
+        const minutes = String(today.getMinutes()).padStart(2, '0');
+        const seconds = String(today.getSeconds()).padStart(2, '0');
+        const formattedDate = `${hours}:${minutes}:${seconds} ${month}/${day}/${year}`;
+        
+        reservationDate.val(formattedDate);
+      }
+    }
+    
+    // Handle company dropdown change
+    $(document).on('change', '.company-name', function() {
+      const row = $(this).closest('tr');
+      checkAndFillDate(row);
+    });
+    
+    // Handle reservation ref input blur (when user leaves the field)
+    $(document).on('blur', '.reservation-ref', function() {
+      const row = $(this).closest('tr');
+      checkAndFillDate(row);
+    });
+    
+    // Handle reservation ref input enter key
+    $(document).on('keypress', '.reservation-ref', function(e) {
+      if (e.which === 13) { // Enter key
+        e.preventDefault();
+        const row = $(this).closest('tr');
+        checkAndFillDate(row);
+        $(this).blur(); // Remove focus
+      }
+    });
+  }
 </script>
 
