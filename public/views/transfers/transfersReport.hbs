@@ -17,30 +17,30 @@
     text-align: center;
   }
 
-  /* Received dropdown styling */
-  .received-select {
-    text-align: center;
-  }
+   /* Approved dropdown styling */
+   .approved-select {
+     text-align: center;
+   }
 
-  .received-select option[value="نعم"] {
-    background-color: #28a745;
-    color: white;
-  }
+   .approved-select option[value="true"] {
+     background-color: #28a745;
+     color: white;
+   }
 
-  .received-select option[value="لا"] {
-    background-color: #dc3545;
-    color: white;
-  }
+   .approved-select option[value="false"] {
+     background-color: #dc3545;
+     color: white;
+   }
 
-  .received-select.received-yes {
-    background-color: #28a745 !important;
-    color: white !important;
-  }
+   .approved-select.approved-yes {
+     background-color: #28a745 !important;
+     color: white !important;
+   }
 
-  .received-select.received-no {
-    background-color: #dc3545 !important;
-    color: white !important;
-  }
+   .approved-select.approved-no {
+     background-color: #dc3545 !important;
+     color: white !important;
+   }
 
   /* Sticky table headers */
   .table-responsive {
@@ -121,7 +121,7 @@
 
   <div class="card">
     <div class="card-body" style="padding-right: 0; padding-left: 0;">
-      <div class="d-print-none mb-2" style="padding: 10px;">
+      <div class="d-print-none mb-2" style="padding: 10px; text-align: right;">
         <button class="btn btn-primary btn-lg" id="add-row-button">
           <i class="fa fa-plus"></i> إضافة سجل جديد
         </button>
@@ -172,7 +172,7 @@
             {{#if data}}
               {{#each data}}
               <tr class="transfer-tr">
-                <td><input class="form-control branch-name" value="{{branchName}}" disabled></td>
+                <td><input type="hidden" class="transfer-id" value="{{_id}}"><input class="form-control branch-name" value="{{branchName}}" disabled></td>
                 <td>
                   <select class="form-control company-name">
                     <option value="">اختر الشركة</option>
@@ -188,7 +188,7 @@
                   </select>
                 </td>
                 <td><input class="form-control reservation-ref" value="{{reservationRef}}"></td>
-                <td><input type="text" class="form-control reservation-date" value="{{formatDate reservationDate}}" disabled></td>
+                <td><input type="text" class="form-control reservation-date" value="{{reservationDate}}" disabled></td>
                 <td><input type="number" class="form-control reservation-amount" value="{{toFixed reservationAmount}}"></td>
                 <td><input type="number" class="form-control sent-amount" value="{{toFixed sentAmount}}"></td>
                 <td><input type="number" class="form-control transferred-amount" value="{{toFixed transferredAmount}}"></td>
@@ -196,9 +196,9 @@
                 <td><input type="number" class="form-control bank-fees" value="{{toFixed bankFees}}" disabled></td>
                 <td><input class="form-control voucher-number" value="{{voucherNumber}}"></td>
                 <td>
-                  <select class="form-control received-select" {{#ifNotEquals expreq.user.role "AccountantManager"}}disabled{{/ifNotEquals}}>
-                    <option value="لا" {{#ifEquals received "لا"}}selected{{/ifEquals}} {{#unless received}}selected{{/unless}}>لا</option>
-                    <option value="نعم" {{#ifEquals received "نعم"}}selected{{/ifEquals}}>نعم</option>
+                  <select class="form-control approved-select" {{#ifNotEquals expreq.user.role "AccountantManager"}}disabled{{/ifNotEquals}}>
+                    <option value="false" {{#unless approved}}selected{{/unless}}>لا</option>
+                    <option value="true" {{#if approved}}selected{{/if}}>نعم</option>
                   </select>
                 </td>
                 <td><input class="form-control notes" value="{{notes}}"></td>
@@ -242,19 +242,34 @@
 
   // Add new row functionality
   $('#add-row-button').on('click', function() {
+    // Check if branch is selected
+    const branchSelect = $('#branchID');
+    const selectedBranchID = branchSelect.val();
+    
+    if (!selectedBranchID) {
+      swal('تنبيه', 'الرجاء اختيار الفرع أولاً', {
+        icon: 'warning',
+        buttons: {
+          confirm: {
+            className: 'btn btn-warning',
+          },
+        },
+      });
+      return;
+    }
+    
     const tbody = $('#transfers-table tbody');
     
     // Remove the "no data" row if it exists
     tbody.find('tr:has(td[colspan])').remove();
     
     // Get the selected branch name from the dropdown
-    const branchSelect = $('#branchID');
     const selectedBranchText = branchSelect.find('option:selected').text().trim();
     
     // Create new row with empty inputs
     const newRow = `
       <tr class="transfer-tr">
-        <td><input class="form-control branch-name" value="${selectedBranchText}" disabled></td>
+        <td><input type="hidden" class="transfer-id" value=""><input class="form-control branch-name" value="${selectedBranchText}" disabled></td>
         <td>
           <select class="form-control company-name">
             <option value="">اختر الشركة</option>
@@ -277,58 +292,69 @@
         <td><input type="number" class="form-control commission-voucher" value="" disabled></td>
         <td><input type="number" class="form-control bank-fees" value="" disabled></td>
         <td><input class="form-control voucher-number" value=""></td>
-        <td>
-          <select class="form-control received-select" disabled>
-            <option value="لا" selected>لا</option>
-            <option value="نعم">نعم</option>
-          </select>
-        </td>
+         <td>
+           <select class="form-control approved-select" disabled>
+             <option value="false" selected>لا</option>
+             <option value="true">نعم</option>
+           </select>
+         </td>
         <td><input class="form-control notes" value=""></td>
       </tr>
     `;
     
     tbody.append(newRow);
     
-    // Enable received dropdown only for AccountantManager
-    const userRole = $('[data-user-role]').attr('data-user-role');
-    const newRowReceived = tbody.find('tr:last .received-select');
-    if (userRole === 'AccountantManager') {
-      newRowReceived.prop('disabled', false);
-    }
-    
-    // Add change event listener to update background color for received dropdown
-    updateReceivedDropdowns();
+     // Enable approved dropdown only for AccountantManager
+     const userRole = $('[data-user-role]').attr('data-user-role');
+     const newRowApproved = tbody.find('tr:last .approved-select');
+     if (userRole === 'AccountantManager') {
+       newRowApproved.prop('disabled', false);
+     }
+     
+     // Update approved dropdowns styling
+     updateApprovedDropdowns();
     
     // Calculate initial values for the new row (will be calculated automatically when values are entered)
   });
 
-  // Function to update received dropdown styling
-  function updateReceivedDropdowns() {
-    $('.received-select').off('change').on('change', function() {
-      $(this).removeClass('received-yes received-no');
-      if ($(this).val() === 'نعم') {
-        $(this).addClass('received-yes');
-      } else if ($(this).val() === 'لا') {
-        $(this).addClass('received-no');
-      }
-    });
-    
-    // Set initial colors for existing dropdowns
-    $('.received-select').each(function() {
-      if ($(this).val() === 'نعم') {
-        $(this).addClass('received-yes');
-      } else if ($(this).val() === 'لا') {
-        $(this).addClass('received-no');
-      }
-    });
-  }
+   // Function to update approved dropdown styling and enabled/disabled state
+   function updateApprovedDropdowns() {
+     const userRole = $('[data-user-role]').attr('data-user-role');
+     
+     $('.approved-select').each(function() {
+       // Enable/disable based on user role
+       if (userRole === 'AccountantManager') {
+         $(this).prop('disabled', false);
+       } else {
+         $(this).prop('disabled', true);
+       }
+       
+       // Set initial colors
+       $(this).removeClass('approved-yes approved-no');
+       if ($(this).val() === 'true') {
+         $(this).addClass('approved-yes');
+       } else {
+         $(this).addClass('approved-no');
+       }
+     });
+     
+     // Add change event listener to update background color
+     $('.approved-select').off('change').on('change', function() {
+       $(this).removeClass('approved-yes approved-no');
+       if ($(this).val() === 'true') {
+         $(this).addClass('approved-yes');
+       } else {
+         $(this).addClass('approved-no');
+       }
+     });
+   }
 
-  // Initialize on page load
-  $(document).ready(function() {
-    updateReceivedDropdowns();
-    initializeAutoDateFill();
-    initializeAutoCalculations();
-  });
+   // Initialize on page load
+   $(document).ready(function() {
+     updateApprovedDropdowns();
+     initializeAutoDateFill();
+     initializeAutoCalculations();
+   });
 
   // Function to auto-calculate commission voucher and bank fees
   function initializeAutoCalculations() {
@@ -367,10 +393,16 @@
       const reservationRef = row.find('.reservation-ref');
       const reservationDate = row.find('.reservation-date');
       
+      // Only fill date if it's empty (not already set from a previous save)
+      const currentDateValue = reservationDate.val();
+      if (currentDateValue && currentDateValue.trim() !== '') {
+        return; // Date already set, don't update it
+      }
+      
       const companyValue = companySelect.val();
       const refValue = reservationRef.val().trim();
       
-      // Only fill if both are present
+      // Only fill if both are present and date is empty
       if (companyValue && refValue) {
         // Get today's date and current time in HH:mm:ss mm/dd/yyyy format (time before date)
         const today = new Date();
@@ -406,6 +438,134 @@
         checkAndFillDate(row);
         $(this).blur(); // Remove focus
       }
+    });
+  }
+
+  // Save button functionality
+  $('#save-button').on('click', function() {
+    const branchID = $('#branchID').val();
+    
+    if (!branchID) {
+      swal('تنبيه', 'الرجاء اختيار الفرع', {
+        icon: 'warning',
+        buttons: {
+          confirm: {
+            className: 'btn btn-warning',
+          },
+        },
+      });
+      return;
+    }
+
+    const transfers = [];
+    
+    // Recalculate all values before saving to ensure they're up to date
+    $('.transfer-tr').each(function() {
+      const row = $(this);
+      if (row.find('td[colspan]').length === 0) {
+        // Recalculate commission and bank fees for this row
+        const reservationAmount = parseFloat(row.find('.reservation-amount').val()) || 0;
+        const sentAmount = parseFloat(row.find('.sent-amount').val()) || 0;
+        const transferredAmount = parseFloat(row.find('.transferred-amount').val()) || 0;
+        const commissionVoucher = reservationAmount - transferredAmount;
+        const bankFees = sentAmount - transferredAmount;
+        row.find('.commission-voucher').val(commissionVoucher.toFixed(2));
+        row.find('.bank-fees').val(bankFees.toFixed(2));
+      }
+    });
+    
+    // Collect data from all rows (skip header and "no data" row)
+    $('.transfer-tr').each(function() {
+      const row = $(this);
+      
+      // Skip if it's the "no data" row
+      if (row.find('td[colspan]').length > 0) {
+        return;
+      }
+
+      const companyName = row.find('.company-name').val();
+      const reservationRef = row.find('.reservation-ref').val();
+      
+      // Only add if at least company or reservation ref is filled
+      if (companyName || reservationRef) {
+        const transferId = row.find('.transfer-id').val();
+        const transferData = {
+          _id: transferId && transferId.trim() !== '' ? transferId : null, // Include _id if it exists (for updates)
+          companyName: companyName || '',
+          reservationRef: reservationRef || '',
+          reservationDate: row.find('.reservation-date').val() || '',
+          reservationAmount: parseFloat(row.find('.reservation-amount').val()) || 0,
+          sentAmount: parseFloat(row.find('.sent-amount').val()) || 0,
+          transferredAmount: parseFloat(row.find('.transferred-amount').val()) || 0,
+          commissionVoucher: parseFloat(row.find('.commission-voucher').val()) || 0,
+          bankFees: parseFloat(row.find('.bank-fees').val()) || 0,
+          voucherNumber: row.find('.voucher-number').val() || '',
+          approved: row.find('.approved-select').val() === 'true',
+          notes: row.find('.notes').val() || '',
+        };
+        
+        transfers.push(transferData);
+      }
+    });
+
+    if (transfers.length === 0) {
+      swal('تنبيه', 'لا توجد بيانات للحفظ', {
+        icon: 'warning',
+        buttons: {
+          confirm: {
+            className: 'btn btn-warning',
+          },
+        },
+      });
+      return;
+    }
+
+    // Send data to backend
+    const url = '/transfers';
+    const method = 'POST';
+    
+    callUrl(url, method, {
+      transfers: JSON.stringify(transfers),
+      branchID: branchID
+    });
+  });
+
+  // callUrl function for AJAX requests
+  function callUrl(url, method, data) {
+    $.ajax({
+      url,
+      type: method,
+      data: data,
+      success: (data, status, xhr) => {
+        swal({
+          title: data.message,
+          type: 'success',
+          buttons: {
+            confirm: {
+              className: 'btn btn-success',
+            },
+          },
+        }).then((OK) => {
+          if (OK) {
+            $(window).scrollTop(0);
+            location.reload();
+          }
+        });
+      },
+      error: (jqXhr, textStatus, errorMessage) => {
+        swal('حدث خطأ', jqXhr.responseJSON?.errorMessage || 'حدث خطأ أثناء الحفظ', {
+          icon: 'error',
+          buttons: {
+            confirm: {
+              className: 'btn btn-danger',
+            },
+          },
+        }).then((OK) => {
+          if (OK) {
+            swal.close();
+          }
+        });
+      },
     });
   }
 </script>
