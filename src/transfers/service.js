@@ -23,6 +23,7 @@ exports.getAll = async (branchID) => {
     voucherNumber: transfer.voucherNumber,
     notes: transfer.notes,
     approved: transfer.approved,
+    createdAt: transfer.createdAt,
   }));
 };
 

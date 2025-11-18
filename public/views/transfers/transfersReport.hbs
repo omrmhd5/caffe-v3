@@ -212,7 +212,7 @@
           <tbody>
             {{#if data}}
               {{#each data}}
-              <tr class="transfer-tr" data-approved="{{approved}}">
+              <tr class="transfer-tr" data-approved="{{approved}}" {{#if createdAt}}data-created-at="{{createdAt}}"{{/if}}>
                 <td><input type="hidden" class="transfer-id" value="{{_id}}"><input class="form-control branch-name" value="{{branchName}}" disabled></td>
                 <td>
                   <select class="form-control company-name">
@@ -413,7 +413,75 @@
      initializeAutoDateFill();
      initializeAutoCalculations();
      initializeFiltering();
+     initializeTimeBasedDisabling();
    });
+
+  // Function to disable fields based on creation time (4 hours rule)
+  function initializeTimeBasedDisabling() {
+    const userRole = $('[data-user-role]').attr('data-user-role');
+    
+    // AccountantManager can always edit, skip this logic
+    if (userRole === 'AccountantManager') {
+      return;
+    }
+    
+    // 4 hours in seconds (4 * 60 * 60 = 14400)
+    const FOUR_HOURS_IN_SECONDS = 14400;
+    
+    // Check each row and disable if 4 hours have passed
+    function checkAndDisableRow(row) {
+      const createdAt = row.attr('data-created-at');
+      
+      // If no createdAt (new row), keep it enabled
+      if (!createdAt) {
+        return;
+      }
+      
+      const createdTime = new Date(createdAt).getTime();
+      const currentTime = new Date().getTime();
+      const secondsPassed = (currentTime - createdTime) / 1000;
+      
+      // If 4 hours or more have passed, disable all inputs
+      if (secondsPassed >= FOUR_HOURS_IN_SECONDS) {
+        row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees)').prop('disabled', true);
+        row.find('select:not(.approved-select)').prop('disabled', true);
+        // Keep approved-select disabled for non-managers anyway
+        row.find('.approved-select').prop('disabled', true);
+      }
+    }
+    
+    // Check all existing rows on page load
+    $('.transfer-tr').each(function() {
+      checkAndDisableRow($(this));
+    });
+    
+    // Set up interval to check every minute for rows that might cross the 4-hour threshold
+    setInterval(function() {
+      $('.transfer-tr').each(function() {
+        const row = $(this);
+        const createdAt = row.attr('data-created-at');
+        
+        if (!createdAt) {
+          return; // New row, skip
+        }
+        
+        const createdTime = new Date(createdAt).getTime();
+        const currentTime = new Date().getTime();
+        const secondsPassed = (currentTime - createdTime) / 1000;
+        
+        // If 4 hours have passed (or more), disable
+        if (secondsPassed >= FOUR_HOURS_IN_SECONDS) {
+          // Check if already disabled to avoid repeated operations
+          const firstInput = row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees)').first();
+          if (!firstInput.prop('disabled')) {
+            row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees)').prop('disabled', true);
+            row.find('select:not(.approved-select)').prop('disabled', true);
+            row.find('.approved-select').prop('disabled', true);
+          }
+        }
+      });
+    }, 60000); // Check every minute (60000 ms)
+  }
 
   // Function to filter rows based on approved status
   function filterRows(showAll) {
