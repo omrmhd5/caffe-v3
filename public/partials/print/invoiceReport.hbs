@@ -79,24 +79,40 @@
           </table>
 
           <div class="row mt-2">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <center class="print-border">
                 <h3 class="print-font">إجمالي الفواتير</h3>
                 <p class="print-font"><strong>{{invoicesTotal}}</strong></p>
               </center>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
               <center class="print-border">
                 <h3 class="print-font">إجمالي الضريبة</h3>
                 <p class="print-font"><strong>{{taxTotal}}</strong></p>
               </center>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
               <center class="print-border">
                 <h3 class="print-font"> إجمالي المصروفات </h3>
                 <p class="print-font"><strong>{{total}}</strong></p>
+              </center>
+            </div>
+
+            <div class="col-md-3">
+              <center class="print-border">
+                <h3 class="print-font">فواتير مدفوعة من خارج الفرع</h3>
+                <p class="print-font"><strong>{{paidFromOutsideTotal}}</strong></p>
+              </center>
+            </div>
+          </div>
+
+          <div class="row mt-2">
+            <div class="col-md-3">
+              <center class="print-border">
+                <h3 class="print-font">عدد الفواتير</h3>
+                <p class="print-font"><strong>{{paidFromOutsideCount}}</strong></p>
               </center>
             </div>
           </div>

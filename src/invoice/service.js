@@ -226,7 +226,8 @@ exports.createInvoice = async (
   supplierTaxNumber,
   userID,
   supplierName,
-  invoiceNumber
+  invoiceNumber,
+  paidFromBranch
 ) => {
   if (!serialNumber) {
     throw new BadRequestException("الرجاء  إدخال الرقم القيد");
@@ -302,6 +303,7 @@ exports.createInvoice = async (
     supplierTaxNumber,
     supplierName,
     invoiceNumber,
+    paidFromBranch: paidFromBranch !== undefined ? paidFromBranch : true, // Default is true (paid from branch)
   });
 
   await financialService.updateExpenses(branchID, date, userID);
@@ -321,7 +323,8 @@ exports.updateInvoice = async (
   image,
   supplierTaxNumber,
   supplierName,
-  invoiceNumber
+  invoiceNumber,
+  paidFromBranch
 ) => {
   let invoice = await Invoice.findById(id).populate("branchID").lean();
 
@@ -381,6 +384,7 @@ exports.updateInvoice = async (
   update.supplierTaxNumber = supplierTaxNumber;
   update.supplierName = supplierName;
   update.invoiceNumber = invoiceNumber;
+  update.paidFromBranch = paidFromBranch !== undefined ? paidFromBranch : true; // Default is true (paid from branch)
 
   invoice = await Invoice.findByIdAndUpdate(id, update, {
     new: true,
@@ -455,6 +459,8 @@ exports.getReport = async (
   let total = 0;
   let taxTotal = 0;
   let invoicesTotal = 0;
+  let paidFromOutsideTotal = 0;
+  let paidFromOutsideCount = 0;
   let invoices = [];
   let currentKey = null;
 
@@ -521,6 +527,14 @@ exports.getReport = async (
       dayInvoicesTotal += invoice.amount;
       dayTaxTotal += invoice.taxValue;
       dayTotal += invoice.totalAmount;
+      
+      // Calculate invoices paid from outside branch (paidFromBranch is false)
+      // Note: null/undefined are treated as paid from branch (true) with new default
+      if (invoice.paidFromBranch === false) {
+        paidFromOutsideTotal += invoice.totalAmount;
+        paidFromOutsideCount += 1;
+      }
+      
       dayInvoices.push(invoice);
     }
 
@@ -534,5 +548,5 @@ exports.getReport = async (
     total += dayTotal;
   }
 
-  return { invoices, total, invoicesTotal, taxTotal };
+  return { invoices, total, invoicesTotal, taxTotal, paidFromOutsideTotal, paidFromOutsideCount };
 };

@@ -60,6 +60,10 @@ const invoiceSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    paidFromBranch: {
+      type: Boolean,
+      default: true, // Default is "لا" which means paid from branch (true)
+    },
   },
   {
     timestamps: true,

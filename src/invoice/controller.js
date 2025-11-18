@@ -204,6 +204,8 @@ exports.createInvoice = async (req, res) => {
     let supplierTaxNumber = req.body.supplierTaxNumber;
     let invoiceNumber = req.body.invoiceNumber;
     let supplierName = req.body.supplierName;
+    // Checkbox logic: checked = paid from outside (false), unchecked = paid from branch (true, default)
+    let paidFromBranch = !req.body.paidFromBranch; // If checkbox is checked, paidFromBranch is false
 
     date = new Date(date);
     date.setHours(new Date().getHours());
@@ -227,7 +229,8 @@ exports.createInvoice = async (req, res) => {
       supplierTaxNumber,
       req.user._id,
       supplierName,
-      invoiceNumber
+      invoiceNumber,
+      paidFromBranch
     );
 
     res.render("invoice/addInvoice.hbs", {
@@ -293,6 +296,8 @@ exports.updateInvoice = async (req, res) => {
     let supplierTaxNumber = req.body.supplierTaxNumber;
     let invoiceNumber = req.body.invoiceNumber;
     let supplierName = req.body.supplierName;
+    // Checkbox logic: checked = paid from outside (false), unchecked = paid from branch (true, default)
+    let paidFromBranch = !req.body.paidFromBranch; // If checkbox is checked, paidFromBranch is false
 
     if (req.files.image) {
       image = "uploads/" + req.files.image[0].filename;
@@ -328,7 +333,8 @@ exports.updateInvoice = async (req, res) => {
       image,
       supplierTaxNumber,
       supplierName,
-      invoiceNumber
+      invoiceNumber,
+      paidFromBranch
     );
 
     res.render("invoice/editInvoice.hbs", {
@@ -435,17 +441,20 @@ exports.report = async (req, res) => {
     });
   }
 
-  let { invoices, total, taxTotal, invoicesTotal } =
+  let { invoices, total, taxTotal, invoicesTotal, paidFromOutsideTotal, paidFromOutsideCount } =
     await invoiceService.getReport(branchID, fromDate, toDate, taxStatus);
   total = (total ?? 0).toFixed(2);
   taxTotal = (taxTotal ?? 0).toFixed(2);
   invoicesTotal = (invoicesTotal ?? 0).toFixed(2);
+  paidFromOutsideTotal = (paidFromOutsideTotal ?? 0).toFixed(2);
   res.render("invoice/invoiceReport.hbs", {
     branches,
     invoices,
     total,
     taxTotal,
     invoicesTotal,
+    paidFromOutsideTotal,
+    paidFromOutsideCount: paidFromOutsideCount || 0,
     branchID,
     statuses: taxStatuses,
     branch,
