@@ -24,8 +24,11 @@ exports.getAll = async (req, res) => {
     });
   }
 
-  // Get transfers data for the selected branch
-  const data = branchID ? await transferService.getAll(branchID) : [];
+  // Get date parameter (format: YYYY-MM)
+  const date = req.query.date || null;
+
+  // Get transfers data for the selected branch, filtered by month if date is provided
+  const data = branchID ? await transferService.getAll(branchID, date) : [];
 
   res.render("transfers/transfersReport.hbs", {
     branches,
@@ -33,6 +36,7 @@ exports.getAll = async (req, res) => {
     branchID,
     branchedRole: req.user.branchedRole,
     data,
+    date: date || new Date().toISOString().slice(0, 7), // Default to current month
     expreq: req,
   });
 };

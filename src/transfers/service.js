@@ -1,15 +1,47 @@
 const Transfer = require("../../models/transfer");
+const moment = require("moment");
 
-exports.getAll = async (branchID) => {
+exports.getAll = async (branchID, date) => {
   if (!branchID) {
     return [];
   }
 
-  const transfers = await Transfer.find({ branchID })
+  const query = { branchID };
+
+  const transfers = await Transfer.find(query)
     .sort({ createdAt: 1 })
     .populate("branchID", "branchname");
 
-  return transfers.map((transfer) => ({
+  // Filter by reservationDate month if date is provided
+  let filteredTransfers = transfers;
+  if (date) {
+    const targetMonth = moment(date, "YYYY-MM");
+    filteredTransfers = transfers.filter((transfer) => {
+      if (!transfer.reservationDate || transfer.reservationDate.trim() === "") {
+        return false;
+      }
+      // Parse reservationDate format: "HH:mm:ss mm/dd/yyyy"
+      const datePart = transfer.reservationDate.split(" ")[1];
+      if (!datePart) {
+        return false;
+      }
+      // Parse mm/dd/yyyy
+      const [month, day, year] = datePart.split("/");
+      if (!month || !day || !year) {
+        return false;
+      }
+      const reservationMoment = moment(
+        `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`,
+        "YYYY-MM-DD"
+      );
+      return (
+        reservationMoment.month() === targetMonth.month() &&
+        reservationMoment.year() === targetMonth.year()
+      );
+    });
+  }
+
+  return filteredTransfers.map((transfer) => ({
     _id: transfer._id,
     branchName: transfer.branchID?.branchname || "",
     companyName: transfer.companyName,

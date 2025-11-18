@@ -17,6 +17,11 @@
     text-align: center;
   }
 
+  .tax-title {
+    font-weight: bold;
+    color: black;
+  }
+
    /* Approved dropdown styling */
    .approved-select {
      text-align: center;
@@ -146,6 +151,15 @@
             </select>
             {{/if}}
           </div>
+          <label for="query-date" class="col-form-label pt-0">
+            <p class="select mr-3">الشهر</p>
+          </label>
+          <div class="col-sm-2">
+            <div class="input-group">
+              <input id="query-date" type="month" onchange="submitSearchForm()" name="date" min="2019-01"
+                class="form-control" value="{{date}}" required>
+            </div>
+          </div>
           <div class="col-sm-1">
             <button class="btnclass width6rem p-0"> بحث </button>
           </div>
@@ -258,6 +272,15 @@
     </div>
   </div>
 
+  <!-- Summary Field Row - Above buttons -->
+  <div class="row d-flex justify-content-center mt-3">
+    <!-- اجمالي التحويلات المعتمدة -->
+    <div class="w-100 d-flex flex-column align-items-center justify-content-center my-2" style="max-width:200px;">
+      <label class="form-control tax-title text-center" style="max-width:200px;margin-bottom:8px;">اجمالي التحويلات المعتمدة</label>
+      <input class="form-control text-center" id="total-approved-amount" value="0.00" disabled style="font-weight:bold;max-width:160px;">
+    </div>
+  </div>
+
   <div class="card-footer d-print-block mt-3">
     <div class="totaldiv" style="width: 100%;">
       <div class="row d-flex justify-content-center">
@@ -272,7 +295,7 @@
   </div>
 </div>
 
-{{> print/transfers branch=branch data=data}}
+{{> print/transfers branch=branch data=data date=date}}
 {{> footer}}
 
 <script>
@@ -356,20 +379,11 @@
      // Update approved dropdowns styling
      updateApprovedDropdowns();
     
-    // Update data-approved attribute when new row's approved dropdown changes
+    // Don't update data-approved attribute or apply filtering for new rows
+    // Filtering will only apply after save and refresh
     const newRowElement = tbody.find('tr:last');
     newRowElement.find('.approved-select').on('change', function() {
-      const isApproved = $(this).val() === 'true';
-      newRowElement.attr('data-approved', isApproved);
-      
-      // If filtering is active (hide approved), hide this row if it's now approved
-      if (!$('#show-all-button').hasClass('active')) {
-        if (isApproved) {
-          newRowElement.hide();
-        } else {
-          newRowElement.show();
-        }
-      }
+      // Don't hide/show or update data-approved - let it be set from server after save
     });
     
     // Calculate initial values for the new row (will be calculated automatically when values are entered)
@@ -409,12 +423,54 @@
 
    // Initialize on page load
    $(document).ready(function() {
+     // The date input should already be set from the server template
+     // If for some reason it's not set, set it to today's month
+     const dateInput = $('#query-date');
+     if (!dateInput.val() || dateInput.val().trim() === '') {
+       const today = new Date();
+       const year = today.getFullYear();
+       const month = String(today.getMonth() + 1).padStart(2, '0');
+       dateInput.val(`${year}-${month}`);
+     }
+     
      updateApprovedDropdowns();
      initializeAutoDateFill();
      initializeAutoCalculations();
      initializeFiltering();
      initializeTimeBasedDisabling();
+     calculateTotalApproved();
    });
+
+  // Function to calculate and display total approved transfers
+  function calculateTotalApproved() {
+    let total = 0;
+    
+    $('.transfer-tr').each(function() {
+      const row = $(this);
+      // Check if approved - use the select value if available, otherwise use data-approved attribute
+      const approvedSelect = row.find('.approved-select');
+      let isApproved = false;
+      
+      if (approvedSelect.length > 0) {
+        // Use the current select value (for unsaved changes)
+        isApproved = approvedSelect.val() === 'true';
+      } else {
+        // Fall back to data-approved attribute (for saved records)
+        isApproved = row.attr('data-approved') === 'true';
+      }
+      
+      if (isApproved) {
+        const reservationAmountInput = row.find('.reservation-amount');
+        if (reservationAmountInput.length > 0) {
+          const amount = parseFloat(reservationAmountInput.val()) || 0;
+          total += amount;
+        }
+      }
+    });
+    
+    // Update the display with formatted number (2 decimal places)
+    $('#total-approved-amount').val(total.toFixed(2));
+  }
 
   // Function to disable fields based on creation time (4 hours rule)
   function initializeTimeBasedDisabling() {
@@ -511,19 +567,19 @@
     $('#hide-approved-button').addClass('active');
     
     // Update data-approved attribute when dropdown changes
+    // But don't apply filtering until save and refresh
     $(document).on('change', '.approved-select', function() {
       const row = $(this).closest('tr');
       const isApproved = $(this).val() === 'true';
-      row.attr('data-approved', isApproved);
-      
-      // If filtering is active (hide approved), hide this row if it's now approved
-      if (!$('#show-all-button').hasClass('active')) {
-        if (isApproved) {
-          row.hide();
-        } else {
-          row.show();
-        }
-      }
+      // Don't update data-approved attribute here - let it be set from server after save
+      // This way, filtering only applies to saved records, not unsaved changes
+      // Update total when approved status changes
+      calculateTotalApproved();
+    });
+    
+    // Update total when reservation amount changes
+    $(document).on('input change', '.reservation-amount', function() {
+      calculateTotalApproved();
     });
   }
 
