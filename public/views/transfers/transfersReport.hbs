@@ -80,6 +80,41 @@
     background-color: #fff3cd !important;
   }
 
+  /* Print styles */
+  @media print {
+    .d-print-none {
+      display: none !important;
+    }
+    
+    .d-print-block {
+      display: block !important;
+    }
+    
+    /* Show all rows in print, regardless of filter */
+    .transfer-tr {
+      display: table-row !important;
+    }
+    
+    /* Hide buttons and filters */
+    #add-row-button,
+    #show-all-button,
+    #hide-approved-button,
+    #save-button,
+    .card-header,
+    .card-footer {
+      display: none !important;
+    }
+    
+    /* Ensure table is visible */
+    .table-responsive {
+      overflow: visible !important;
+    }
+    
+    body {
+      background: white !important;
+    }
+  }
+
 </style>
 
 <div class=" bg-white col-md-12 d-print-none p-0" dir="rtl" style="padding: 0px 28px;" data-user-role="{{expreq.user.role}}">
@@ -122,8 +157,14 @@
   <div class="card">
     <div class="card-body" style="padding-right: 0; padding-left: 0;">
       <div class="d-print-none mb-2" style="padding: 10px; text-align: right;">
-        <button class="btn btn-primary btn-lg" id="add-row-button">
+        <button class="btn btn-primary btn-lg" id="add-row-button" style="margin-left: 10px;">
           <i class="fa fa-plus"></i> إضافة سجل جديد
+        </button>
+        <button class="btn btn-info btn-lg" id="show-all-button">
+          <i class="fa fa-eye"></i> عرض الكل
+        </button>
+        <button class="btn btn-secondary btn-lg" id="hide-approved-button">
+          <i class="fa fa-eye-slash"></i> إخفاء الموافق عليها
         </button>
       </div>
       <div class="table-responsive">
@@ -171,7 +212,7 @@
           <tbody>
             {{#if data}}
               {{#each data}}
-              <tr class="transfer-tr">
+              <tr class="transfer-tr" data-approved="{{approved}}">
                 <td><input type="hidden" class="transfer-id" value="{{_id}}"><input class="form-control branch-name" value="{{branchName}}" disabled></td>
                 <td>
                   <select class="form-control company-name">
@@ -231,6 +272,7 @@
   </div>
 </div>
 
+{{> print/transfers branch=branch data=data}}
 {{> footer}}
 
 <script>
@@ -268,7 +310,7 @@
     
     // Create new row with empty inputs
     const newRow = `
-      <tr class="transfer-tr">
+      <tr class="transfer-tr" data-approved="false">
         <td><input type="hidden" class="transfer-id" value=""><input class="form-control branch-name" value="${selectedBranchText}" disabled></td>
         <td>
           <select class="form-control company-name">
@@ -314,6 +356,22 @@
      // Update approved dropdowns styling
      updateApprovedDropdowns();
     
+    // Update data-approved attribute when new row's approved dropdown changes
+    const newRowElement = tbody.find('tr:last');
+    newRowElement.find('.approved-select').on('change', function() {
+      const isApproved = $(this).val() === 'true';
+      newRowElement.attr('data-approved', isApproved);
+      
+      // If filtering is active (hide approved), hide this row if it's now approved
+      if (!$('#show-all-button').hasClass('active')) {
+        if (isApproved) {
+          newRowElement.hide();
+        } else {
+          newRowElement.show();
+        }
+      }
+    });
+    
     // Calculate initial values for the new row (will be calculated automatically when values are entered)
   });
 
@@ -354,7 +412,66 @@
      updateApprovedDropdowns();
      initializeAutoDateFill();
      initializeAutoCalculations();
+     initializeFiltering();
    });
+
+  // Function to filter rows based on approved status
+  function filterRows(showAll) {
+    $('.transfer-tr').each(function() {
+      const row = $(this);
+      const isApproved = row.attr('data-approved') === 'true';
+      
+      if (showAll) {
+        row.show();
+      } else {
+        // Hide approved records
+        if (isApproved) {
+          row.hide();
+        } else {
+          row.show();
+        }
+      }
+    });
+  }
+
+  // Initialize filtering - hide approved by default
+  function initializeFiltering() {
+    // Hide approved records by default
+    filterRows(false);
+    
+    // Mark "Hide Approved" button as active by default
+    $('#hide-approved-button').addClass('active');
+    
+    // Update data-approved attribute when dropdown changes
+    $(document).on('change', '.approved-select', function() {
+      const row = $(this).closest('tr');
+      const isApproved = $(this).val() === 'true';
+      row.attr('data-approved', isApproved);
+      
+      // If filtering is active (hide approved), hide this row if it's now approved
+      if (!$('#show-all-button').hasClass('active')) {
+        if (isApproved) {
+          row.hide();
+        } else {
+          row.show();
+        }
+      }
+    });
+  }
+
+  // Show all button
+  $('#show-all-button').on('click', function() {
+    filterRows(true);
+    $(this).addClass('active');
+    $('#hide-approved-button').removeClass('active');
+  });
+
+  // Hide approved button
+  $('#hide-approved-button').on('click', function() {
+    filterRows(false);
+    $(this).addClass('active');
+    $('#show-all-button').removeClass('active');
+  });
 
   // Function to auto-calculate commission voucher and bank fees
   function initializeAutoCalculations() {
@@ -568,5 +685,10 @@
       },
     });
   }
+
+  // Print button functionality
+  $('#print-button').on('click', function() {
+    window.print();
+  });
 </script>
 

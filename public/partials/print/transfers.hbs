@@ -1,0 +1,141 @@
+<style>
+  .table {
+    border-collapse: collapse;
+    color: black;
+  }
+
+  th p {
+    color: black;
+  }
+
+  .table td,
+  .table th {
+    height: 75% !important;
+    padding: .2rem !important;
+    text-align: center;
+  }
+
+  #page-title {
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: auto;
+    color: black;
+    height: 75px;
+    width: 680px;
+    margin: 50px auto;
+  }
+
+  .table-bordered td,
+  .table-bordered th {
+    text-align: center;
+    border-color: black !important;
+  }
+
+  /* Print-specific styles for repeating header on each page */
+  @media print {
+    .print-header {
+      display: table-header-group;
+    }
+    
+    .print-content {
+      display: table-row-group;
+    }
+    
+    /* Ensure proper page breaks */
+    .page-break {
+      page-break-before: always;
+    }
+    
+    /* Force table headers to repeat on each page */
+    thead {
+      display: table-header-group;
+    }
+    
+    tbody {
+      display: table-row-group;
+    }
+    
+    /* Page numbering - only using @page rule */
+    @page {
+      @bottom-center {
+        content: counter(page);
+        font-size: 18px;
+        color: black;
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+    }
+  }
+</style>
+
+<div class="card-body d-none d-print-block" style="padding-right: 0; padding-left: 0;" dir="rtl">
+  <!-- Main table structure to enable header repetition -->
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead class="print-header">
+      <tr>
+        <td>
+          <div id="page-title" class="headerPage">
+            <h2>
+              ادارة التحويلات{{#if branch}} - {{branch.branchname}}{{/if}}
+            </h2>
+          </div>
+        </td>
+      </tr>
+    </thead>
+    
+    <tbody class="print-content">
+      <tr>
+        <td>
+          <table id="transfers-printed-table" class="table table-bordered">
+            <thead>
+              <tr>
+                <th>الفرع</th>
+                <th>الشركة</th>
+                <th>الحجز المعني</th>
+                <th>تاريخ الحجز</th>
+                <th>مبلغ الحجز</th>
+                <th>المبلغ المرسل في الموقع</th>
+                <th>المبلغ المحول في القروب</th>
+                <th>العمولة سند صرف</th>
+                <th>رسوم البنك</th>
+                <th>رقم السند</th>
+                <th>تم الاستلام</th>
+                <th>ملاحظات</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {{#if data}}
+                {{#each data}}
+                <tr>
+                  <td>{{branchName}}</td>
+                  <td>{{companyName}}</td>
+                  <td>{{reservationRef}}</td>
+                  <td>{{reservationDate}}</td>
+                  <td>{{toFixed reservationAmount}}</td>
+                  <td>{{toFixed sentAmount}}</td>
+                  <td>{{toFixed transferredAmount}}</td>
+                  <td>{{toFixed commissionVoucher}}</td>
+                  <td>{{toFixed bankFees}}</td>
+                  <td>{{voucherNumber}}</td>
+                  <td>{{#if approved}}نعم{{else}}لا{{/if}}</td>
+                  <td>{{notes}}</td>
+                </tr>
+                {{/each}}
+              {{else}}
+                <tr>
+                  <td colspan="12" style="text-align: center; padding: 20px;">
+                    <p>لا توجد بيانات</p>
+                  </td>
+                </tr>
+              {{/if}}
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

@@ -119,14 +119,15 @@ exports.addTransfers = async (req, res) => {
         const wasApproved = existingTransfer?.approved || false;
         const isNowApproved = data.approved === true;
         const existingAmount = existingTransfer?.reservationAmount || 0;
+        const newAmount = data.reservationAmount || 0;
 
         const updatedTransfer = await transferService.updateTransfer(id, data);
 
         // If approved changed from false to true, add to receivedValues
-        if (!wasApproved && isNowApproved && data.reservationAmount > 0) {
+        if (!wasApproved && isNowApproved && newAmount > 0) {
           await updateReceivedAmountForTransfer(
             updatedTransfer,
-            data.reservationAmount
+            newAmount
           );
         }
 
@@ -136,6 +137,24 @@ exports.addTransfers = async (req, res) => {
             updatedTransfer,
             existingAmount
           );
+        }
+
+        // If record was approved and is still approved, but amount changed
+        if (wasApproved && isNowApproved && existingAmount !== newAmount) {
+          // Subtract the old amount
+          if (existingAmount > 0) {
+            await subtractReceivedAmountForTransfer(
+              updatedTransfer,
+              existingAmount
+            );
+          }
+          // Add the new amount
+          if (newAmount > 0) {
+            await updateReceivedAmountForTransfer(
+              updatedTransfer,
+              newAmount
+            );
+          }
         }
       } catch (error) {
         throw error;
