@@ -7,20 +7,6 @@
   </button>
   
   <div class="navContainer">
-    <div class="logoImg">
-  <a  href="/">
-    {{#ifEquals expreq.user.role 'Admin'}}
-    {{/ifEquals}}
-      <img 
-        {{#ifNotEquals expreq.user.role 'SuperAdmin'}}
-          src='/{{expreq.user.companyID.companyImage}}'
-        {{/ifNotEquals}} 
-        {{#ifEquals expreq.user.role 'SuperAdmin'}}
-          src='/images/ronzaHeaderLogo.jpeg'
-        {{/ifEquals}}
-        class="d-inline-block align-top navLogo" alt="">
-    </a>
-    </div>
 <div class="navLinks collapse navbar-collapse"  id="navbarSupportedContent">
    <ul class="navbar-nav  navItems mr-4 mx-md-auto">
         <li class="nav-item ">
