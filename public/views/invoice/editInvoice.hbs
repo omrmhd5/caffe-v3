@@ -143,15 +143,6 @@
                 </div>
               </div>
             </div>
-            <div class="row form-group">
-              <div class="col">
-                <label for="description" class="float-right">
-                  <p class="select"> وصف الفاتورة</p>
-                </label>
-                <input type="text" id="description" name="description" class="form-control" placeholder=" وصف الفاتورة"
-                  value="{{invoice.description}}" dir="rtl">
-              </div>
-            </div>
             <div class="form-group" dir="rtl">
               <div class="row">
                 <div class="col-12">
@@ -160,6 +151,15 @@
                     <input type="checkbox" class="form-control cursor" id="paidFromBranch" name="paidFromBranch" {{#ifEquals invoice.paidFromBranch false}}checked{{/ifEquals}}>
                   </label>
                 </div>
+              </div>
+            </div>
+            <div class="row form-group">
+              <div class="col">
+                <label for="description" class="float-right">
+                  <p class="select"> وصف الفاتورة</p>
+                </label>
+                <input type="text" id="description" name="description" class="form-control" placeholder=" وصف الفاتورة"
+                  value="{{invoice.description}}" dir="rtl">
               </div>
             </div>
 

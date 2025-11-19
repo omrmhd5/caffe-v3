@@ -68,6 +68,18 @@
                 </div>
               </div>
             </div>
+            <label for="paidFromBranchStatus" class="col-form-label pt-0">
+              <p class="select"> مدفوع من </p>
+            </label>
+            <div class="col-sm-2" dir="ltr">
+              <div class="input-group">
+                <select id="paidFromBranchStatus" name="paidFromBranchStatus" class="form-control">
+                  <option value="0" {{#ifEquals paidFromBranchStatus 0}}selected{{/ifEquals}}{{#unless paidFromBranchStatus}}selected{{/unless}}>الكل</option>
+                  <option value="1" {{#ifEquals paidFromBranchStatus 1}}selected{{/ifEquals}}>المدفوع من الفرع</option>
+                  <option value="2" {{#ifEquals paidFromBranchStatus 2}}selected{{/ifEquals}}>المدفوع من خارج الفرع</option>
+                </select>
+              </div>
+            </div>
             <div class="col-sm-1">
               <button class="btnclass width6rem p-0"> بحث </button>
             </div>
@@ -270,6 +282,7 @@
     let fromDate = $('#fromDate').val();
     let toDate = $('#toDate').val();
     let taxStatus = $('#taxStatus').val();
+    let paidFromBranchStatus = $('#paidFromBranchStatus').val();
 
     if (fromDate && toDate) {
       if (fromDate > toDate) {
@@ -284,7 +297,7 @@
           delay: 2000,
         });
       } else {
-        window.open(`/invoice/excel-report?branchID=${branchID}&fromDate=${fromDate}&toDate=${toDate}&taxStatus=${taxStatus}`, '_blank').focus()
+        window.open(`/invoice/excel-report?branchID=${branchID}&fromDate=${fromDate}&toDate=${toDate}&taxStatus=${taxStatus}&paidFromBranchStatus=${paidFromBranchStatus}`, '_blank').focus()
         {{!-- $.ajax({
           url: `/invoice/excel-report?branchID=${branchID}&fromDate=${fromDate}&toDate=${toDate}`
         }); --}}

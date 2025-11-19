@@ -453,7 +453,8 @@ exports.getReport = async (
   branchID = null,
   fromDate,
   toDate,
-  taxStatus = null
+  taxStatus = null,
+  paidFromBranchStatus = 0
 ) => {
   let find = {};
   let total = 0;
@@ -484,6 +485,14 @@ exports.getReport = async (
         { supplierTaxNumber: { $eq: " " } },
       ],
     };
+  }
+
+  // Filter by paidFromBranch status
+  // 0 = All, 1 = Paid from branch (true), 2 = Paid from outside (false)
+  if (paidFromBranchStatus == 1) {
+    find.paidFromBranch = true;
+  } else if (paidFromBranchStatus == 2) {
+    find.paidFromBranch = false;
   }
 
   if (branchID) {

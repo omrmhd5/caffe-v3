@@ -382,6 +382,7 @@ exports.report = async (req, res) => {
   let fromDate = null;
   let toDate = null;
   let taxStatus = 0;
+  let paidFromBranchStatus = 0;
 
   let branches = await branchService.getAllBranches(req.user.companyID);
   branches.unshift({
@@ -441,8 +442,12 @@ exports.report = async (req, res) => {
     });
   }
 
+  if (req.query.paidFromBranchStatus) {
+    paidFromBranchStatus = parseInt(req.query.paidFromBranchStatus);
+  }
+
   let { invoices, total, taxTotal, invoicesTotal, paidFromOutsideTotal, paidFromOutsideCount } =
-    await invoiceService.getReport(branchID, fromDate, toDate, taxStatus);
+    await invoiceService.getReport(branchID, fromDate, toDate, taxStatus, paidFromBranchStatus);
   total = (total ?? 0).toFixed(2);
   taxTotal = (taxTotal ?? 0).toFixed(2);
   invoicesTotal = (invoicesTotal ?? 0).toFixed(2);
@@ -461,6 +466,7 @@ exports.report = async (req, res) => {
     branchedRole: req.user.branchedRole,
     fromDate,
     toDate,
+    paidFromBranchStatus,
   });
 };
 
@@ -528,8 +534,13 @@ exports.excelReport = async (req, response) => {
     });
   }
 
+  let paidFromBranchStatus = 0;
+  if (req.query.paidFromBranchStatus) {
+    paidFromBranchStatus = parseInt(req.query.paidFromBranchStatus);
+  }
+
   const { invoices, total, taxTotal, invoicesTotal } =
-    await invoiceService.getReport(branchID, fromDate, toDate, taxStatus);
+    await invoiceService.getReport(branchID, fromDate, toDate, taxStatus, paidFromBranchStatus);
 
   const workbook = new excelJS.Workbook();
   const worksheet = workbook.addWorksheet("Invoices");
