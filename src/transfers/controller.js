@@ -44,14 +44,21 @@ exports.getAll = async (req, res) => {
 exports.addTransfers = async (req, res) => {
   try {
     let transfers = req.body.transfers;
+    let transfersToDelete = req.body.transfersToDelete;
 
     // Parse JSON if it's a string (following the pattern from other controllers)
     if (typeof transfers === "string") {
       transfers = JSON.parse(transfers);
     }
+    if (typeof transfersToDelete === "string") {
+      transfersToDelete = JSON.parse(transfersToDelete);
+    }
 
     if (!transfers || !Array.isArray(transfers)) {
-      return res.status(400).send({ errorMessage: "Invalid transfers data" });
+      transfers = [];
+    }
+    if (!transfersToDelete || !Array.isArray(transfersToDelete)) {
+      transfersToDelete = [];
     }
 
     const branchID = req.user.branchedRole
@@ -60,6 +67,23 @@ exports.addTransfers = async (req, res) => {
 
     if (!branchID) {
       return res.status(400).send({ errorMessage: "Branch ID is required" });
+    }
+
+    // Handle deletions first
+    for (const transferId of transfersToDelete) {
+      try {
+        const transfer = await transferService.getTransferById(transferId);
+        if (transfer) {
+          // If the transfer was approved, subtract the amount from received values
+          if (transfer.approved === true && transfer.reservationAmount > 0) {
+            await subtractReceivedAmountForTransfer(transfer, transfer.reservationAmount);
+          }
+          // Delete the transfer
+          await transferService.deleteTransfer(transferId);
+        }
+      } catch (error) {
+        // Continue with other deletions even if one fails
+      }
     }
 
     // Process each transfer - separate updates and new records
@@ -192,7 +216,14 @@ exports.addTransfers = async (req, res) => {
       }
     }
 
-    res.send({ message: "! تم الحفظ بنجاح" });
+    // Return success message
+    let message = "! تم الحفظ بنجاح";
+    if (transfersToDelete.length > 0 && transfers.length === 0) {
+      message = "! تم الحذف بنجاح";
+    } else if (transfersToDelete.length > 0) {
+      message = "! تم الحفظ والحذف بنجاح";
+    }
+    res.send({ message });
   } catch (error) {
     res
       .status(error.status || 500)
@@ -340,3 +371,32 @@ async function subtractReceivedAmountForTransfer(transfer, amount) {
     // Don't throw - we don't want to fail the transfer save if this fails
   }
 }
+
+exports.deleteTransfer = async (req, res) => {
+  try {
+    const transferId = req.params.id;
+    
+    if (!transferId) {
+      return res.status(400).send({ errorMessage: "Transfer ID is required" });
+    }
+
+    // Get the transfer before deleting to check if it was approved
+    const transfer = await transferService.getTransferById(transferId);
+    
+    if (!transfer) {
+      return res.status(404).send({ errorMessage: "Transfer not found" });
+    }
+
+    // If the transfer was approved, subtract the amount from received values
+    if (transfer.approved === true && transfer.reservationAmount > 0) {
+      await subtractReceivedAmountForTransfer(transfer, transfer.reservationAmount);
+    }
+
+    // Delete the transfer
+    await transferService.deleteTransfer(transferId);
+
+    res.send({ message: "تم الحذف بنجاح" });
+  } catch (error) {
+    res.status(error.status || 500).send({ errorMessage: error.message || "Failed to delete transfer" });
+  }
+};

@@ -37,6 +37,12 @@
      color: white;
    }
 
+   .approved-select option[value="delete"] {
+     background-color: #343a40;
+     color: white;
+     font-weight: bold;
+   }
+
    .approved-select.approved-yes {
      background-color: #28a745 !important;
      color: white !important;
@@ -254,6 +260,7 @@
                   <select class="form-control approved-select" {{#ifNotEquals expreq.user.role "AccountantManager"}}disabled{{/ifNotEquals}}>
                     <option value="false" {{#unless approved}}selected{{/unless}}>لا</option>
                     <option value="true" {{#if approved}}selected{{/if}}>نعم</option>
+                    <option value="delete">حذف</option>
                   </select>
                 </td>
                 <td><input class="form-control notes" value="{{notes}}"></td>
@@ -361,6 +368,7 @@
            <select class="form-control approved-select" disabled>
              <option value="false" selected>لا</option>
              <option value="true">نعم</option>
+             <option value="delete">حذف</option>
            </select>
          </td>
         <td><input class="form-control notes" value=""></td>
@@ -403,8 +411,12 @@
        
        // Set initial colors
        $(this).removeClass('approved-yes approved-no');
-       if ($(this).val() === 'true') {
+       const value = $(this).val();
+       if (value === 'true') {
          $(this).addClass('approved-yes');
+       } else if (value === 'delete') {
+         $(this).css('background-color', '#343a40');
+         $(this).css('color', 'white');
        } else {
          $(this).addClass('approved-no');
        }
@@ -413,8 +425,12 @@
      // Add change event listener to update background color
      $('.approved-select').off('change').on('change', function() {
        $(this).removeClass('approved-yes approved-no');
-       if ($(this).val() === 'true') {
+       const value = $(this).val();
+       if (value === 'true') {
          $(this).addClass('approved-yes');
+       } else if (value === 'delete') {
+         $(this).css('background-color', '#343a40');
+         $(this).css('color', 'white');
        } else {
          $(this).addClass('approved-no');
        }
@@ -715,12 +731,27 @@
       }
     });
     
+    // Separate transfers to save/update and transfers to delete
+    const transfersToDelete = [];
+    
     // Collect data from all rows (skip header and "no data" row)
     $('.transfer-tr').each(function() {
       const row = $(this);
       
       // Skip if it's the "no data" row
       if (row.find('td[colspan]').length > 0) {
+        return;
+      }
+
+      const approvedSelect = row.find('.approved-select').val();
+      
+      // Check if delete is selected
+      if (approvedSelect === 'delete') {
+        const transferId = row.find('.transfer-id').val();
+        if (transferId && transferId.trim() !== '' && transferId !== 'null') {
+          transfersToDelete.push(transferId);
+        }
+        // Skip this row - don't include it in transfers array
         return;
       }
 
@@ -741,7 +772,7 @@
           commissionVoucher: parseFloat(row.find('.commission-voucher').val()) || 0,
           bankFees: parseFloat(row.find('.bank-fees').val()) || 0,
           voucherNumber: row.find('.voucher-number').val() || '',
-          approved: row.find('.approved-select').val() === 'true',
+          approved: approvedSelect === 'true',
           notes: row.find('.notes').val() || '',
         };
         
@@ -749,7 +780,7 @@
       }
     });
 
-    if (transfers.length === 0) {
+    if (transfers.length === 0 && transfersToDelete.length === 0) {
       swal('تنبيه', 'لا توجد بيانات للحفظ', {
         icon: 'warning',
         buttons: {
@@ -767,6 +798,7 @@
     
     callUrl(url, method, {
       transfers: JSON.stringify(transfers),
+      transfersToDelete: JSON.stringify(transfersToDelete),
       branchID: branchID
     });
   });
@@ -813,6 +845,19 @@
   // Print button functionality
   $('#print-button').on('click', function() {
     window.print();
+  });
+
+  // Handle delete option selection in dropdown
+  $(document).on('change', '.approved-select', function() {
+    const select = $(this);
+    const value = select.val();
+    
+    // If delete is selected, optionally highlight the row or show visual feedback
+    if (value === 'delete') {
+      select.closest('tr').css('opacity', '0.6');
+    } else {
+      select.closest('tr').css('opacity', '1');
+    }
   });
 </script>
 
