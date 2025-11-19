@@ -64,8 +64,25 @@
                 </div>
               </div>
             </div>
-            <div class="form-group row">
-              <label for="role" class="col-form-label col-md-4 col-12">
+            <div class="form-group align-items-center row">
+              <label for="role" class="col-form-label col-md-3 col-12">
+                <p class="select"> الوصف </p>
+                <div class="">
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="description" value={{description}}>
+                  </div>
+                </div>
+              </label>
+              <label for="paidFromBranchStatus" class="col-form-label col-md-2 col-12">
+                <p class="select"> مدفوع من </p>
+                <div class="">
+                  <select id="paidFromBranchStatus" name="paidFromBranchStatus" class="form-control">
+                    <option value="0" {{#ifEquals paidFromBranchStatus 0}}selected{{/ifEquals}}{{#unless paidFromBranchStatus}}selected{{/unless}}>الكل</option>
+                    <option value="2" {{#ifEquals paidFromBranchStatus 2}}selected{{/ifEquals}}>المدفوع من خارج الفرع</option>
+                  </select>
+                </div>
+              </label>
+              <label for="role" class="col-form-label col-md-2 col-12">
                 <p class="select"> حالة الضمان </p>
                 <div class="">
                   <select id="warrantyStatus" name="warrantyStatus" class="form-control">
@@ -75,7 +92,7 @@
                   </select>
                 </div>
               </label>
-              <label for="role" class="col-form-label col-md-4 col-12">
+              <label for="role" class="col-form-label col-md-2 col-12">
                 <p class="select"> نوع الفاتورة </p>
                 <div class="">
                   <select id="taxStatus" name="taxStatus" class="form-control">
@@ -85,16 +102,8 @@
                   </select>
                 </div>
               </label>
-              <label for="role" class="col-form-label col-4">
-                <p class="select"> الوصف </p>
-                <div class="">
-                  <div class="input-group">
-                    <input type="text" class="form-control" name="description" value={{description}}>
-                  </div>
-                </div>
-              </label>
-              <div class="col-sm-1">
-                <button class="btnclass width6rem p-0"> بحث </button>
+              <div class="col-md-2 col-12 text-center">
+                <button class="btnclass width6rem p-0 mt-4"> بحث </button>
               </div>
             </div>
         </form>

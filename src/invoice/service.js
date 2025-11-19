@@ -23,7 +23,8 @@ exports.getAllInvoicesWithPagination = (
   toDate,
   warrantyStatus,
   page,
-  taxStatus = 0
+  taxStatus = 0,
+  paidFromBranchStatus = 0
 ) => {
   let find = {};
 
@@ -47,6 +48,12 @@ exports.getAllInvoicesWithPagination = (
       { supplierTaxNumber: { $eq: "" } },
       { supplierTaxNumber: { $eq: " " } },
     ];
+  }
+
+  // Filter by paidFromBranch status
+  // 0 = All, 2 = Paid from outside (false)
+  if (paidFromBranchStatus == 2) {
+    find.paidFromBranch = false;
   }
 
   if (!branchID) {
@@ -77,7 +84,8 @@ exports.getCount = (
   toDate,
   warrantyStatus,
   description,
-  taxStatus = 0
+  taxStatus = 0,
+  paidFromBranchStatus = 0
 ) => {
   let find = {};
 
@@ -111,6 +119,12 @@ exports.getCount = (
     ];
   }
 
+  // Filter by paidFromBranch status
+  // 0 = All, 2 = Paid from outside (false)
+  if (paidFromBranchStatus == 2) {
+    find.paidFromBranch = false;
+  }
+
   find.branchID = branchID;
 
   if (fromDate && toDate) {
@@ -139,7 +153,8 @@ exports.getInvoiceByDescription = async (
   page,
   fromDate,
   toDate,
-  taxStatus = 0
+  taxStatus = 0,
+  paidFromBranchStatus = 0
 ) => {
   let find = {};
 
@@ -167,6 +182,12 @@ exports.getInvoiceByDescription = async (
       { supplierTaxNumber: { $eq: "" } },
       { supplierTaxNumber: { $eq: " " } },
     ];
+  }
+
+  // Filter by paidFromBranch status
+  // 0 = All, 2 = Paid from outside (false)
+  if (paidFromBranchStatus == 2) {
+    find.paidFromBranch = false;
   }
 
   if (fromDate && toDate) {

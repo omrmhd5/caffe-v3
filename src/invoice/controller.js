@@ -23,6 +23,7 @@ exports.getAllInvoices = async (req, res) => {
   let invoices = null;
   let warrantyStatus = 0;
   let description = null;
+  let paidFromBranchStatus = 0;
   let branches = await branchService.getAllBranches(req.user.companyID);
 
   if (req.user.branchedRole) {
@@ -79,6 +80,10 @@ exports.getAllInvoices = async (req, res) => {
     description = req.query.description;
   }
 
+  if (req.query.paidFromBranchStatus) {
+    paidFromBranchStatus = parseInt(req.query.paidFromBranchStatus);
+  }
+
   if (description) {
     invoices = await invoiceService.getInvoiceByDescription(
       branchID,
@@ -87,7 +92,8 @@ exports.getAllInvoices = async (req, res) => {
       page,
       fromDate,
       toDate,
-      taxStatus
+      taxStatus,
+      paidFromBranchStatus
     );
   } else {
     invoices = await invoiceService.getAllInvoicesWithPagination(
@@ -96,7 +102,8 @@ exports.getAllInvoices = async (req, res) => {
       toDate,
       warrantyStatus,
       page,
-      taxStatus
+      taxStatus,
+      paidFromBranchStatus
     );
   }
 
@@ -125,7 +132,8 @@ exports.getAllInvoices = async (req, res) => {
     toDate,
     warrantyStatus,
     description,
-    taxStatus
+    taxStatus,
+    paidFromBranchStatus
   );
   count < PAGE_SIZE ? (count = 1) : (count = count);
 
@@ -142,6 +150,7 @@ exports.getAllInvoices = async (req, res) => {
     warrantyStatus,
     taxStatus,
     description,
+    paidFromBranchStatus,
     pagination: {
       page,
       pageCount: Math.ceil(count / PAGE_SIZE),
