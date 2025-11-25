@@ -515,7 +515,7 @@
       
       // If 4 hours or more have passed, disable all inputs
       if (secondsPassed >= FOUR_HOURS_IN_SECONDS) {
-        row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees)').prop('disabled', true);
+        row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees):not(.transferred-amount)').prop('disabled', true);
         row.find('select:not(.approved-select)').prop('disabled', true);
         // Keep approved-select disabled for non-managers anyway
         row.find('.approved-select').prop('disabled', true);
@@ -544,9 +544,9 @@
         // If 4 hours have passed (or more), disable
         if (secondsPassed >= FOUR_HOURS_IN_SECONDS) {
           // Check if already disabled to avoid repeated operations
-          const firstInput = row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees)').first();
+          const firstInput = row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees):not(.transferred-amount)').first();
           if (!firstInput.prop('disabled')) {
-            row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees)').prop('disabled', true);
+            row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees):not(.transferred-amount)').prop('disabled', true);
             row.find('select:not(.approved-select)').prop('disabled', true);
             row.find('.approved-select').prop('disabled', true);
           }
