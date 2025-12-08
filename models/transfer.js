@@ -47,9 +47,17 @@ const transferSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    voucherNumberUpdatedAt: {
+      type: Date,
+      default: null,
+    },
     notes: {
       type: String,
       default: "",
+    },
+    notesUpdatedAt: {
+      type: Date,
+      default: null,
     },
     approved: {
       type: Boolean,

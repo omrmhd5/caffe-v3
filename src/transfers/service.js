@@ -57,6 +57,8 @@ exports.getAll = async (branchID, date) => {
     approved: transfer.approved,
     createdAt: transfer.createdAt,
     transferredAmountUpdatedAt: transfer.transferredAmountUpdatedAt,
+    voucherNumberUpdatedAt: transfer.voucherNumberUpdatedAt,
+    notesUpdatedAt: transfer.notesUpdatedAt,
   }));
 };
 
@@ -125,6 +127,58 @@ exports.updateTransfer = async (transferId, updateData) => {
     } else {
       // Value didn't change, preserve existing timestamp
       updateData.transferredAmountUpdatedAt = existingTransfer.transferredAmountUpdatedAt;
+    }
+  }
+  
+  // Handle voucherNumber: if not provided, preserve existing value and timestamp
+  if (updateData.voucherNumber === undefined || updateData.voucherNumber === null) {
+    // Not provided - preserve existing value and timestamp
+    updateData.voucherNumber = existingTransfer.voucherNumber || "";
+    updateData.voucherNumberUpdatedAt = existingTransfer.voucherNumberUpdatedAt;
+  } else {
+    // Provided - compare with existing value
+    const existingVoucherNumber = existingTransfer.voucherNumber || "";
+    const newVoucherNumber = updateData.voucherNumber.trim() || "";
+    updateData.voucherNumber = newVoucherNumber;
+    
+    // Only update timestamp if the value actually changed
+    if (newVoucherNumber !== existingVoucherNumber) {
+      if (newVoucherNumber !== '') {
+        // Value changed and is not empty, set new timestamp
+        updateData.voucherNumberUpdatedAt = new Date();
+      } else {
+        // Value changed to empty, clear timestamp
+        updateData.voucherNumberUpdatedAt = null;
+      }
+    } else {
+      // Value didn't change, preserve existing timestamp
+      updateData.voucherNumberUpdatedAt = existingTransfer.voucherNumberUpdatedAt;
+    }
+  }
+  
+  // Handle notes: if not provided, preserve existing value and timestamp
+  if (updateData.notes === undefined || updateData.notes === null) {
+    // Not provided - preserve existing value and timestamp
+    updateData.notes = existingTransfer.notes || "";
+    updateData.notesUpdatedAt = existingTransfer.notesUpdatedAt;
+  } else {
+    // Provided - compare with existing value
+    const existingNotes = existingTransfer.notes || "";
+    const newNotes = updateData.notes.trim() || "";
+    updateData.notes = newNotes;
+    
+    // Only update timestamp if the value actually changed
+    if (newNotes !== existingNotes) {
+      if (newNotes !== '') {
+        // Value changed and is not empty, set new timestamp
+        updateData.notesUpdatedAt = new Date();
+      } else {
+        // Value changed to empty, clear timestamp
+        updateData.notesUpdatedAt = null;
+      }
+    } else {
+      // Value didn't change, preserve existing timestamp
+      updateData.notesUpdatedAt = existingTransfer.notesUpdatedAt;
     }
   }
   

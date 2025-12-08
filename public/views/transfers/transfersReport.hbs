@@ -255,7 +255,7 @@
                 <td><input type="number" class="form-control transferred-amount" value="{{toFixed transferredAmount}}" {{#if transferredAmountUpdatedAt}}data-transferred-timestamp="{{transferredAmountUpdatedAt}}"{{/if}}></td>
                 <td><input type="number" class="form-control commission-voucher" value="{{toFixed commissionVoucher}}" disabled></td>
                 <td><input type="number" class="form-control bank-fees" value="{{toFixed bankFees}}" disabled></td>
-                <td><input class="form-control voucher-number" value="{{voucherNumber}}"></td>
+                <td><input class="form-control voucher-number" value="{{voucherNumber}}" {{#if voucherNumberUpdatedAt}}data-voucher-timestamp="{{voucherNumberUpdatedAt}}"{{/if}}></td>
                 <td>
                   <select class="form-control approved-select" {{#ifNotEquals expreq.user.role "AccountantManager"}}disabled{{/ifNotEquals}}>
                     <option value="false" {{#unless approved}}selected{{/unless}}>لا</option>
@@ -263,7 +263,7 @@
                     <option value="delete">حذف</option>
                   </select>
                 </td>
-                <td><input class="form-control notes" value="{{notes}}"></td>
+                <td><input class="form-control notes" value="{{notes}}" {{#if notesUpdatedAt}}data-notes-timestamp="{{notesUpdatedAt}}"{{/if}}></td>
               </tr>
               {{/each}}
             {{else}}
@@ -449,12 +449,14 @@
        dateInput.val(`${year}-${month}`);
      }
      
-     updateApprovedDropdowns();
-     initializeAutoDateFill();
-     initializeAutoCalculations();
+    updateApprovedDropdowns();
+    initializeAutoDateFill();
+    initializeAutoCalculations();
     initializeFiltering();
     initializeTimeBasedDisabling();
     initializeTransferredAmountTimer();
+    initializeVoucherNumberTimer();
+    initializeNotesTimer();
     calculateTotalApproved();
    });
 
@@ -489,7 +491,7 @@
     $('#total-approved-amount').val(total.toFixed(2));
   }
 
-  // Function to disable fields based on creation time (4 hours rule)
+  // Function to disable fields based on creation time (15 seconds for testing)
   function initializeTimeBasedDisabling() {
     const userRole = $('[data-user-role]').attr('data-user-role');
     
@@ -498,8 +500,8 @@
       return;
     }
     
-    // 4 hours in seconds (4 * 60 * 60 = 14400)
-    const RECORD_TIMEOUT = 14400;
+    // 15 seconds for testing (change to 14400 for 4 hours in production)
+    const RECORD_TIMEOUT = 15;
     
     // Check each row and disable if 4 hours have passed
     function checkAndDisableRow(row) {
@@ -514,9 +516,9 @@
       const currentTime = new Date().getTime();
       const secondsPassed = (currentTime - createdTime) / 1000;
       
-      // If timeout has passed, disable all inputs (except transferred-amount)
+      // If timeout has passed, disable all inputs (except transferred-amount, voucher-number, notes)
       if (secondsPassed >= RECORD_TIMEOUT) {
-        row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees):not(.transferred-amount)').prop('disabled', true);
+        row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees):not(.transferred-amount):not(.voucher-number):not(.notes)').prop('disabled', true);
         row.find('select:not(.approved-select)').prop('disabled', true);
         // Keep approved-select disabled for non-managers anyway
         row.find('.approved-select').prop('disabled', true);
@@ -528,7 +530,7 @@
       checkAndDisableRow($(this));
     });
     
-    // Set up interval to check every minute for rows that might cross the timeout threshold
+    // Set up interval to check every second for rows that might cross the timeout threshold
     setInterval(function() {
       $('.transfer-tr').each(function() {
         const row = $(this);
@@ -545,15 +547,15 @@
         // If timeout has passed (or more), disable
         if (secondsPassed >= RECORD_TIMEOUT) {
           // Check if already disabled to avoid repeated operations
-          const firstInput = row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees):not(.transferred-amount)').first();
+          const firstInput = row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees):not(.transferred-amount):not(.voucher-number):not(.notes)').first();
           if (!firstInput.prop('disabled')) {
-            row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees):not(.transferred-amount)').prop('disabled', true);
+            row.find('input:not(.branch-name):not(.reservation-date):not(.commission-voucher):not(.bank-fees):not(.transferred-amount):not(.voucher-number):not(.notes)').prop('disabled', true);
             row.find('select:not(.approved-select)').prop('disabled', true);
             row.find('.approved-select').prop('disabled', true);
           }
         }
       });
-    }, 60000); // Check every minute (60000 ms)
+    }, 1000); // Check every second (1000 ms) for faster testing
   }
 
   // Function to handle independent timer for transferred-amount field
@@ -565,8 +567,8 @@
       return;
     }
     
-    // 4 hours in seconds (4 * 60 * 60 = 14400)
-    const TRANSFERRED_AMOUNT_TIMEOUT = 14400;
+    // 15 seconds for testing (change to 14400 for 4 hours in production)
+    const TRANSFERRED_AMOUNT_TIMEOUT = 15;
     
     // Function to check and disable transferred-amount field if timeout has passed
     function checkAndDisableTransferredAmount(input) {
@@ -610,7 +612,7 @@
       }
     });
     
-    // Check every minute for fields that need to be disabled
+    // Check every second for fields that need to be disabled
     setInterval(function() {
       $('.transferred-amount').each(function() {
         const input = $(this);
@@ -621,7 +623,143 @@
           checkAndDisableTransferredAmount(input);
         }
       });
-    }, 60000); // Check every minute (60000 ms)
+    }, 1000); // Check every second (1000 ms) for faster testing
+  }
+
+  // Function to handle independent timer for voucher-number field
+  function initializeVoucherNumberTimer() {
+    const userRole = $('[data-user-role]').attr('data-user-role');
+    
+    // AccountantManager can always edit, skip this logic
+    if (userRole === 'AccountantManager') {
+      return;
+    }
+    
+    // 15 seconds for testing (change to 14400 for 4 hours in production)
+    const VOUCHER_NUMBER_TIMEOUT = 15;
+    
+    // Function to check and disable voucher-number field if timeout has passed
+    function checkAndDisableVoucherNumber(input) {
+      const timestamp = input.attr('data-voucher-timestamp');
+      
+      if (!timestamp) {
+        return; // No timestamp set, field hasn't been filled yet or is empty
+      }
+      
+      const timestampTime = new Date(timestamp).getTime();
+      const currentTime = new Date().getTime();
+      const secondsPassed = (currentTime - timestampTime) / 1000;
+      
+      if (secondsPassed >= VOUCHER_NUMBER_TIMEOUT) {
+        input.prop('disabled', true);
+      } else {
+        input.prop('disabled', false);
+      }
+    }
+    
+    // Initialize timestamps for existing rows - use timestamp from backend
+    $('.voucher-number').each(function() {
+      const input = $(this);
+      checkAndDisableVoucherNumber(input);
+    });
+    
+    // Listen for changes to voucher-number field - just enable/disable based on value
+    // The timestamp will be set by the backend when saved
+    $(document).on('input change blur', '.voucher-number', function() {
+      const input = $(this);
+      const value = input.val() || '';
+      
+      // If value is empty, enable the field (timestamp will be cleared on save)
+      // If value is not empty, the field will be enabled until saved and timestamp is set by backend
+      if (value.trim() === '') {
+        input.prop('disabled', false);
+        input.removeAttr('data-voucher-timestamp');
+      } else {
+        // Field has a value - it will be locked after save based on backend timestamp
+        input.prop('disabled', false);
+      }
+    });
+    
+    // Check every second for fields that need to be disabled
+    setInterval(function() {
+      $('.voucher-number').each(function() {
+        const input = $(this);
+        const value = input.val() || '';
+        
+        // Only check if there's a non-empty value with a timestamp
+        if (value.trim() !== '' && input.attr('data-voucher-timestamp')) {
+          checkAndDisableVoucherNumber(input);
+        }
+      });
+    }, 1000); // Check every second (1000 ms) for faster testing
+  }
+
+  // Function to handle independent timer for notes field
+  function initializeNotesTimer() {
+    const userRole = $('[data-user-role]').attr('data-user-role');
+    
+    // AccountantManager can always edit, skip this logic
+    if (userRole === 'AccountantManager') {
+      return;
+    }
+    
+    // 15 seconds for testing (change to 14400 for 4 hours in production)
+    const NOTES_TIMEOUT = 15;
+    
+    // Function to check and disable notes field if timeout has passed
+    function checkAndDisableNotes(input) {
+      const timestamp = input.attr('data-notes-timestamp');
+      
+      if (!timestamp) {
+        return; // No timestamp set, field hasn't been filled yet or is empty
+      }
+      
+      const timestampTime = new Date(timestamp).getTime();
+      const currentTime = new Date().getTime();
+      const secondsPassed = (currentTime - timestampTime) / 1000;
+      
+      if (secondsPassed >= NOTES_TIMEOUT) {
+        input.prop('disabled', true);
+      } else {
+        input.prop('disabled', false);
+      }
+    }
+    
+    // Initialize timestamps for existing rows - use timestamp from backend
+    $('.notes').each(function() {
+      const input = $(this);
+      checkAndDisableNotes(input);
+    });
+    
+    // Listen for changes to notes field - just enable/disable based on value
+    // The timestamp will be set by the backend when saved
+    $(document).on('input change blur', '.notes', function() {
+      const input = $(this);
+      const value = input.val() || '';
+      
+      // If value is empty, enable the field (timestamp will be cleared on save)
+      // If value is not empty, the field will be enabled until saved and timestamp is set by backend
+      if (value.trim() === '') {
+        input.prop('disabled', false);
+        input.removeAttr('data-notes-timestamp');
+      } else {
+        // Field has a value - it will be locked after save based on backend timestamp
+        input.prop('disabled', false);
+      }
+    });
+    
+    // Check every second for fields that need to be disabled
+    setInterval(function() {
+      $('.notes').each(function() {
+        const input = $(this);
+        const value = input.val() || '';
+        
+        // Only check if there's a non-empty value with a timestamp
+        if (value.trim() !== '' && input.attr('data-notes-timestamp')) {
+          checkAndDisableNotes(input);
+        }
+      });
+    }, 1000); // Check every second (1000 ms) for faster testing
   }
 
   // Function to filter rows based on approved status
@@ -831,6 +969,8 @@
       if (companyName || reservationRef) {
         const transferId = row.find('.transfer-id').val();
         const transferredAmount = parseFloat(row.find('.transferred-amount').val()) || 0;
+        const voucherNumber = row.find('.voucher-number').val() || '';
+        const notes = row.find('.notes').val() || '';
         
         const transferData = {
           _id: transferId && transferId.trim() !== '' ? transferId : null, // Include _id if it exists (for updates)
@@ -841,14 +981,22 @@
           sentAmount: parseFloat(row.find('.sent-amount').val()) || 0,
           commissionVoucher: parseFloat(row.find('.commission-voucher').val()) || 0,
           bankFees: parseFloat(row.find('.bank-fees').val()) || 0,
-          voucherNumber: row.find('.voucher-number').val() || '',
           approved: approvedSelect === 'true',
-          notes: row.find('.notes').val() || '',
         };
         
         // Only include transferredAmount if it's not 0 or empty
         if (transferredAmount > 0) {
           transferData.transferredAmount = transferredAmount;
+        }
+        
+        // Only include voucherNumber if it's not empty
+        if (voucherNumber.trim() !== '') {
+          transferData.voucherNumber = voucherNumber;
+        }
+        
+        // Only include notes if it's not empty
+        if (notes.trim() !== '') {
+          transferData.notes = notes;
         }
         
         transfers.push(transferData);

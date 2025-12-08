@@ -109,8 +109,6 @@ exports.addTransfers = async (req, res) => {
         sentAmount: sentAmount,
         commissionVoucher: commissionVoucher,
         bankFees: bankFees,
-        voucherNumber: transfer.voucherNumber || "",
-        notes: transfer.notes || "",
         approved:
           transfer.approved === true ||
           transfer.approved === "true" ||
@@ -130,6 +128,28 @@ exports.addTransfers = async (req, res) => {
       }
       // If transferredAmount is not provided at all, don't include it in transferData
       // The service will preserve the existing value
+      
+      // Handle voucherNumber: only include if provided and not empty
+      // The timestamp will be set in the service only if the value actually changed
+      if (transfer.voucherNumber !== undefined && transfer.voucherNumber !== null) {
+        if (transfer.voucherNumber.trim() !== '') {
+          transferData.voucherNumber = transfer.voucherNumber;
+        }
+        // If empty, don't include it - service will handle clearing timestamp if needed
+      }
+      // If voucherNumber is not provided at all, don't include it in transferData
+      // The service will preserve the existing value
+      
+      // Handle notes: only include if provided and not empty
+      // The timestamp will be set in the service only if the value actually changed
+      if (transfer.notes !== undefined && transfer.notes !== null) {
+        if (transfer.notes.trim() !== '') {
+          transferData.notes = transfer.notes;
+        }
+        // If empty, don't include it - service will handle clearing timestamp if needed
+      }
+      // If notes is not provided at all, don't include it in transferData
+      // The service will preserve the existing value
 
       // Only include reservationDate if it's provided and not empty
       // For updates, we'll preserve the existing date in the service if not provided
@@ -148,9 +168,15 @@ exports.addTransfers = async (req, res) => {
       if (hasValidId) {
         transfersToUpdate.push({ id: transfer._id, data: transferData });
       } else {
-        // For new records, if transferredAmount is provided and > 0, set the timestamp
+        // For new records, set timestamps if fields are provided and not empty
         if (transfer.transferredAmount !== undefined && transfer.transferredAmount !== null && transferredAmount > 0) {
           transferData.transferredAmountUpdatedAt = new Date();
+        }
+        if (transfer.voucherNumber !== undefined && transfer.voucherNumber !== null && transfer.voucherNumber.trim() !== '') {
+          transferData.voucherNumberUpdatedAt = new Date();
+        }
+        if (transfer.notes !== undefined && transfer.notes !== null && transfer.notes.trim() !== '') {
+          transferData.notesUpdatedAt = new Date();
         }
         // For new records, approved value is already set correctly from transferData.approved (line 83)
         // Don't override it - preserve the value from the frontend
