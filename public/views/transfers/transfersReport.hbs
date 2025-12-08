@@ -491,7 +491,7 @@
     $('#total-approved-amount').val(total.toFixed(2));
   }
 
-  // Function to disable fields based on creation time (15 seconds for testing)
+  // Function to disable fields based on creation time (4 hours)
   function initializeTimeBasedDisabling() {
     const userRole = $('[data-user-role]').attr('data-user-role');
     
@@ -500,8 +500,8 @@
       return;
     }
     
-    // 15 seconds for testing (change to 14400 for 4 hours in production)
-    const RECORD_TIMEOUT = 15;
+    // 4 hours in seconds
+    const RECORD_TIMEOUT = 14400;
     
     // Check each row and disable if 4 hours have passed
     function checkAndDisableRow(row) {
@@ -555,7 +555,7 @@
           }
         }
       });
-    }, 1000); // Check every second (1000 ms) for faster testing
+    }, 60000); // Check every minute (60000 ms)
   }
 
   // Function to handle independent timer for transferred-amount field
@@ -567,8 +567,8 @@
       return;
     }
     
-    // 15 seconds for testing (change to 14400 for 4 hours in production)
-    const TRANSFERRED_AMOUNT_TIMEOUT = 15;
+    // 4 hours in seconds
+    const TRANSFERRED_AMOUNT_TIMEOUT = 14400;
     
     // Function to check and disable transferred-amount field if timeout has passed
     function checkAndDisableTransferredAmount(input) {
@@ -612,7 +612,7 @@
       }
     });
     
-    // Check every second for fields that need to be disabled
+    // Check every minute for fields that need to be disabled
     setInterval(function() {
       $('.transferred-amount').each(function() {
         const input = $(this);
@@ -623,7 +623,7 @@
           checkAndDisableTransferredAmount(input);
         }
       });
-    }, 1000); // Check every second (1000 ms) for faster testing
+    }, 60000); // Check every minute (60000 ms)
   }
 
   // Function to handle independent timer for voucher-number field
@@ -635,8 +635,8 @@
       return;
     }
     
-    // 15 seconds for testing (change to 14400 for 4 hours in production)
-    const VOUCHER_NUMBER_TIMEOUT = 15;
+    // 4 hours in seconds
+    const VOUCHER_NUMBER_TIMEOUT = 14400;
     
     // Function to check and disable voucher-number field if timeout has passed
     function checkAndDisableVoucherNumber(input) {
@@ -680,7 +680,7 @@
       }
     });
     
-    // Check every second for fields that need to be disabled
+    // Check every minute for fields that need to be disabled
     setInterval(function() {
       $('.voucher-number').each(function() {
         const input = $(this);
@@ -691,7 +691,7 @@
           checkAndDisableVoucherNumber(input);
         }
       });
-    }, 1000); // Check every second (1000 ms) for faster testing
+    }, 60000); // Check every minute (60000 ms)
   }
 
   // Function to handle independent timer for notes field
@@ -703,8 +703,8 @@
       return;
     }
     
-    // 15 seconds for testing (change to 14400 for 4 hours in production)
-    const NOTES_TIMEOUT = 15;
+    // 4 hours in seconds
+    const NOTES_TIMEOUT = 14400;
     
     // Function to check and disable notes field if timeout has passed
     function checkAndDisableNotes(input) {
@@ -748,7 +748,7 @@
       }
     });
     
-    // Check every second for fields that need to be disabled
+    // Check every minute for fields that need to be disabled
     setInterval(function() {
       $('.notes').each(function() {
         const input = $(this);
@@ -759,7 +759,7 @@
           checkAndDisableNotes(input);
         }
       });
-    }, 1000); // Check every second (1000 ms) for faster testing
+    }, 60000); // Check every minute (60000 ms)
   }
 
   // Function to filter rows based on approved status
