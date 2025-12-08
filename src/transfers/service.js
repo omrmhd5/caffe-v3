@@ -56,6 +56,7 @@ exports.getAll = async (branchID, date) => {
     notes: transfer.notes,
     approved: transfer.approved,
     createdAt: transfer.createdAt,
+    transferredAmountUpdatedAt: transfer.transferredAmountUpdatedAt,
   }));
 };
 
@@ -90,6 +91,41 @@ exports.updateTransfer = async (transferId, updateData) => {
   } else {
     // Existing date exists - always preserve it, never update
     updateData.reservationDate = existingTransfer.reservationDate;
+  }
+  
+  // Handle transferredAmount: compare with existing value and only update timestamp if changed
+  const existingTransferredAmount = existingTransfer.transferredAmount || 0;
+  const newTransferredAmount = updateData.transferredAmount !== undefined && updateData.transferredAmount !== null 
+    ? (parseFloat(updateData.transferredAmount) || 0) 
+    : existingTransferredAmount;
+  
+  if (updateData.transferredAmount === undefined || updateData.transferredAmount === null) {
+    // Not provided - preserve existing value and timestamp
+    updateData.transferredAmount = existingTransferredAmount;
+    updateData.transferredAmountUpdatedAt = existingTransfer.transferredAmountUpdatedAt;
+    
+    // Recalculate commissionVoucher and bankFees with preserved transferredAmount
+    const reservationAmount = updateData.reservationAmount !== undefined ? updateData.reservationAmount : existingTransfer.reservationAmount || 0;
+    const sentAmount = updateData.sentAmount !== undefined ? updateData.sentAmount : existingTransfer.sentAmount || 0;
+    updateData.commissionVoucher = reservationAmount - existingTransferredAmount;
+    updateData.bankFees = sentAmount - existingTransferredAmount;
+  } else {
+    // Provided - compare with existing value
+    updateData.transferredAmount = newTransferredAmount;
+    
+    // Only update timestamp if the value actually changed
+    if (newTransferredAmount !== existingTransferredAmount) {
+      if (newTransferredAmount > 0) {
+        // Value changed and is > 0, set new timestamp
+        updateData.transferredAmountUpdatedAt = new Date();
+      } else {
+        // Value changed to 0, clear timestamp
+        updateData.transferredAmountUpdatedAt = null;
+      }
+    } else {
+      // Value didn't change, preserve existing timestamp
+      updateData.transferredAmountUpdatedAt = existingTransfer.transferredAmountUpdatedAt;
+    }
   }
   
   const transfer = await Transfer.findByIdAndUpdate(

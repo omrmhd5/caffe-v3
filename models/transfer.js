@@ -31,6 +31,10 @@ const transferSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    transferredAmountUpdatedAt: {
+      type: Date,
+      default: null,
+    },
     commissionVoucher: {
       type: Number,
       default: 0,

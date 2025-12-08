@@ -94,7 +94,9 @@ exports.addTransfers = async (req, res) => {
       // Calculate commission voucher and bank fees
       const reservationAmount = parseFloat(transfer.reservationAmount) || 0;
       const sentAmount = parseFloat(transfer.sentAmount) || 0;
-      const transferredAmount = parseFloat(transfer.transferredAmount) || 0;
+      const transferredAmount = transfer.transferredAmount !== undefined && transfer.transferredAmount !== null 
+        ? parseFloat(transfer.transferredAmount) || 0 
+        : 0;
 
       const commissionVoucher = reservationAmount - transferredAmount;
       const bankFees = sentAmount - transferredAmount;
@@ -105,7 +107,6 @@ exports.addTransfers = async (req, res) => {
         reservationRef: transfer.reservationRef || "",
         reservationAmount: reservationAmount,
         sentAmount: sentAmount,
-        transferredAmount: transferredAmount,
         commissionVoucher: commissionVoucher,
         bankFees: bankFees,
         voucherNumber: transfer.voucherNumber || "",
@@ -115,6 +116,20 @@ exports.addTransfers = async (req, res) => {
           transfer.approved === "true" ||
           transfer.approved === "نعم",
       };
+      
+      // Handle transferredAmount: only include if provided
+      // The timestamp will be set in the service only if the value actually changed
+      if (transfer.transferredAmount !== undefined && transfer.transferredAmount !== null) {
+        if (transferredAmount > 0) {
+          transferData.transferredAmount = transferredAmount;
+          // Don't set timestamp here - let the service compare and set it only if value changed
+        } else {
+          // Explicitly set to 0 - service will clear timestamp if value changed
+          transferData.transferredAmount = 0;
+        }
+      }
+      // If transferredAmount is not provided at all, don't include it in transferData
+      // The service will preserve the existing value
 
       // Only include reservationDate if it's provided and not empty
       // For updates, we'll preserve the existing date in the service if not provided
@@ -133,6 +148,10 @@ exports.addTransfers = async (req, res) => {
       if (hasValidId) {
         transfersToUpdate.push({ id: transfer._id, data: transferData });
       } else {
+        // For new records, if transferredAmount is provided and > 0, set the timestamp
+        if (transfer.transferredAmount !== undefined && transfer.transferredAmount !== null && transferredAmount > 0) {
+          transferData.transferredAmountUpdatedAt = new Date();
+        }
         // For new records, approved value is already set correctly from transferData.approved (line 83)
         // Don't override it - preserve the value from the frontend
         transfersToCreate.push(transferData);
