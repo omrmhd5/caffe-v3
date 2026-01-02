@@ -347,17 +347,45 @@ exports.updateBulk = async (user, salaries) => {
     }
 
     const normalizedDate = toMonthStartDate(salary.date);
-    await Salary.findOneAndUpdate(
-      {
+    
+    // CRITICAL: First check if a salary record exists for this employee/date, regardless of branchID
+    // This prevents creating duplicate records when an employee moved branches
+    const existingSalary = await Salary.findOne({
+      employeeID: salary.employeeID,
+      date: normalizedDate,
+    });
+
+    if (existingSalary) {
+      // If an existing record is found, PRESERVE its original branchID
+      // Only update the salary fields, NOT the branchID
+      // This allows editing historical records for employees who moved branches
+      // while keeping the branchID as it was originally (the branch they worked in at that time)
+      const updateData = {
+        ...salary,
         date: normalizedDate,
-        branchID: salary.branchID,
-        employeeID: salary.employeeID,
-      },
-      { ...salary, date: normalizedDate },
-      {
-        upsert: true,
-      }
-    );
+        branchID: existingSalary.branchID, // PRESERVE the existing branchID, don't change it
+      };
+      
+      await Salary.findByIdAndUpdate(
+        existingSalary._id,
+        updateData,
+        { new: true }
+      );
+    } else {
+      // Only create a new record if no existing record is found
+      // Use the selected branchID from the frontend for new records
+      await Salary.findOneAndUpdate(
+        {
+          date: normalizedDate,
+          branchID: salary.branchID, // Use selected branchID for new records
+          employeeID: salary.employeeID,
+        },
+        { ...salary, date: normalizedDate },
+        {
+          upsert: true,
+        }
+      );
+    }
   }
 
   // Only update financials if we have at least one valid salary
