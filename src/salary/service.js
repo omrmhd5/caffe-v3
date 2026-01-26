@@ -12,7 +12,7 @@ const { toMonthStartDate } = require("../common/date");
 exports.getAllSalaries = async (
   branchID = null,
   date = null,
-  userRole = ""
+  userRole = "",
 ) => {
   let results = [];
   let total = 0;
@@ -180,7 +180,7 @@ exports.createSalary = async (
   daysIncrease,
   amountDecrease,
   daysDecrease,
-  userID
+  userID,
 ) => {
   if (!employeeID) {
     throw new BadRequestException("الرجاء اختيار الموظف");
@@ -256,7 +256,7 @@ exports.updateSalary = async (
   amountDecrease,
   daysDecrease,
   netSalary,
-  date
+  date,
 ) => {
   const { toMonthStartDate } = require("../common/date");
   let result = await Salary.findById(id).populate("branchID").lean();
@@ -322,22 +322,22 @@ exports.updateBulk = async (user, salaries) => {
   let date = null;
 
   for (let salary of salaries) {
-    // Check if all salary values are zero - skip these rows
-    // Convert to numbers to handle string values properly
-    const isAllZero =
-      (parseFloat(salary.salary) || 0) === 0 &&
-      (parseFloat(salary.extraWork) || 0) === 0 &&
-      (parseFloat(salary.allowance) || 0) === 0 &&
-      (parseFloat(salary.amountDecrease) || 0) === 0 &&
-      (parseFloat(salary.amountIncrease) || 0) === 0 &&
-      (parseFloat(salary.daysDecrease) || 0) === 0 &&
-      (parseFloat(salary.daysIncrease) || 0) === 0 &&
-      (parseFloat(salary.netSalary) || 0) === 0;
+    // // Check if all salary values are zero - skip these rows
+    // // Convert to numbers to handle string values properly
+    // const isAllZero =
+    //   (parseFloat(salary.salary) || 0) === 0 &&
+    //   (parseFloat(salary.extraWork) || 0) === 0 &&
+    //   (parseFloat(salary.allowance) || 0) === 0 &&
+    //   (parseFloat(salary.amountDecrease) || 0) === 0 &&
+    //   (parseFloat(salary.amountIncrease) || 0) === 0 &&
+    //   (parseFloat(salary.daysDecrease) || 0) === 0 &&
+    //   (parseFloat(salary.daysIncrease) || 0) === 0 &&
+    //   (parseFloat(salary.netSalary) || 0) === 0;
 
-    // Skip all-zero rows - don't save them to database
-    if (isAllZero) {
-      continue;
-    }
+    // // Skip all-zero rows - don't save them to database
+    // if (isAllZero) {
+    //   continue;
+    // }
 
     // Store branchID and date from first valid salary for financial update
     if (!branchID && salary.branchID) {
@@ -347,7 +347,7 @@ exports.updateBulk = async (user, salaries) => {
     }
 
     const normalizedDate = toMonthStartDate(salary.date);
-    
+
     // CRITICAL: First check if a salary record exists for this employee/date, regardless of branchID
     // This prevents creating duplicate records when an employee moved branches
     const existingSalary = await Salary.findOne({
@@ -365,12 +365,10 @@ exports.updateBulk = async (user, salaries) => {
         date: normalizedDate,
         branchID: existingSalary.branchID, // PRESERVE the existing branchID, don't change it
       };
-      
-      await Salary.findByIdAndUpdate(
-        existingSalary._id,
-        updateData,
-        { new: true }
-      );
+
+      await Salary.findByIdAndUpdate(existingSalary._id, updateData, {
+        new: true,
+      });
     } else {
       // Only create a new record if no existing record is found
       // Use the selected branchID from the frontend for new records
@@ -383,7 +381,7 @@ exports.updateBulk = async (user, salaries) => {
         { ...salary, date: normalizedDate },
         {
           upsert: true,
-        }
+        },
       );
     }
   }
@@ -393,7 +391,7 @@ exports.updateBulk = async (user, salaries) => {
     await financialService.updateSalariesAndNetIncome(
       branchID,
       toMonthStartDate(date),
-      user._id
+      user._id,
     );
   }
 
